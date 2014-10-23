@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.tianyi.bph.dao.duty.DutyItemsMapper" >
+  <resultMap id="BaseResultMap" type="com.tianyi.bph.domain.duty.DutyItems" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="duty_id" property="dutyId" jdbcType="INTEGER" />
+    <result column="duty_type_id" property="dutyTypeId" jdbcType="INTEGER" />
+    <result column="begin_time" property="beginTime" jdbcType="TIMESTAMP" />
+    <result column="end_time" property="endTime" jdbcType="TIMESTAMP" />
+    <result column="item_type_id" property="itemTypeId" jdbcType="INTEGER" />
+    <result column="item_id" property="itemId" jdbcType="INTEGER" />
+    <result column="item_name" property="itemName" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="parent_id" property="parentId" jdbcType="INTEGER" />
+    <result column="level" property="level" jdbcType="INTEGER" />
+    <result column="is_leaf" property="isLeaf" jdbcType="BIT" />
+    <result column="full_id_path" property="fullIdPath" jdbcType="VARCHAR" />
+    <result column="icon_url" property="iconUrl" jdbcType="VARCHAR" />
+    <result column="sync_state" property="syncState" jdbcType="BIT" />
+    <result column="platform_id" property="platformId" jdbcType="INTEGER" />
+    <result column="description" property="description" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, duty_id, duty_type_id, begin_time, end_time, item_type_id, item_id, item_name, 
+    name, parent_id, level, is_leaf, full_id_path, iconUrl,sync_state, platform_id, description
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_duty_item
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from t_duty_item
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.tianyi.bph.domain.duty.DutyItems" useGeneratedKeys="true" keyProperty="id">
+   <selectKey resultType="INTEGER" keyProperty="id">  
+  SELECT LAST_INSERT_ID()  
+  </selectKey> 
+    insert into t_duty_item (id, duty_id, duty_type_id, 
+      begin_time, end_time, item_type_id, 
+      item_id, item_name, name, 
+      parent_id, level, is_leaf, 
+      full_id_path, icon_url,sync_state, platform_id, 
+      description)
+    values (#{id,jdbcType=INTEGER}, #{dutyId,jdbcType=INTEGER}, #{dutyTypeId,jdbcType=INTEGER}, 
+      #{beginTime,jdbcType=TIMESTAMP}, #{endTime,jdbcType=TIMESTAMP}, #{itemTypeId,jdbcType=INTEGER}, 
+      #{itemId,jdbcType=INTEGER}, #{itemName,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, 
+      #{parentId,jdbcType=INTEGER}, #{level,jdbcType=INTEGER}, #{isLeaf,jdbcType=BIT}, 
+      #{fullIdPath,jdbcType=VARCHAR},#{iconUrl,jdbcType=VARCHAR}, #{syncState,jdbcType=BIT}, #{platformId,jdbcType=INTEGER}, 
+      #{description,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.tianyi.bph.domain.duty.DutyItems" useGeneratedKeys="true" keyProperty="id">
+    insert into t_duty_item
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="dutyId != null" >
+        duty_id,
+      </if>
+      <if test="dutyTypeId != null" >
+        duty_type_id,
+      </if>
+      <if test="beginTime != null" >
+        begin_time,
+      </if>
+      <if test="endTime != null" >
+        end_time,
+      </if>
+      <if test="itemTypeId != null" >
+        item_type_id,
+      </if>
+      <if test="itemId != null" >
+        item_id,
+      </if>
+      <if test="itemName != null" >
+        item_name,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="parentId != null" >
+        parent_id,
+      </if>
+      <if test="level != null" >
+        level,
+      </if>
+      <if test="isLeaf != null" >
+        is_leaf,
+      </if>
+      <if test="fullIdPath != null" >
+        full_id_path,
+      </if>
+      <if test="iconUrl != null" >
+        icon_url,
+      </if>
+      <if test="syncState != null" >
+        sync_state,
+      </if>
+      <if test="platformId != null" >
+        platform_id,
+      </if>
+      <if test="description != null" >
+        description,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="dutyId != null" >
+        #{dutyId,jdbcType=INTEGER},
+      </if>
+      <if test="dutyTypeId != null" >
+        #{dutyTypeId,jdbcType=INTEGER},
+      </if>
+      <if test="beginTime != null" >
+        #{beginTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null" >
+        #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="itemTypeId != null" >
+        #{itemTypeId,jdbcType=INTEGER},
+      </if>
+      <if test="itemId != null" >
+        #{itemId,jdbcType=INTEGER},
+      </if>
+      <if test="itemName != null" >
+        #{itemName,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="parentId != null" >
+        #{parentId,jdbcType=INTEGER},
+      </if>
+      <if test="level != null" >
+        #{level,jdbcType=INTEGER},
+      </if>
+      <if test="isLeaf != null" >
+        #{isLeaf,jdbcType=BIT},
+      </if>
+      <if test="fullIdPath != null" >
+        #{fullIdPath,jdbcType=VARCHAR},
+      </if>
+      <if test="syncState != null" >
+        #{syncState,jdbcType=BIT},
+      </if>
+      <if test="platformId != null" >
+        #{platformId,jdbcType=INTEGER},
+      </if>
+      <if test="description != null" >
+        #{description,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.tianyi.bph.domain.duty.DutyItems" >
+    update t_duty_item
+    <set >
+      <if test="dutyId != null" >
+        duty_id = #{dutyId,jdbcType=INTEGER},
+      </if>
+      <if test="dutyTypeId != null" >
+        duty_type_id = #{dutyTypeId,jdbcType=INTEGER},
+      </if>
+      <if test="beginTime != null" >
+        begin_time = #{beginTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null" >
+        end_time = #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="itemTypeId != null" >
+        item_type_id = #{itemTypeId,jdbcType=INTEGER},
+      </if>
+      <if test="itemId != null" >
+        item_id = #{itemId,jdbcType=INTEGER},
+      </if>
+      <if test="itemName != null" >
+        item_name = #{itemName,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="parentId != null" >
+        parent_id = #{parentId,jdbcType=INTEGER},
+      </if>
+      <if test="level != null" >
+        level = #{level,jdbcType=INTEGER},
+      </if>
+      <if test="isLeaf != null" >
+        is_leaf = #{isLeaf,jdbcType=BIT},
+      </if>
+      <if test="fullIdPath != null" >
+        full_id_path = #{fullIdPath,jdbcType=VARCHAR},
+      </if>
+      <if test="iconUrl != null" >
+        icon_url = #{iconUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="syncState != null" >
+        sync_state = #{syncState,jdbcType=BIT},
+      </if>
+      <if test="platformId != null" >
+        platform_id = #{platformId,jdbcType=INTEGER},
+      </if>
+      <if test="description != null" >
+        description = #{description,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.tianyi.bph.domain.duty.DutyItems" >
+    update t_duty_item
+    set duty_id = #{dutyId,jdbcType=INTEGER},
+      duty_type_id = #{dutyTypeId,jdbcType=INTEGER},
+      begin_time = #{beginTime,jdbcType=TIMESTAMP},
+      end_time = #{endTime,jdbcType=TIMESTAMP},
+      item_type_id = #{itemTypeId,jdbcType=INTEGER},
+      item_id = #{itemId,jdbcType=INTEGER},
+      item_name = #{itemName,jdbcType=VARCHAR},
+      name = #{name,jdbcType=VARCHAR},
+      parent_id = #{parentId,jdbcType=INTEGER},
+      level = #{level,jdbcType=INTEGER},
+      is_leaf = #{isLeaf,jdbcType=BIT},
+      full_id_path = #{fullIdPath,jdbcType=VARCHAR},
+      icon_url = #{iconUrl,jdbcType=VARCHAR},
+      sync_state = #{syncState,jdbcType=BIT},
+      platform_id = #{platformId,jdbcType=INTEGER},
+      description = #{description,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+  <delete id="deleteByDutyId" parameterType="java.lang.Integer">
+  	delete from t_duty_item where duty_id=#{dutyId,jdbcType=INTEGER}
+  </delete>
+   <select id="loadlistByDutyId" parameterType="java.lang.Integer" resultType="com.tianyi.bph.domain.duty.DutyItems">  
+       		select * from t_duty_item where duty_id = #{id}  
+    	 </select> 
+   <delete id="deleteByDutyIdlist"  parameterType="java.util.Map"  >  
+       		delete from t_duty_item where duty_id    in
+
+				<foreach item="item" index="index" collection="ids" open="(" separator="," close=")">  
+  					#{item}  
+ 				</foreach>
+    	 </delete> 
+</mapper>
