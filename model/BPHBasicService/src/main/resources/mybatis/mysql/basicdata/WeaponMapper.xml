@@ -312,7 +312,7 @@
   		 </if> 
   		 where 
   		 (
-  		 o.id = #{orgId,jdbcType=INTEGER}
+  		 o.organ_id = #{orgId,jdbcType=INTEGER}
   		  or 
   		  o.path like CONCAT(#{orgPath,jdbcType=VARCHAR},"/",#{orgCode,jdbcType=VARCHAR},"%")
   		)

@@ -466,6 +466,7 @@ var DutyPraperManage = {
 		DutyPraperManage.bph_gps_query.groupId = "";  
 	},
 	initGpsResource:function(){
+		DutyPraperManage.packageGpsQuery();
 		$.ajax({
 			url : "<%=basePath%>dutyResourceWeb/getGpsSource.do?sessionId="+sessionId,
 			type : "POST",
@@ -717,12 +718,12 @@ var DutyPraperManage = {
 								field : "properties",
 								title : "属性",
 								width : 160,
-								template: '#= getProperty(properties) #'
+								template: '#= DutyPraperManage.getProperty(properties) #'
 							}, {
 								field : "assoTaskType",
 								title : "关联任务",
 								width : 80,
-								template: '#= contactName(assoTaskType) #'
+								template: '#= DutyPraperManage.contactName(assoTaskType) #'
 							}, {
 								field : "attireType",
 								title : "着装",
@@ -755,6 +756,30 @@ var DutyPraperManage = {
                             ]
                         });
                     } 
+	},
+	getProperty:function(data){
+		if (data == null || data.length == 0)
+			return "";
+		var rs = "";
+		for (var item in data) 
+			if (data[item].name != null){
+				rs += data[item].name + ";"
+			}
+		return rs;
+	},
+	contactName:function(value){
+		var showValue = "";
+		switch (parseInt(value)) {
+			case 1:
+				showValue = '社区';break;
+			case 2:
+				showValue = '巡区';break;
+			case 3:
+				showValue = '卡点';break;
+			default:
+				showValue = '';
+		}
+		return showValue;
 	},
 	ondTypeWindowClose:function(){
 		alert("勤务类型选择");

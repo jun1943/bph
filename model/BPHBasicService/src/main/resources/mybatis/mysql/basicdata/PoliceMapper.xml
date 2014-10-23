@@ -53,10 +53,10 @@
 	</sql>
 	<sql id="Base_Model_Column_List">
 		p.id,p.isUsed as isused, p.type_id as typeId,pt.name as typeName, p.name, p.org_id
-		as orgId,o.short_name as orgName,p.idcardno, p.number, p.title,
+		as orgId,org.short_name as orgName,p.idcardno, p.number, p.title,
 		p.mobile, p.mobile_short as mobileShort,
 		p.intercom_group as intercomGroup, p.intercom_person, p.gps_id as gpsId, p.gps_name as
-		gpsName,o.code as orgCode,o.path as orgPath,tg.icon_url as
+		gpsName,org.code as orgCode,org.path as orgPath,tg.icon_url as
 		iconUrl,CONCAT(pt.name,":",p.name) as display_name
 	</sql>
 	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
@@ -420,11 +420,11 @@
 		<include refid="Base_Model_Column_List" />
 		from t_police p
 		left join t_policetype pt on pt.id = p.type_id
-		left join t_organ o on o.id = p.org_id
+		left join t_organ org on org.organ_id = p.org_id
 		left join t_gps tg on p.gps_id = tg.id
 		<include refid="Where_Sql" />
 
-		order by id
+		order by p.id
 		<if test="pageStart !=null">
 			limit #{pageStart,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
 		</if>
@@ -481,17 +481,17 @@
 		<include refid="Base_Model_Column_List" />
 		from t_police p
 		left join t_policetype pt on pt.id = p.type_id
-		left join t_organ o on o.organ_id = p.org_id
+		left join t_organ org on org.organ_id = p.org_id
 		left join t_gps tg on p.gps_id = tg.id
 		where
 		( 
-		o.organ_id = #{orgId,jdbcType=INTEGER}
+		org.organ_id = #{orgId,jdbcType=INTEGER}
 		<if test="orgCode !=null">
 			or
-			o.code =#{orgCode,jdbcType=VARCHAR}
+			org.code =#{orgCode,jdbcType=VARCHAR}
 		</if> 
 		<if test="isSubOrg ==2">
-			or o.path like
+			or org.path like
 			CONCAT(#{orgPath,jdbcType=VARCHAR},"/","%")
 		</if>
 		)
@@ -564,7 +564,7 @@
 		where
 
 		p.isUsed = 1 and
-		o.organ_id = #{orgId,jdbcType=INTEGER}
+		org.organ_id = #{orgId,jdbcType=INTEGER}
 
 		<if test="name !=null">
 			and p.name like CONCAT('%','${name}','%' )
@@ -583,7 +583,7 @@
 		typeName,
 
 		p.name, p.org_id as orgId,(select orn.short_name from t_organ as orn where
-		orn.id = ( select org_id from t_police as tp where tp.id = p.id)) as
+		orn.organ_id = ( select org_id from t_police as tp where tp.id = p.id)) as
 		orgName,p.idcardno, p.number, p.title,
 
 		p.mobile, p.mobile_short as mobileShort, p.intercom_group as intercomGroup,
