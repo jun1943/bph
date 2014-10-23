@@ -57,14 +57,14 @@ $(document).ready(function() {
 	</div>
 	<div class="fl set-hei48">
 		<div class="ty-decorate1"></div>
-		<button id="undo" class="ty-btn-add ty-btn-offset" onclick="VehicleManage.addVehicle()"></button>
+		<button id="undo" class="ty-btn-add ty-btn-offset" onclick="WeaponManage.addWeapon()"></button>
                     
-                   <span id="btncreateGroup" class="k-button"  onclick="GpsgroupManage.createGroup()">创建分组</span>
-                   <span id="btneditGroup" class="k-button"  onclick="GpsgroupManage.editGroup()">修改分组</span> 
-                   <span id="btndeleteGroup" class="k-button"  onclick="GpsgroupManage.deleteGroup)">删除分组</span>
-                   <span id="btnaddMember" class="k-button"  onclick="GpsgroupManage.addMember()">添加成员</span> 
-                   <span id="btndeleteMember" class="k-button"  onclick="GpsgroupManage.deleteMember()">删除成员</span> 
-                   <span id="btnclearUpMember" class="k-button"  onclick="GpsgroupManage.clearUpMember()">清空成员</span> 
+                   <span id="btncreateGroup" class="k-button"  onclick="WeapongroupManage.createGroup()">创建分组</span>
+                   <span id="btneditGroup" class="k-button"  onclick="WeapongroupManage.editGroup()">修改分组</span> 
+                   <span id="btndeleteGroup" class="k-button"  onclick="WeapongroupManage.deleteGroup)">删除分组</span>
+                   <span id="btnaddMember" class="k-button"  onclick="WeapongroupManage.addMember()">添加成员</span> 
+                   <span id="btndeleteMember" class="k-button"  onclick="WeapongroupManage.deleteMember()">删除成员</span> 
+                   <span id="btnclearUpMember" class="k-button"  onclick="WeapongroupManage.clearUpMember()">清空成员</span> 
 	</div>
 	<div class="fr set-hei48">
 		<div class="ty-screen-mode" id="tyScreenMode">

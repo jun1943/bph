@@ -68,8 +68,36 @@ var PolicegroupManage = {
 		});
 	},  
 	createGroup:function(){
+		var organId = $("#organId").val();
+		$("#dialog").kendoWindow({
+			width : "680px",
+			height : "500px",
+			title : "警员信息",
+			position : {
+				top : "100px"
+			},
+		content: "<%=basePath%>policeGroupWeb/gotoPolicegroupCreate.do?gpsId="
+							+ gpsId + "&organId=" + organId+"&sessionId="+sessionId,
+					iframe : true,
+					closeCallback :PolicegroupManage.onClose,
+					okCallback:PolicegroupManage.onClose
+				});
 	},
 	editGroup:function(){
+		var organId = $("#organId").val();
+		$("#dialog").kendoWindow({
+			width : "680px",
+			height : "500px",
+			title : "警员信息",
+			position : {
+				top : "100px"
+			},
+		content: "<%=basePath%>policeGroupWeb/gotoPolicegroupEdit.do?gpsId="
+							+ gpsId + "&organId=" + organId+"&sessionId="+sessionId,
+					iframe : true,
+					closeCallback :PolicegroupManage.onClose,
+					okCallback:PolicegroupManage.onClose
+				});
 	},
 	deleteGroup:function(){
 		
@@ -97,7 +125,7 @@ var PolicegroupManage = {
 				});
 	}
 	},
-	loadMemberData:function(gId){
+	loadMemberData:function(groupId){
 		$.ajax({
 					type: "post",
 					url: "gpsGroupTest/loadMemberByGroupId.do?groupId="+groupId,
@@ -135,6 +163,20 @@ var PolicegroupManage = {
 							});
 						} ,
 	addMember:function(){
+		var organId = $("#organId").val();
+		$("#dialog").kendoWindow({
+			width : "680px",
+			height : "500px",
+			title : "警员信息",
+			position : {
+				top : "100px"
+			},
+		content: "<%=basePath%>policeGroupWeb/gotoPolicegroupAdd.do?gpsId="
+							+ gpsId + "&organId=" + organId+"&sessionId="+sessionId,
+					iframe : true,
+					closeCallback :PolicegroupManage.onClose,
+					okCallback:PolicegroupManage.onClose
+				});
 	},
 	deleteMember:function(){
 		var kGrid = $("#dtGroupMember").data("kendoGrid");
@@ -187,15 +229,15 @@ var PolicegroupManage = {
 	},
 	
 	onCloseMember:function(e){
-		GpsgroupManage.loadMemberData(GpsgroupManage.pageNo);  
+		PolicegroupManage.loadMemberData(PolicegroupManage.pageNo);  
 	},
 	onCloseGorup:function(e){
-		GpsgroupManage.loadGroupData(GpsgroupManage.pageNo);  
+		PolicegroupManage.loadGroupData(PolicegroupManage.pageNo);  
 	}
 };
 
 </script>
-<div id="dtGpsGroup" style="width:70%"></div>   
+<div id="dtPoliceGroup" style="width:70%"></div>   
 <div id="dtGroupMember" style="width:60%"></div> 
 <div id="dialog"></div> 
 

@@ -2,6 +2,7 @@
 
 <script type="text/javascript"> 
 var sessionId = $("#token").val(); 
+var opteType = "";
 $(function() {
 	$("#dtGpsGroup").empty();
 	loadData(1);
@@ -68,8 +69,36 @@ var GpsgroupManage = {
 		});
 	},  
 	createGroup:function(){
+		var organId = $("#organId").val();
+		$("#dialog").kendoWindow({
+			width : "680px",
+			height : "500px",
+			title : "GPS组创建",
+			position : {
+				top : "100px"
+			},
+		content: "<%=basePath%>gpsGroupWeb/gotoGpsgroupCreate.do?organId=" + organId+"&sessionId="+sessionId,
+					iframe : true, 
+					closeCallback :GpsgroupManage.onClose,
+					okCallback:GpsgroupManage.onClose
+				});
+	//	GpsGroupManage.showGpsGroupDlg();
 	},
 	editGroup:function(){
+		var organId = $("#organId").val();
+		$("#dialog").kendoWindow({
+			width : "680px",
+			height : "500px",
+			title : "编辑定位设备信息",
+			position : {
+				top : "100px"
+			},
+		content: "<%=basePath%>gpsGroupWeb/gotoGpsgroupEdit.do?gpsId="
+							+ gpsId + "&organId=" + organId+"&sessionId="+sessionId,
+					iframe : true,
+					closeCallback :GpsgroupManage.onClose,
+					okCallback:GpsgroupManage.onClose
+				});
 	},
 	deleteGroup:function(){
 		
@@ -97,7 +126,7 @@ var GpsgroupManage = {
 				});
 	}
 	},
-	loadMemberData:function(gId){
+	loadMemberData:function(groupId){
 		$.ajax({
 					type: "post",
 					url: "gpsGroupTest/loadMemberByGroupId.do?groupId="+groupId,
@@ -135,6 +164,20 @@ var GpsgroupManage = {
 							});
 						} ,
 	addMember:function(){
+		var organId = $("#organId").val();
+		$("#dialog").kendoWindow({
+			width : "680px",
+			height : "500px",
+			title : "GPS组管理",
+			position : {
+				top : "100px"
+			},
+		content: "<%=basePath%>gpsGroupWeb/gotoGpsgroupAdd.do?gpsId="
+							+ gpsId + "&organId=" + organId+"&sessionId="+sessionId,
+					iframe : true,
+					closeCallback :GpsgroupManage.onClose,
+					okCallback:GpsgroupManage.onClose
+				});
 	},
 	deleteMember:function(){
 		var kGrid = $("#dtGroupMember").data("kendoGrid");
