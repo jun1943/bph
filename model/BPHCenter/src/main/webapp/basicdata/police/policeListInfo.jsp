@@ -6,9 +6,10 @@ var sessionId = $("#token").val();
 $(function() {
 	$("#policegrid").empty();
 	loadData(1);
-	$("#policeName").keyup(function(){
+	$("#policeName").keydown(function(){
         	if(event.keyCode == 13){
            		 PoliceManage.search();
+            		$("#policeName").focus();
 		}
     	});
 });
@@ -114,7 +115,6 @@ var PoliceManage = {
 															} ],
 													change : function(e) {
 														var userId = e.sender.selectable.userEvents.currentTarget.cells[0].innerHTML;
-														//alert(userId);
 													}
 												});
 												$("#policegrid .k-grid-content").mCustomScrollbar( {scrollButtons:{enable:true},advanced:{ updateOnContentResize: true } });
@@ -153,6 +153,15 @@ var PoliceManage = {
 		}});	
 	},
 	search:function(){ 
+		var policeName = $("#policeName").val();
+		if(policeName.length>0)
+		{
+			var myReg = /^[^@\/\'\\\"#$%&\^\*]+$/;
+			if(!myReg.test(policeName)){
+				$("body").popjs({"title":"提示","content":"查询条件不能包含非法字符"}); 
+				return;
+			}
+		}
 		PoliceManage.packageQuery(1);
 		PoliceManage.loadData(1);
 	},

@@ -112,12 +112,16 @@ var policeAddManage= {
 			}
 			var pName = $.trim($("#policename").val());
 			if (pName == ""||pName==undefined) {
-					$("body").popjs({"title":"提示","content":"请输入警员名称"});  
-					$("#policename").focus();
+					$("body").popjs({"title":"提示","content":"请输入警员名称","callback":function(){
+								$("#policename").focus();
+							}});    
+					
 				return;
 			}
 			if (pName.length > 20) { 
-					$("body").popjs({"title":"提示","content":"警员姓名长度过长，限制长度为20！"});  
+					$("body").popjs({"title":"提示","content":"警员姓名长度过长，限制长度为20！","callback":function(){
+								$("#policename").focus();
+							}});    
 				return;
 			}
 			bph_policeAdd_pkg.name = pName; 
@@ -126,28 +130,33 @@ var policeAddManage= {
 			var idcardno = $.trim($("#policeidcardno").val());
 			if (idcardno.length > 0) {
 				if (idcardno.length != 18 && idcardno.length != 15) { 
-					$("body").popjs({"title":"提示","content":"警员身份证号码长度出错，限制长度为15位或者18位！"}); 
-					$("#policeidcardno").focus(); 
+					$("body").popjs({"title":"提示","content":"警员身份证号码长度出错，限制长度为15位或者18位！","callback":function(){
+								$("#policeidcardno").focus(); 
+							}});    
+					
 					return;
 				}
 
 				var Regx = /^[A-Za-z0-9]+$/;
 				if (!Regx.test(idcardno)) {
-					$("body").popjs({"title":"提示","content":"警员身份证号码格式出错，只能是全部数字或者最后一位是字母！"}); 
-					$("#policeidcardno").focus(); 
+					$("body").popjs({"title":"提示","content":"警员身份证号码格式出错，只能是全部数字或者最后一位是字母！","callback":function(){
+								$("#policeidcardno").focus(); 
+							}});    
 					return;
 				}
 				var subIdCard = idcardno.substring(0, idcardno.length - 1);
 				if (pattern.test(subIdCard)) { 
-					$("body").popjs({"title":"提示","content":"警员身份证号码格式出错  ！"}); 
-					$("#policeidcardno").focus(); 
+					$("body").popjs({"title":"提示","content":"警员身份证号码格式出错  ！","callback":function(){
+								$("#policeidcardno").focus(); 
+							}});    
 					return;
 				}
 				policeAddManage.isExistPolice(idcardno, "idCard",0,0);
 				if (!isExist) {
 					isExist = false;  
-					$("body").popjs({"title":"提示","content":"警员身份证号码重复，请检查"}); 
-					$("#policeidcardno").focus(); 
+					$("body").popjs({"title":"提示","content":"警员身份证号码重复，请检查","callback":function(){
+								$("#policeidcardno").focus(); 
+							}});    
 					return;
 				}
 			}
@@ -156,36 +165,45 @@ var policeAddManage= {
 			
 			if(pnumber.length>0){
 				if (pnumber.length > 20 || pnumber.length < 6) {
-					$("body").popjs({"title":"提示","content":"警员警号长度出错，限制长度为6--20！"}); 
-					$("#policecode").focus();  
+					$("body").popjs({"title":"提示","content":"警员警号长度出错，限制长度为6--20！","callback":function(){
+								$("#policecode").focus();  
+							}});    
+					
 					return;
 				}
 				policeAddManage.isExistPolice(pnumber, "number",0,0);
 				if (!isExist) { 
-					$("body").popjs({"title":"提示","content":"警员警号重复，请检查"});  
-					$("#policecode").focus();  
+					$("body").popjs({"title":"提示","content":"警员警号重复，请检查","callback":function(){
+								$("#policecode").focus();  
+							}});    
 					return;
 				}
 			}
 			bph_policeAdd_pkg.number= pnumber;
 			 var ptitle= $.trim($("#policetitle").val());
 			if (ptitle.length > 0 && ptitle.length > 20) {
-					$("body").popjs({"title":"提示","content":"警员职位长度过长，限制长度为20！"});  
-					$("#policetitle").focus();   
+					$("body").popjs({"title":"提示","content":"警员职位长度过长，限制长度为20！","callback":function(){
+								$("#policetitle").focus();   
+							}});      
+					
 				return;
 			}
 			bph_policeAdd_pkg.title = ptitle;
 			var phone = $.trim($("#policephone").val());
 			if (phone.length > 0 && phone.length > 20) {
-				$("body").popjs({"title":"提示","content":"警员电话号码长度过长，限制长度为20！"});   
-					$("#policephone").focus(); 
+				$("body").popjs({"title":"提示","content":"警员电话号码长度过长，限制长度为20！","callback":function(){
+								$("#policephone").focus();    
+							}});         
+					
 				return;  
 			}
 			bph_policeAdd_pkg.mobile=phone;
 			var mobileShorts = $.trim($("#policeshortno").val());
 			if (mobileShorts.length > 0 && mobileShorts.length > 20) {
-			$("body").popjs({"title":"提示","content":"警员公安短号长度过长，限制长度为1--20！"});   
-					$("#policeshortno").focus(); 
+			$("body").popjs({"title":"提示","content":"警员公安短号长度过长，限制长度为1--20！","callback":function(){
+								$("#policeshortno").focus();   
+							}});         
+					
 				return;
 			}
 			bph_policeAdd_pkg.mobileShort = mobileShorts;
@@ -194,14 +212,17 @@ var policeAddManage= {
 			if(intercomPerson.length>0){
 				policeAddManage.isExistPolice(intercomPerson, "intercomPerson",0,0);
 				if (!isExist) { 
-					$("body").popjs({"title":"提示","content":"个呼号为  " + intercomPerson + " 的警员已存在，请检查！"});     
-					$("#policepersonno").focus(); 
+					$("body").popjs({"title":"提示","content":"个呼号为  " + intercomPerson + " 的警员已存在，请检查！","callback":function(){
+								$("#policepersonno").focus();    
+							}});   
 					return;
 				}
 			}
 			if(intercomPerson.length>30){ 
-				$("body").popjs({"title":"提示","content":"警员对讲机个呼号长度过长，限制长度为0-30"});    
-					$("#policepersonno").focus(); 
+				$("body").popjs({"title":"提示","content":"警员对讲机个呼号长度过长，限制长度为0-30","callback":function(){
+								$("#policepersonno").focus();  
+							}});   
+					
 				return;
 			}
 			bph_policeAdd_pkg.intercomPerson = intercomPerson;  
