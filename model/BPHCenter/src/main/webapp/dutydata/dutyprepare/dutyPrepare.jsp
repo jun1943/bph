@@ -31,7 +31,10 @@
 						<div class="row-fluid">
 							<!----功能模块---->
 							<div class="set">
-								<h1>报备日历统计</h1> 
+								<h1>勤务报备</h1> 
+								<div class="clear box">
+									<%@ include file="dutyToolbar.jsp"%>
+								</div>
 							</div>
 						</div>
 						<!----功能模块结束---->
@@ -40,7 +43,7 @@
 							<!----信息显示区---->
 							<div class="span8 box">
 								<!----表格---->
-								<%@ include file="dutyCalendarInfo.jsp"%>
+								<%@ include file="dutyPrepareInfo.jsp"%>
 							</div>
 							<!----表格结束---->
 						</div>
