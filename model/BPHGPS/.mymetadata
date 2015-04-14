@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-module
+  type="WEB"
+  name="BPHGPS"
+  id="myeclipse.1421719663707"
+  context-root="/BPHGPS"
+  j2ee-spec="6.0"
+  archive="BPHGPS.war">
+  <attributes>
+    <attribute name="webrootdir" value="src/main/webapp" />
+  </attributes>
+</project-module>
+

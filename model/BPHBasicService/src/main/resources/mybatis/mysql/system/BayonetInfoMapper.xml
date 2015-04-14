@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.tianyi.bph.dao.system.BayonetInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.tianyi.bph.domain.system.BayonetInfo" >
+    <id column="BAYONET_ID" property="bayonetId" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="code" property="code" jdbcType="VARCHAR" />
+    <result column="direction" property="direction" jdbcType="VARCHAR" />
+    <result column="ORGAN_ID" property="organId" jdbcType="INTEGER" />
+    <result column="lane" property="lane" jdbcType="INTEGER" />
+    <result column="longitude" property="longitude" jdbcType="VARCHAR" />
+    <result column="latitude" property="latitude" jdbcType="VARCHAR" />
+    <result column="altitude" property="altitude" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIME" />
+    <result column="describe" property="describe" jdbcType="VARCHAR" />
+    <result column="state" property="state" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    b.BAYONET_ID, b.name, b.code, b.direction, b.ORGAN_ID, b.lane, b.longitude, b.latitude, b.altitude, 
+    b.create_time, b.describe, b.state
+  </sql>
+  
+  <select id="findCount"  resultType="Integer">
+		select count(distinct BAYONET_ID) from (
+			<include refid="find" />
+		) count_
+	</select>
+	
+	<select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" />
+		from b_bayonet_info b where b.BAYONET_ID=#{userId,jdbcType=DECIMAL}
+	</select>
+	
+	<select id="findByPage" parameterType="com.tianyi.bph.query.system.BayonetQuery"  resultMap="BaseResultMap" >
+		select <include refid="Base_Column_List" />,bl.code as laneCode,
+		bl.name as laneName,bl.direction as laneDirection,bl.idx as laneIDX
+		from b_bayonet_info b left join t_organ o on b.organ_id=o.organ_id
+		 left join b_bayonet_lane bl on bl.BAYONET_ID=b.BAYONET_ID
+		where 1=1 
+		<if test="organId != null and organId != ''">
+			AND b.organ_id =#{organId,jdbcType=DECIMAL}
+		</if>
+	</select>
+	
+	<!-- 条件、分页 -->
+ 	<sql id="find">
+		select <include refid="Base_Column_List" />,bl.code as laneCode,
+		bl.name as laneName,bl.direction as laneDirection,bl.idx as laneIDX
+		from b_bayonet_info b left join t_organ o on b.organ_id=o.organ_id
+		 left join b_bayonet_lane bl on bl.BAYONET_ID=b.BAYONET_ID
+		where 1=1 
+		<if test="organId != null and organId != ''">
+			AND b.organ_id =#{organId,jdbcType=DECIMAL}
+		</if>
+	</sql>
+  
+  
+  
+  <update id="updateByPrimaryKey" parameterType="com.tianyi.bph.domain.system.BayonetInfo" >
+    update b_bayonet_info
+    <set >
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="code != null" >
+        code = #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="direction != null" >
+        direction = #{direction,jdbcType=VARCHAR},
+      </if>
+      <if test="organId != null" >
+        ORGAN_ID = #{organId,jdbcType=INTEGER},
+      </if>
+      <if test="lane != null" >
+        lane = #{lane,jdbcType=INTEGER},
+      </if>
+      <if test="longitude != null" >
+        longitude = #{longitude,jdbcType=VARCHAR},
+      </if>
+      <if test="latitude != null" >
+        latitude = #{latitude,jdbcType=VARCHAR},
+      </if>
+      <if test="altitude != null" >
+        altitude = #{altitude,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIME},
+      </if>
+      <if test="describe != null" >
+        describe = #{describe,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null" >
+        state = #{state,jdbcType=INTEGER},
+      </if>
+    </set>
+    where BAYONET_ID=#{bayonetId,jdbcType=DECIMAL}
+  </update>
+  
+</mapper>

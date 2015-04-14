@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tianyi.bph.dao.base.ManTypeDAO">
+ 
+  <resultMap id="BaseResultMap" type="com.tianyi.bph.domain.base.ManType">
+    <id column="CODE" jdbcType="VARCHAR" property="code" />
+    <result column="TYPE_NAME" jdbcType="VARCHAR" property="typeName" />
+  </resultMap>
+  
+  <sql id="Base_Column_List">
+    CODE, TYPE_NAME
+  </sql>
+  
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from MAN_TYPE
+    where CODE = #{code,jdbcType=VARCHAR}
+  </select>
+  
+  <!-- 查询所有的警员类型 -->
+  <select id="selectAll"  resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from MAN_TYPE
+   </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from MAN_TYPE
+    where code = #{code,jdbcType=VARCHAR}
+  </delete>
+  
+  <insert id="insert" parameterType="com.tianyi.bph.domain.base.ManType">
+    insert into MAN_TYPE (CODE, TYPE_NAME)
+    values (#{code,jdbcType=VARCHAR}, #{typeName,jdbcType=VARCHAR})
+  </insert>
+  
+  <insert id="insertSelective" parameterType="com.tianyi.bph.domain.base.ManType">
+    insert into MAN_TYPE
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        CODE,
+      </if>
+      <if test="typeName != null">
+        TYPE_NAME,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="typeName != null">
+        #{typeName,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  
+  
+  <update id="updateByPrimaryKeySelective" parameterType="com.tianyi.bph.domain.base.ManType">
+    update MAN_TYPE
+    <set>
+      <if test="typeName != null">
+        TYPE_NAME = #{typeName,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where CODE = #{code,jdbcType=VARCHAR}
+  </update>
+  
+  
+  <update id="updateByPrimaryKey" parameterType="com.tianyi.bph.domain.base.ManType">
+    update MAN_TYPE
+    set TYPE_NAME = #{typeName,jdbcType=VARCHAR}
+    where CODE = #{code,jdbcType=VARCHAR}
+  </update>
+  
+  
+</mapper>

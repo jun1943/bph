@@ -1,0 +1,25 @@
+package com.tianyi.bph.dao.base;
+
+import java.util.List;
+
+import com.tianyi.bph.dao.MyBatisRepository;
+import com.tianyi.bph.domain.base.IntercomGroup;
+
+@MyBatisRepository
+public interface IntercomGroupDAO {
+    int deleteByPrimaryKey(Integer id);
+
+    //新增记录
+    int insert(IntercomGroup record);
+
+    int insertSelective(IntercomGroup record);
+
+    IntercomGroup selectByPrimaryKey(Integer id);
+
+    int updateByPrimaryKeySelective(IntercomGroup record);
+
+    int updateByPrimaryKey(IntercomGroup record);
+    
+    //查询所有记录
+    List<IntercomGroup> selectAll();
+}

@@ -1,0 +1,24 @@
+package com.tianyi.bph.dao.base;
+
+import java.util.List;
+
+import com.tianyi.bph.dao.MyBatisRepository;
+import com.tianyi.bph.domain.base.DutyType;
+@MyBatisRepository
+public interface DutyTypeDAO {
+    int deleteByPrimaryKey(String code);
+
+    int insert(DutyType record);
+
+    int insertSelective(DutyType record);
+
+    DutyType selectByPrimaryKey(String code);
+
+    int updateByPrimaryKeySelective(DutyType record);
+
+    int updateByPrimaryKey(DutyType record);
+    
+    //查询所有的警务类型
+    
+    List<DutyType> selectAll();
+}

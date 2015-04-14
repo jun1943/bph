@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tianyi.bph.dao.system.UserRoleDAO">
+  <resultMap id="BaseResultMap" type="com.tianyi.bph.domain.system.UserRoleKey">
+    <id column="ROLE_ID" jdbcType="DECIMAL" property="roleId" />
+    <id column="USER_ID" jdbcType="DECIMAL" property="userId" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="com.tianyi.bph.domain.system.UserRoleKey">
+    delete from USER_ROLE
+    where ROLE_ID = #{roleId,jdbcType=DECIMAL}
+      and USER_ID = #{userId,jdbcType=DECIMAL}
+  </delete>
+  <delete id="deleteByUserKey" parameterType="java.lang.Long">
+    delete from USER_ROLE
+    where USER_ID = #{userId,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.tianyi.bph.domain.system.UserRoleKey">
+    insert into USER_ROLE (ROLE_ID, USER_ID)
+    values (#{roleId,jdbcType=DECIMAL}, #{userId,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.tianyi.bph.domain.system.UserRoleKey">
+    insert into USER_ROLE
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="roleId != null">
+        ROLE_ID,
+      </if>
+      <if test="userId != null">
+        USER_ID,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="roleId != null">
+        #{roleId,jdbcType=DECIMAL},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+</mapper>

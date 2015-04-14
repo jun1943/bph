@@ -1,0 +1,444 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.tianyi.bph.dao.system.AreaMapper">
+	<resultMap id="BaseResultMap" type="com.tianyi.bph.domain.system.Area">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="area_name" property="areaName" jdbcType="VARCHAR" />
+		<result column="area_type" property="areaType" jdbcType="INTEGER" />
+		<result column="display_property" property="displayProperty"
+			jdbcType="VARCHAR" />
+		<result column="map_property" property="mapProperty" jdbcType="VARCHAR" />
+		<result column="centre" property="centre" jdbcType="VARCHAR" />
+		<result column="organ_id" property="organId" jdbcType="INTEGER" />
+		<result column="change_range" property="changeRange" jdbcType="BIT" />
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="flag" property="flag" jdbcType="INTEGER" />
+		<result column="create_user_id" property="createUserId"
+			jdbcType="INTEGER" />
+		<result column="tel" property="tel" jdbcType="VARCHAR" />
+		<result column="nnt" property="nnt" jdbcType="INTEGER" />
+		<result column="organ_name" property="organName" jdbcType="VARCHAR" />
+		<result column="organ_path" property="organPath" jdbcType="VARCHAR" />
+	</resultMap>
+	
+	
+		<resultMap id="BaseResultMap1" type="com.tianyi.bph.domain.system.Area">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="area_name" property="areaName" jdbcType="VARCHAR" />
+		<result column="area_type" property="areaType" jdbcType="INTEGER" />
+		<result column="display_property" property="displayProperty"
+			jdbcType="VARCHAR" />
+		<result column="map_property" property="mapProperty" jdbcType="VARCHAR" />
+		<result column="centre" property="centre" jdbcType="VARCHAR" />
+		<result column="organ_id" property="organId" jdbcType="INTEGER" />
+		<result column="change_range" property="changeRange" jdbcType="BIT" />
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="flag" property="flag" jdbcType="INTEGER" />
+		<result column="create_user_id" property="createUserId"
+			jdbcType="INTEGER" />
+		<result column="tel" property="tel" jdbcType="VARCHAR" />
+		<result column="nnt" property="nnt" jdbcType="INTEGER" />
+		<result column="organ_name" property="organName" jdbcType="VARCHAR" />
+		<result column="organ_path" property="organPath" jdbcType="VARCHAR" />
+
+		<collection property="relationUserKeys" ofType="INTEGER" column="area_id">
+			<result column="user_id" />
+		</collection>
+		<!-- 关联警员信息 <collection property="relationUserKeys" ofType="AreaRelationUserKey" 
+			column="area_id"> <id column="area_id" property="areaId" /> <id column="user_id" 
+			property="userId" /> </collection> -->
+		<!-- <association property="group" column="group_id" javaType="Group"> 
+			<id column="g_id" property="id"/> <result column="g_name" property="name"/> 
+			<result column="g_position" property="position"/> </association> -->
+	</resultMap>
+	
+	
+	
+	<sql id="Example_Where_Clause">
+		<where>
+			<foreach collection="oredCriteria" item="criteria" separator="or">
+				<if test="criteria.valid">
+					<trim prefix="(" suffix=")" prefixOverrides="and">
+						<foreach collection="criteria.criteria" item="criterion">
+							<choose>
+								<when test="criterion.noValue">
+									and ${criterion.condition}
+								</when>
+								<when test="criterion.singleValue">
+									and ${criterion.condition} #{criterion.value}
+								</when>
+								<when test="criterion.betweenValue">
+									and ${criterion.condition} #{criterion.value}
+									and
+									#{criterion.secondValue}
+								</when>
+								<when test="criterion.listValue">
+									and ${criterion.condition}
+									<foreach collection="criterion.value" item="listItem"
+										open="(" close=")" separator=",">
+										#{listItem}
+									</foreach>
+								</when>
+							</choose>
+						</foreach>
+					</trim>
+				</if>
+			</foreach>
+		</where>
+	</sql>
+	<sql id="Update_By_Example_Where_Clause">
+		<where>
+			<foreach collection="example.oredCriteria" item="criteria"
+				separator="or">
+				<if test="criteria.valid">
+					<trim prefix="(" suffix=")" prefixOverrides="and">
+						<foreach collection="criteria.criteria" item="criterion">
+							<choose>
+								<when test="criterion.noValue">
+									and ${criterion.condition}
+								</when>
+								<when test="criterion.singleValue">
+									and ${criterion.condition} #{criterion.value}
+								</when>
+								<when test="criterion.betweenValue">
+									and ${criterion.condition} #{criterion.value}
+									and
+									#{criterion.secondValue}
+								</when>
+								<when test="criterion.listValue">
+									and ${criterion.condition}
+									<foreach collection="criterion.value" item="listItem"
+										open="(" close=")" separator=",">
+										#{listItem}
+									</foreach>
+								</when>
+							</choose>
+						</foreach>
+					</trim>
+				</if>
+			</foreach>
+		</where>
+	</sql>
+	<sql id="Base_Column_List">
+		id, area_name, area_type, display_property, map_property,
+		organ_id, change_range, create_time, flag,
+		create_user_id,
+		tel,
+		nnt
+	</sql>
+
+	<sql id="Base_Column_List1">
+		t.id, t.area_name, t.area_type, t.display_property,
+		t.map_property, t.organ_id, t.change_range,
+		t.create_time, t.flag,
+		t.create_user_id,
+		t.tel,
+		t.nnt
+	</sql>
+
+
+	<select id="selectByExample" resultMap="BaseResultMap"
+		parameterType="com.tianyi.bph.query.system.AreaExample">
+		select
+		<if test="distinct">
+			distinct
+		</if>
+		<include refid="Base_Column_List" />
+		from t_area
+		<if test="_parameter != null">
+			<include refid="Example_Where_Clause" />
+		</if>
+		<if test="orderByClause != null">
+			order by ${orderByClause}
+		</if>
+
+		<if test="end !=0">
+			limit #{begin},#{end}
+		</if>
+	</select>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap1"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List1" />
+		,o.path as organ_path,o.name as organ_name,r.area_id as
+		area_id,r.user_id as user_id
+		from t_area t left join
+		t_organ o on
+		o.organ_id=t.organ_id left join r_area_relation_user r on r.area_id=
+		t.id
+		where t.id = #{id,jdbcType=INTEGER}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from t_area
+		where id = #{id,jdbcType=INTEGER}
+	</delete>
+	<delete id="deleteByExample" parameterType="com.tianyi.bph.query.system.AreaExample">
+		delete from t_area
+		<if test="_parameter != null">
+			<include refid="Example_Where_Clause" />
+		</if>
+	</delete>
+	<insert id="insert" parameterType="com.tianyi.bph.domain.system.Area">
+		insert into t_area (id,
+		area_name, area_type,
+		display_property,
+		map_property,organ_id,
+		change_range,
+		create_time, flag,
+		create_user_id,
+		tel, nnt)
+		values
+		(#{id,jdbcType=INTEGER},
+		#{areaName,jdbcType=VARCHAR},
+		#{areaType,jdbcType=INTEGER},
+		#{displayProperty,jdbcType=VARCHAR},
+		#{mapProperty,jdbcType=VARCHAR},
+		#{organId,jdbcType=VARCHAR},
+		#{changeRange,jdbcType=BIT},
+		#{createTime,jdbcType=TIMESTAMP},
+		#{flag,jdbcType=INTEGER},
+		#{createUserId,jdbcType=INTEGER},
+		#{tel,jdbcType=VARCHAR},
+		#{nnt,jdbcType=INTEGER})
+		<selectKey resultType="int" keyProperty="id">
+			select
+			LAST_INSERT_ID() as ID
+		</selectKey>
+	</insert>
+	<insert id="insertSelective" parameterType="com.tianyi.bph.domain.system.Area">
+		insert into t_area
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="areaName != null">
+				area_name,
+			</if>
+			<if test="areaType != null">
+				area_type,
+			</if>
+			<if test="displayProperty != null">
+				display_property,
+			</if>
+			<if test="mapProperty != null">
+				display_property,
+			</if>
+
+			<if test="organId != null">
+				organ_id,
+			</if>
+			<if test="changeRange != null">
+				change_range,
+			</if>
+			<if test="createTime != null">
+				create_time,
+			</if>
+			<if test="flag != null">
+				flag,
+			</if>
+			<if test="createUserId != null">
+				create_user_id,
+			</if>
+			<if test="tel != null">
+				tel,
+			</if>
+			<if test="nnt != null">
+				nnt,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=INTEGER},
+			</if>
+			<if test="areaName != null">
+				#{areaName,jdbcType=VARCHAR},
+			</if>
+			<if test="areaType != null">
+				#{areaType,jdbcType=INTEGER},
+			</if>
+			<if test="displayProperty != null">
+				#{display_property,jdbcType=VARCHAR},
+			</if>
+			<if test="mapProperty != null">
+				#{map_property,jdbcType=VARCHAR},
+			</if>
+			<if test="organId != null">
+				#{organId,jdbcType=INTEGER},
+			</if>
+			<if test="changeRange != null">
+				#{changeRange,jdbcType=BIT},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="flag != null">
+				#{flag,jdbcType=INTEGER},
+			</if>
+			<if test="createUserId != null">
+				#{createUserId,jdbcType=INTEGER},
+			</if>
+			<if test="tel != null">
+				#{tel,jdbcType=VARCHAR},
+			</if>
+			<if test="nnt != null">
+				#{nnt,jdbcType=INTEGER},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByExampleSelective" parameterType="map">
+		update t_area
+		<set>
+			<if test="record.id != null">
+				id = #{record.id,jdbcType=INTEGER},
+			</if>
+			<if test="record.areaName != null">
+				area_name = #{record.areaName,jdbcType=VARCHAR},
+			</if>
+			<if test="record.areaType != null">
+				area_type = #{record.areaType,jdbcType=INTEGER},
+			</if>
+			<if test="record.displayProperty != null">
+				display_property =
+				#{record.displayProperty,jdbcType=VARCHAR},
+			</if>
+			<if test="record.mapProperty != null">
+				map_Property =
+				#{record.mapProperty,jdbcType=VARCHAR},
+			</if>
+
+			<if test="record.organId != null">
+				organ_id = #{record.organId,jdbcType=INTEGER},
+			</if>
+			<if test="record.changeRange != null">
+				change_range = #{record.changeRange,jdbcType=BIT},
+			</if>
+			<if test="record.createTime != null">
+				create_time = #{record.createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="record.flag != null">
+				flag = #{record.flag,jdbcType=INTEGER},
+			</if>
+			<if test="record.createUserId != null">
+				create_user_id = #{record.createUserId,jdbcType=INTEGER},
+			</if>
+			<if test="record.tel != null">
+				tel = #{record.tel,jdbcType=VARCHAR},
+			</if>
+			<if test="record.nnt != null">
+				nnt = #{record.nnt,jdbcType=INTEGER},
+			</if>
+		</set>
+		<if test="_parameter != null">
+			<include refid="Update_By_Example_Where_Clause" />
+		</if>
+	</update>
+	<update id="updateByExample" parameterType="map">
+		update t_area
+		set id = #{record.id,jdbcType=INTEGER},
+		area_name =
+		#{record.areaName,jdbcType=VARCHAR},
+		area_type =
+		#{record.areaType,jdbcType=INTEGER},
+		display_property =
+		#{record.displayProperty,jdbcType=VARCHAR},
+		map_property =
+		#{record.mapProperty,jdbcType=VARCHAR},
+		organ_id =
+		#{record.organId,jdbcType=INTEGER},
+		change_range =
+		#{record.changeRange,jdbcType=BIT},
+		create_time =
+		#{record.createTime,jdbcType=TIMESTAMP},
+		flag =
+		#{record.flag,jdbcType=INTEGER},
+		create_user_id =
+		#{record.createUserId,jdbcType=INTEGER},
+		tel =
+		#{record.tel,jdbcType=VARCHAR},
+		nnt = #{record.nnt,jdbcType=INTEGER}
+		<if test="_parameter != null">
+			<include refid="Update_By_Example_Where_Clause" />
+		</if>
+	</update>
+	<update id="updateByPrimaryKeySelective" parameterType="com.tianyi.bph.domain.system.Area">
+		update t_area
+		<set>
+			<if test="areaName != null">
+				area_name = #{areaName,jdbcType=VARCHAR},
+			</if>
+			<if test="areaType != null">
+				area_type = #{areaType,jdbcType=INTEGER},
+			</if>
+			<if test="displayProperty != null">
+				display_property = #{displayProperty,jdbcType=VARCHAR},
+			</if>
+			<if test="mapProperty != null">
+				map_property = #{mapProperty,jdbcType=VARCHAR},
+			</if>
+
+			<if test="organId != null">
+				organ_id = #{organId,jdbcType=INTEGER},
+			</if>
+			<if test="changeRange != null">
+				change_range = #{changeRange,jdbcType=BIT},
+			</if>
+			<if test="createTime != null">
+				create_time = #{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="flag != null">
+				flag = #{flag,jdbcType=INTEGER},
+			</if>
+			<if test="createUserId != null">
+				create_user_id = #{createUserId,jdbcType=INTEGER},
+			</if>
+			<if test="tel != null">
+				tel = #{tel,jdbcType=VARCHAR},
+			</if>
+			<if test="nnt != null">
+				nnt = #{nnt,jdbcType=INTEGER},
+			</if>
+		</set>
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="com.tianyi.bph.domain.system.Area">
+		update t_area
+		set
+		area_name = #{areaName,jdbcType=VARCHAR},
+		area_type =
+		#{areaType,jdbcType=INTEGER},
+		display_property =
+		#{displayProperty,jdbcType=VARCHAR},
+		map_property =
+		#{mapProperty,jdbcType=VARCHAR},
+		organ_id =
+		#{organId,jdbcType=INTEGER},
+		change_range =
+		#{changeRange,jdbcType=BIT},
+		create_time =
+		#{createTime,jdbcType=TIMESTAMP},
+		flag = #{flag,jdbcType=INTEGER},
+		create_user_id = #{createUserId,jdbcType=INTEGER},
+		tel =
+		#{tel,jdbcType=VARCHAR},
+		nnt = #{nnt,jdbcType=INTEGER}
+		where id =
+		#{id,jdbcType=INTEGER}
+	</update>
+
+
+	<select id="selectByOrganId" resultMap="BaseResultMap"
+		parameterType="java.lang.String">
+		select
+		<include refid="Base_Column_List" />
+		from t_area t
+		<if test="path != null">
+			where organ_id in ( select organ_id from t_organ where
+			path like
+			CONCAT(#{path,jdbcType=VARCHAR},'%') and flag=1 )
+		</if>
+	</select>
+
+
+
+
+</mapper>

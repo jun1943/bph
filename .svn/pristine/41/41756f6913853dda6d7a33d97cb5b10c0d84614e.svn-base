@@ -1,0 +1,25 @@
+package com.tianyi.bph.dao.base;
+
+import java.util.List;
+
+import com.tianyi.bph.dao.MyBatisRepository;
+import com.tianyi.bph.domain.base.GpsDevice;
+
+@MyBatisRepository
+public interface GpsDeviceDAO {
+    int deleteByPrimaryKey(Integer id);
+
+    //实现新增操作
+    int insert(GpsDevice record);
+
+    int insertSelective(GpsDevice record);
+
+    GpsDevice selectByPrimaryKey(Integer id);
+
+    int updateByPrimaryKeySelective(GpsDevice record);
+
+    int updateByPrimaryKey(GpsDevice record);
+    
+   //查询所有的记录
+    List<GpsDevice> selectAll();
+}

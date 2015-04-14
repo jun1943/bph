@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tianyi.bph.dao.base.PoliceDAO">
+  <resultMap id="BaseResultMap" type="com.tianyi.bph.domain.base.Police">
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="STATE" jdbcType="DECIMAL" property="state" />
+    <result column="GPS_DEVICE_ID" jdbcType="DECIMAL" property="gpsDeviceId" />
+    <result column="IDENTITY_CARD" jdbcType="VARCHAR" property="identityCard" />
+    <result column="INTERCOM_ID" jdbcType="DECIMAL" property="intercomId" />
+    <result column="NAME" jdbcType="VARCHAR" property="name" />
+    <result column="QUICK_CODE" jdbcType="VARCHAR" property="quickCode" />
+    <result column="NOTE" jdbcType="VARCHAR" property="note" />
+    <result column="PHONE" jdbcType="VARCHAR" property="phone" />
+    <result column="POLICE_ID" jdbcType="VARCHAR" property="policeId" />
+    <result column="POSITION" jdbcType="VARCHAR" property="position" />
+    <result column="SEX" jdbcType="DECIMAL" property="sex" />
+    <result column="SHORT_CODE" jdbcType="VARCHAR" property="shortCode" />
+    <result column="UPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="ORGAN_ID" jdbcType="DECIMAL" property="organId" />
+    <result column="MAN_TYPE_CODE" jdbcType="VARCHAR" property="manTypeCode" />
+    <result column="POLICE_TYPE_CODE" jdbcType="VARCHAR" property="policeTypeCode" />
+    <result column="ETHNIC" jdbcType="VARCHAR" property="ethnic" />
+    <result column="ADDRESS" jdbcType="VARCHAR" property="address" />
+    <result column="EMAIL" jdbcType="VARCHAR" property="email" />
+    <result column="IS_PARTY" jdbcType="DECIMAL" property="isParty" />
+    <result column="MARK_STATUS" jdbcType="DECIMAL" property="markStatus" />
+    <result column="SORT_NO" jdbcType="DECIMAL" property="sortNo" />
+  </resultMap>
+  
+  <resultMap id="OrganResultMap" type="com.tianyi.bph.domain.system.Organ">
+    <id column="OID" jdbcType="DECIMAL" property="id" />
+    <result column="OCODE" jdbcType="VARCHAR" property="code" />
+    <result column="ONAME" jdbcType="VARCHAR" property="name" />
+    <result column="OPARENT_ID" jdbcType="DECIMAL" property="parentId" />
+    <result column="OPATH" jdbcType="VARCHAR" property="path" />
+    <result column="OSHORT_NAME" jdbcType="VARCHAR" property="shortName" />
+    <result column="OORG_TYPE_CODE" jdbcType="VARCHAR" property="orgTypeCode" />
+    <result column="OORG_PC_CGY_CODE" jdbcType="VARCHAR" property="orgPcCgyCode" />
+    <result column="OLEVLE" jdbcType="DECIMAL" property="levle" />
+    <result column="OSTATE" jdbcType="DECIMAL" property="state" />
+    <result column="OCREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="OPRESET" jdbcType="DECIMAL" property="preset" />
+    <result column="OUPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="ONOTE" jdbcType="VARCHAR" property="note" />
+    <result column="OSORT_NO" jdbcType="DECIMAL" property="sortNo" />
+  </resultMap>
+  
+  
+   <resultMap id="ManTypeResultMap" type="com.tianyi.bph.domain.base.ManType">
+    <id column="MCODE" jdbcType="VARCHAR" property="code" />
+    <result column="MTYPE_NAME" jdbcType="VARCHAR" property="typeName" />
+  </resultMap>
+  
+   <resultMap id="DutyTypeResultMap" type="com.tianyi.bph.domain.base.DutyType">
+    <id column="DTCODE" jdbcType="VARCHAR" property="code" />
+    <result column="DTTYPE_NAME" jdbcType="VARCHAR" property="typeName" />
+  </resultMap>
+  
+  <resultMap id="GpsDeviceResultMap" type="com.tianyi.bph.domain.base.GpsDevice">
+    <id column="GID" jdbcType="DECIMAL" property="id" />
+    <result column="GIDENTIFICATION" jdbcType="VARCHAR" property="identification" />
+    <result column="GMODEL_NUM" jdbcType="VARCHAR" property="modelNum" />
+    <result column="GGPS_SOURCE_TYPE_CODE" jdbcType="VARCHAR" property="gpsSourceTypeCode" />
+    <result column="GSTATE" jdbcType="DECIMAL" property="state" />
+    <result column="GNOTE" jdbcType="VARCHAR" property="note" />
+    <result column="GICON_CODE" jdbcType="VARCHAR" property="iconCode" />
+  </resultMap>
+  
+  <resultMap id="IntercomResultMap" type="com.tianyi.bph.domain.base.Intercom">
+    <id column="IID" jdbcType="DECIMAL" property="id" />
+    <result column="IIDENTIFICATION" jdbcType="VARCHAR" property="identification" />
+    <result column="IMODEL_NUM" jdbcType="VARCHAR" property="modelNum" />
+    <result column="ISTATE" jdbcType="DECIMAL" property="state" />
+    <result column="INOTE" jdbcType="VARCHAR" property="note" />
+    <result column="IINTERCOM_CODE" jdbcType="VARCHAR" property="intercomCode" />
+    <result column="IINTERCOM_GROUP_ID" jdbcType="DECIMAL" property="intercomGroupId" />
+    <result column="IORGAN_ID" jdbcType="DECIMAL" property="organId" />
+    <result column="IGPS_DEVICE_ID" jdbcType="DECIMAL" property="gpsDeviceId" />
+  </resultMap>
+  
+  <!-- 将从机构查询到的所有的列封装到警员里面 -->
+  <resultMap type="com.tianyi.bph.domain.base.Police" id="AllResultMap" extends="BaseResultMap">  
+  	   <association property="gpsDevice" resultMap="GpsDeviceResultMap"/>
+       <association property="organ" resultMap="OrganResultMap"/>
+       <association property="manType" resultMap="ManTypeResultMap"/>
+       <association property="intercom" resultMap="IntercomResultMap"/>
+       <collection property="dutyTypes" ofType="DutyType" resultMap="DutyTypeResultMap"/> 
+   </resultMap>
+  
+  
+   <sql id="Organ_Column_List">
+    O.ID as OID, O.CODE as OCODE, O.NAME as ONAME, O.PARENT_ID as OPARENT_ID, O.PATH as OPATH, O.SHORT_NAME as OSHORT_NAME, 
+    O.ORG_TYPE_CODE as OORG_TYPE_CODE, O.ORG_PC_CGY_CODE as OORG_PC_CGY_CODE, O.LEVLE as OLEVLE, O.STATE as OSTATE, 
+    O.CREATE_TIME as OCREATE_TIME, O.PRESET as OPRESET, O.UPDATE_TIME as OUPDATE_TIME, O.NOTE as ONOTE, O.SORT_NO as OSORT_NO
+  </sql>
+  
+  <sql id="Base_Column_List">
+    P.ID, P.CREATE_TIME, P.STATE,P.GPS_DEVICE_ID, P.IDENTITY_CARD, P.INTERCOM_ID, P.NAME, P.QUICK_CODE, 
+   P.NOTE, P.PHONE, P.POLICE_ID, P.POSITION, P.SEX, P.SHORT_CODE, P.UPDATE_TIME, P.ORGAN_ID, P.MAN_TYPE_CODE, P.POLICE_TYPE_CODE, 
+   P.ETHNIC, P.ADDRESS, P.EMAIL, P.IS_PARTY, P.MARK_STATUS, P.SORT_NO
+  </sql>
+  
+  <sql id="ManType_Column_List">
+    M.CODE as MCODE, M.TYPE_NAME as MTYPE_NAME
+  </sql>
+ 
+
+  
+  <sql id="Duty_Type_Column_List">
+    DT.CODE as DTCODE, DT.TYPE_NAME as DTTYPE_NAME
+  </sql>
+  
+  <sql id="GpsDevice_Column_List">
+    G.ID as GID, G.IDENTIFICATION as GIDENTIFICATION, G.MODEL_NUM as GMODEL_NUM, 
+    G.GPS_SOURCE_TYPE_CODE as GGPS_SOURCE_TYPE_CODE, G.STATE as GSTATE, G.NOTE as GNOTE, G.ICON_CODE as GICON_CODE
+  </sql>
+  
+  <sql id="Intercom_Column_List">
+    I.ID as IID, I.IDENTIFICATION as IIDENTIFICATION, I.MODEL_NUM as IMODEL_NUM, I.STATE as ISTATE, 
+    I.NOTE as INOTE, I.INTERCOM_CODE as IINTERCOM_CODE, I.INTERCOM_GROUP_ID as IINTERCOM_GROUP_ID, I.ORGAN_ID as IORGAN_ID, 
+    I.GPS_DEVICE_ID as IGPS_DEVICE_ID 
+  </sql>
+  
+  <select id="select" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from POLICE_USER
+    where ID = #{id,jdbcType=DECIMAL}
+  </select>
+  
+  <delete id="delete" parameterType="java.lang.Integer">
+    delete from POLICE_USER
+    where ID = #{id,jdbcType=DECIMAL}
+  </delete>
+  
+  <insert id="insert" parameterType="com.tianyi.bph.domain.base.Police">
+    <selectKey statementType="STATEMENT" order="BEFORE" resultType="Integer" keyProperty="id" >  
+			SELECT POLICE_USER_SEQ.NEXTVAL FROM DUAL
+	</selectKey>
+    insert into POLICE_USER (ID, CREATE_TIME, STATE, 
+      GPS_DEVICE_ID, IDENTITY_CARD, INTERCOM_ID, 
+      NAME, QUICK_CODE, NOTE, 
+      PHONE, POLICE_ID, POSITION, 
+      SEX, SHORT_CODE, UPDATE_TIME, 
+      ORGAN_ID, MAN_TYPE_CODE, POLICE_TYPE_CODE, 
+      ETHNIC, ADDRESS, EMAIL, 
+      IS_PARTY, MARK_STATUS, SORT_NO
+      )
+    values (#{id,jdbcType=DECIMAL}, #{createTime,jdbcType=TIMESTAMP}, #{state,jdbcType=DECIMAL}, 
+      #{gpsDeviceId,jdbcType=DECIMAL}, #{identityCard,jdbcType=VARCHAR}, #{intercomId,jdbcType=DECIMAL}, 
+      #{name,jdbcType=VARCHAR}, #{quickCode,jdbcType=VARCHAR}, #{note,jdbcType=VARCHAR}, 
+      #{phone,jdbcType=VARCHAR}, #{policeId,jdbcType=VARCHAR}, #{position,jdbcType=VARCHAR}, 
+      #{sex,jdbcType=DECIMAL}, #{shortCode,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{organId,jdbcType=DECIMAL}, #{manTypeCode,jdbcType=VARCHAR}, #{policeTypeCode,jdbcType=VARCHAR}, 
+      #{ethnic,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, 
+      #{isParty,jdbcType=DECIMAL}, #{markStatus,jdbcType=DECIMAL}, #{sortNo,jdbcType=DECIMAL}
+      )
+  </insert>
+  
+  <update id="update" parameterType="com.tianyi.bph.domain.base.Police">
+    update POLICE_USER
+    <set>
+      <if test="createTime != null">
+        CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="state != null">
+        STATE = #{state,jdbcType=DECIMAL},
+      </if>
+      <if test="gpsDeviceId != null">
+        GPS_DEVICE_ID = #{gpsDeviceId,jdbcType=DECIMAL},
+      </if>
+      <if test="identityCard != null">
+        IDENTITY_CARD = #{identityCard,jdbcType=VARCHAR},
+      </if>
+      <if test="intercomId != null">
+        INTERCOM_ID = #{intercomId,jdbcType=DECIMAL},
+      </if>
+      <if test="name != null">
+        NAME = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="quickCode != null">
+        QUICK_CODE = #{quickCode,jdbcType=VARCHAR},
+      </if>
+      <if test="note != null">
+        NOTE = #{note,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null">
+        PHONE = #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="policeId != null">
+        POLICE_ID = #{policeId,jdbcType=VARCHAR},
+      </if>
+      <if test="position != null">
+        POSITION = #{position,jdbcType=VARCHAR},
+      </if>
+      <if test="sex != null">
+        SEX = #{sex,jdbcType=DECIMAL},
+      </if>
+      <if test="shortCode != null">
+        SHORT_CODE = #{shortCode,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null">
+        UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="organId != null">
+        ORGAN_ID = #{organId,jdbcType=DECIMAL},
+      </if>
+      <if test="manTypeCode != null">
+        MAN_TYPE_CODE = #{manTypeCode,jdbcType=VARCHAR},
+      </if>
+      <if test="policeTypeCode != null">
+        POLICE_TYPE_CODE = #{policeTypeCode,jdbcType=VARCHAR},
+      </if>
+      <if test="ethnic != null">
+        ETHNIC = #{ethnic,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null">
+        ADDRESS = #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null">
+        EMAIL = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="isParty != null">
+        IS_PARTY = #{isParty,jdbcType=DECIMAL},
+      </if>
+      <if test="markStatus != null">
+        MARK_STATUS = #{markStatus,jdbcType=DECIMAL},
+      </if>
+      <if test="sortNo != null">
+        SORT_NO = #{sortNo,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=DECIMAL}
+  </update>
+  
+  <!-- 通过id该sortNo -->
+ <update id="changeSortNo" parameterType="com.tianyi.bph.domain.base.Police">
+    update POLICE_USER
+  <set>
+     <if test="sortNo != null">
+        SORT_NO = #{sortNo,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=DECIMAL}
+ </update>
+ 
+ <!-- 查询最大的sortNo -->
+ <select id="selectMaxSortNo" resultType="java.lang.Integer">
+    select decode(MAX(SORT_NO),null,0,MAX(SORT_NO))  from POLICE_USER
+ </select>
+ 
+ 	<!-- 条件、分页 -->
+ 	<sql id="find">
+		select <include refid="Base_Column_List" />, <include refid="Organ_Column_List" />
+		,<include refid="ManType_Column_List" />,<include refid="Duty_Type_Column_List"/>
+    	from POLICE_USER P 
+    	inner join Organ O on P.ORGAN_ID = O.ID 
+    	left join MAN_TYPE M on P.MAN_TYPE_CODE = M.CODE
+    	left join Police_Duty_Type PD on P.ID = PD.ID 
+    	left join Duty_Type DT on PD.DUTY_CODE = DT.CODE 
+		where 1=1 
+		<if test="path != null and path != '' and !child">
+			AND O.PATH  =  #{path,jdbcType=VARCHAR}
+		</if>
+		<if test="path != null and path != '' and child">
+			AND O.PATH  like #{path,jdbcType=VARCHAR}||'%' 
+		</if>
+		<if test="name != null and name != ''">
+			AND P.NAME  like '%'||#{name,jdbcType=VARCHAR}||'%' 
+		</if>
+		 order by P.ORGAN_ID, P.SORT_NO
+	</sql>
+	
+	
+	
+	<select id="findByPage" parameterType="com.tianyi.bph.query.base.PoliceQuery"  resultMap="AllResultMap" >
+		    
+		    <!-- select * from ( select r.*, rownum ro from (
+			<include refid="find" />
+			) r  where rownum &lt;=#{end}) where ro &gt;#{begin} -->
+			
+			
+			select <include refid="Base_Column_List" />, <include refid="Organ_Column_List" />,
+			<include refid="ManType_Column_List" />,<include refid="Duty_Type_Column_List" /> ,
+			<include refid="GpsDevice_Column_List" /> ,<include refid="Intercom_Column_List" /> 
+			from 
+			(select * from (select P.*, rownum ro from (select distinct <include refid="Base_Column_List" /> from (<include refid="find" /> ) P ) P
+			where rownum &lt;=#{end}) where ro &gt;#{begin}) P 
+			left join Organ O on P.ORGAN_ID = O.ID 
+    	   left join MAN_TYPE M on P.MAN_TYPE_CODE = M.CODE
+    	   left join Police_Duty_Type PD on P.ID = PD.ID 
+    	   left join Duty_Type DT on PD.DUTY_CODE = DT.CODE
+    	   left join GPS_DEVICE G on P.GPS_DEVICE_ID = G.ID 
+    	   left join INTERCOM I on P.INTERCOM_ID = I.ID
+	</select>
+	
+	<select id="findCount"  resultType="Integer">
+		select count(distinct ID) from (
+			<include refid="find" />
+		) count_
+	</select>
+	
+	<select id="findByQuery" parameterType="com.tianyi.bph.query.base.PoliceQuery"  resultMap="AllResultMap" >
+		<include refid="find" />
+	</select>
+</mapper>

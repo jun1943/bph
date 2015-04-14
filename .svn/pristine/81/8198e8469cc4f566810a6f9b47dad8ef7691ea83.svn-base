@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.tianyi.bph.dao.system.ModuleDAO">
+	
+	<resultMap id="BaseResultMap" type="com.tianyi.bph.domain.system.Module">
+	    <id column="MODULE_ID" jdbcType="DECIMAL" property="id" />
+	    <result column="NAME" jdbcType="VARCHAR" property="name" />
+	    <result column="PARAM" jdbcType="DECIMAL" property="param" />
+	    <result column="PARENT_ID" jdbcType="TIMESTAMP" property="parentId" />
+	    <result column="MTYPE" jdbcType="VARCHAR" property="mtype" />
+	    <result column="OP_TYPE" jdbcType="VARCHAR" property="opType" />
+	    <result column="SORT_NO" jdbcType="VARCHAR" property="sortNo" />
+	  </resultMap>
+	  
+	 <sql id="Module_Column_List">
+	    M.MODULE_ID as MID, M.CODE as MCODE, M.NAME as MNAME, M.PARAM as MPARAM, M.PARENT_ID as MPARENT_ID, 
+	    M.MTYPE as MMTYPE, M.OP_TYPE as MOP_TYPE, M.SORT_NO as MSORT_NO
+  	 </sql>
+  	 
+  	 
+  	 <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+	    select 
+	    M.*,M.NAME as text
+	    from t_module M
+	    where M.MODULE_ID = #{id,jdbcType=DECIMAL}
+   </select>
+  	 
+  	
+  	 <select id="findByQuery" parameterType="com.tianyi.bph.query.system.ModuleQuery" resultMap="BaseResultMap">
+	  	select 
+	  	M.*,M.NAME as text
+	  	from t_module M where 1=1 
+	  	<if test="name != null and name != ''">
+	  		M.name =#{name,jdbcType=VARCHAR}
+	  	</if>
+  	</select>
+  	
+  	<!-- 通过父功能id获取下级功能id -->
+  	<select id="findModuleByParentId" resultType="String">
+	  	select M.MODULE_ID
+	  	from t_module M where M.PARENT_ID in
+	  	<foreach collection="parentIds" index="index" item="item" open="(" separator="," close=")">  
+	        #{item}   
+	    </foreach>
+  	</select>
+  	
+  		<!-- 通过父功能id获取下级功能id -->
+  	<select id="getFirstByParentId" resultType="String">
+	  	select M.MODULE_ID
+	  	from t_module M where M.PARENT_ID =#{id,jdbcType=DECIMAL}
+  	</select>
+  	
+  	<!-- 获取一级功能菜单ID -->
+  	<select id="findModuleSecondLevel" parameterType="java.lang.Integer" resultType="java.lang.String">
+  		select M.MODULE_ID
+	  	from t_module M where M.PARENT_ID =#{parentId,jdbcType=DECIMAL}
+  	</select>
+  	<!-- 
+  		<select id="getModuleIdsByRoleIds" resultType="String">
+			select DISTINCT MODULE_ID from t_role_module_fuction where ROLE_ID in
+			<foreach collection="roleIds" index="index" item="item" open="(" separator="," close=")">  
+	            #{item}   
+	    	</foreach> 
+		</select>
+  	
+  	 -->
+</mapper>

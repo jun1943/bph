@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tianyi.bph.dao.base.GpsDeviceDAO">
+  
+  <resultMap id="BaseResultMap" type="com.tianyi.bph.domain.base.GpsDevice">
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="IDENTIFICATION" jdbcType="VARCHAR" property="identification" />
+    <result column="MODEL_NUM" jdbcType="VARCHAR" property="modelNum" />
+    <result column="GPS_SOURCE_TYPE_CODE" jdbcType="VARCHAR" property="gpsSourceTypeCode" />
+    <result column="STATE" jdbcType="DECIMAL" property="state" />
+    <result column="NOTE" jdbcType="VARCHAR" property="note" />
+    <result column="ICON_CODE" jdbcType="VARCHAR" property="iconCode" />
+  </resultMap>
+  
+  <sql id="Base_Column_List">
+    ID, IDENTIFICATION, MODEL_NUM, GPS_SOURCE_TYPE_CODE, STATE, NOTE,ICON_CODE
+  </sql>
+  
+  <!-- 查询所有记录 -->
+  <select id="selectAll" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from GPS_DEVICE
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from GPS_DEVICE
+    where ID = #{id,jdbcType=DECIMAL}
+  </delete>
+  
+  
+  <!-- 新增记录 -->
+  <insert id="insert" parameterType="com.tianyi.bph.domain.base.GpsDevice">
+    <selectKey statementType="STATEMENT" order="BEFORE" resultType="Integer" keyProperty="id" >  
+			SELECT GPS_DEVICE_SEQ.NEXTVAL FROM DUAL
+	</selectKey>
+    insert into GPS_DEVICE (ID, IDENTIFICATION, MODEL_NUM, GPS_SOURCE_TYPE_CODE, STATE, NOTE,ICON_CODE)
+    values (#{id,jdbcType=DECIMAL}, #{identification,jdbcType=VARCHAR}, #{modelNum,jdbcType=VARCHAR}, 
+      #{gpsSourceTypeCode,jdbcType=VARCHAR}, #{state,jdbcType=DECIMAL}, #{note,jdbcType=VARCHAR}, #{iconCode,jdbcType=VARCHAR}
+      )
+  </insert>
+  
+  
+  
+  <update id="updateByPrimaryKeySelective" parameterType="com.tianyi.bph.domain.base.GpsDevice">
+    update GPS_DEVICE
+    <set>
+      <if test="identification != null">
+        IDENTIFICATION = #{identification,jdbcType=VARCHAR},
+      </if>
+      <if test="modelNum != null">
+        MODEL_NUM = #{modelNum,jdbcType=VARCHAR},
+      </if>
+      <if test="gpsSouce != null">
+        GPS_SOURCE = #{gpsSouce,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null">
+        STATE = #{state,jdbcType=DECIMAL},
+      </if>
+      <if test="note != null">
+        NOTE = #{note,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=DECIMAL}
+  </update>
+  
+  <update id="updateByPrimaryKey" parameterType="com.tianyi.bph.domain.base.GpsDevice">
+    update GPS_DEVICE
+    set IDENTIFICATION = #{identification,jdbcType=VARCHAR},
+      MODEL_NUM = #{modelNum,jdbcType=VARCHAR},
+      GPS_SOURCE = #{gpsSouce,jdbcType=VARCHAR},
+      STATE = #{state,jdbcType=DECIMAL},
+      NOTE = #{note,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=DECIMAL}
+  </update>
+  
+</mapper>

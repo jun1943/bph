@@ -1,0 +1,34 @@
+package com.tianyi.bph.dao.base;
+
+import java.util.List;
+
+import com.tianyi.bph.dao.MyBatisRepository;
+import com.tianyi.bph.domain.base.Police;
+import com.tianyi.bph.query.base.PoliceQuery;
+@MyBatisRepository
+public interface PoliceDAO {
+    int delete(Integer id);
+
+    int insert(Police police);
+
+
+    Police select(Long id);
+
+
+    int update(Police police);
+    
+    
+    //分页查询
+    List<Police> findByPage(PoliceQuery policeQuery);
+    //分页总条数
+    int findCount(PoliceQuery policeQuery);
+    //条件查询
+    List<Police> findByQuery(PoliceQuery policeQuery);
+    
+    
+   //通过id改变sortNo
+    int changeSortNo(Police police);
+    
+    //查询最大的sortNO
+    int selectMaxSortNo();
+}

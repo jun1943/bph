@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>BPHGPSService</artifactId>
+	<packaging>jar</packaging>
+	<parent>
+		<groupId>com.tiyi.BPH</groupId>
+		<artifactId>BPH</artifactId>
+		<version>1.0</version>
+		<relativePath>../../pom.xml</relativePath>
+	</parent>
+
+	<description>公安扁平化系统::业务服务模块</description>
+
+	<organization>
+		<name>四川天翼网络</name>
+	</organization>
+	
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.2.5</version>
+		</dependency>
+		<dependency>
+			<groupId>com.tiyi.BPH</groupId>
+			<artifactId>BPHCommon</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+		<!-- mongodb 支持-->
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-mongodb</artifactId>
+			<version>1.3.0.RELEASE</version>
+		</dependency>    
+		<dependency>
+			<groupId>org.mongodb</groupId>
+			<artifactId>mongo-java-driver</artifactId>
+			<version>2.11.1</version>
+		</dependency>
+		<!-- <dependency>   
+			<groupId>dom4j</groupId>    
+			<artifactId>dom4j</artifactId>    
+			<version>1.6</version>   
+	    </dependency>   -->
+		<!-- mongodb 支持结束 -->
+		
+		<!-- mina 支持 -->
+		<dependency>
+	      <groupId>org.apache.mina</groupId>
+	      <artifactId>mina-core</artifactId>
+	      <version>2.0.7</version>
+	    </dependency>
+	    <dependency>
+	      <groupId>org.apache.mina</groupId>
+	      <artifactId>mina-transport-apr</artifactId>
+	      <version>2.0.7</version>
+	    </dependency>
+	    <dependency>
+	      <groupId>org.apache.mina</groupId>
+	      <artifactId>mina-statemachine</artifactId>
+	      <version>2.0.7</version>
+	    </dependency>
+	    <dependency>
+	      <groupId>org.apache.mina</groupId>
+	      <artifactId>mina-integration-xbean</artifactId>
+	      <version>2.0.7</version>
+	    </dependency>
+	    <dependency>
+	      <groupId>org.apache.mina</groupId>
+	      <artifactId>mina-integration-ognl</artifactId>
+	      <version>2.0.7</version>
+	    </dependency>
+	    <dependency>
+	      <groupId>org.apache.mina</groupId>
+	      <artifactId>mina-integration-jmx</artifactId>
+	      <version>2.0.7</version>
+	    </dependency>
+	    <dependency>
+	      <groupId>org.apache.mina</groupId>
+	      <artifactId>mina-integration-beans</artifactId>
+	      <version>2.0.7</version>
+	    </dependency>
+	    <dependency>
+	      <groupId>org.apache.mina</groupId>
+	      <artifactId>mina-filter-compression</artifactId>
+	      <version>2.0.7</version>
+	    </dependency>
+	    <!-- mina 支持结束 -->
+	</dependencies>
+
+	<repositories>
+		<repository>
+			<id>tianyi</id>
+			<name>tianyi repository</name>
+			<url>http://25.30.9.198:8081/nexus/content/groups/public/</url>
+		</repository>
+		<repository>
+			<id>jboss</id>
+			<name>jboss repository</name>
+			<url>https://repository.jboss.org/nexus/content/groups/public</url>
+		</repository>
+	</repositories>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.4</version>
+				<configuration>
+					<excludes>
+						<exclude>spring/</exclude>
+						<exclude>logback.xml</exclude>
+						<exclude>sysConfig.properties</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
+	
+			<plugin>  
+			    <groupId>org.apache.felix</groupId>  
+			    <artifactId>maven-bundle-plugin</artifactId>  
+			    <extensions>true</extensions>  
+			</plugin>  
+			
+			<!-- <plugin>
+				<groupId>org.apache.tomcat.maven</groupId>
+				<artifactId>tomcat7-maven-plugin</artifactId>
+				<version>2.0-beta-1</version>
+				<configuration>
+					<uriEncoding>utf-8</uriEncoding>
+					<port>8070</port>
+					<path>/</path>
+				</configuration>
+			</plugin> -->
+		</plugins>
+	</build>
+
+</project>

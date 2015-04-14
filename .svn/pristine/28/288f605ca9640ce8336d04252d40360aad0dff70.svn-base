@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tianyi.bph.dao.base.IntercomDAO">
+
+  <resultMap id="BaseResultMap" type="com.tianyi.bph.domain.base.Intercom">
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="IDENTIFICATION" jdbcType="VARCHAR" property="identification" />
+    <result column="MODEL_NUM" jdbcType="VARCHAR" property="modelNum" />
+    <result column="STATE" jdbcType="DECIMAL" property="state" />
+    <result column="NOTE" jdbcType="VARCHAR" property="note" />
+    <result column="INTERCOM_CODE" jdbcType="VARCHAR" property="intercomCode" />
+    <result column="INTERCOM_GROUP_ID" jdbcType="DECIMAL" property="intercomGroupId" />
+    <result column="ORGAN_ID" jdbcType="DECIMAL" property="organId" />
+    <result column="GPS_DEVICE_ID" jdbcType="DECIMAL" property="gpsDeviceId" />
+  </resultMap>
+  
+  <sql id="Base_Column_List">
+    ID, IDENTIFICATION, MODEL_NUM, STATE, NOTE, INTERCOM_CODE, INTERCOM_GROUP_ID, ORGAN_ID, 
+    GPS_DEVICE_ID
+  </sql>
+  
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from INTERCOM
+    where ID = #{id,jdbcType=DECIMAL}
+  </select>
+  
+  <!-- 查询所有的记录 -->
+    <select id="selectAll"  resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from INTERCOM
+  </select>
+  
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from INTERCOM
+    where ID = #{id,jdbcType=DECIMAL}
+  </delete>
+  
+  <!-- 插入记录 -->
+  <insert id="insert" parameterType="com.tianyi.bph.domain.base.Intercom">
+    <selectKey statementType="STATEMENT" order="BEFORE" resultType="Integer" keyProperty="id" >  
+			SELECT INTERCOM_SEQ.NEXTVAL FROM DUAL
+	</selectKey>
+    insert into INTERCOM (ID, IDENTIFICATION, MODEL_NUM, 
+      STATE, NOTE, INTERCOM_CODE, 
+      INTERCOM_GROUP_ID, ORGAN_ID, GPS_DEVICE_ID
+      )
+    values (#{id,jdbcType=DECIMAL}, #{identification,jdbcType=VARCHAR}, #{modelNum,jdbcType=VARCHAR}, 
+      #{state,jdbcType=DECIMAL}, #{note,jdbcType=VARCHAR}, #{intercomCode,jdbcType=VARCHAR}, 
+      #{intercomGroupId,jdbcType=DECIMAL}, #{organId,jdbcType=DECIMAL}, #{gpsDeviceId,jdbcType=DECIMAL}
+      )
+  </insert>
+  
+  <insert id="insertSelective" parameterType="com.tianyi.bph.domain.base.Intercom">
+    insert into INTERCOM
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="identification != null">
+        IDENTIFICATION,
+      </if>
+      <if test="modelNum != null">
+        MODEL_NUM,
+      </if>
+      <if test="state != null">
+        STATE,
+      </if>
+      <if test="note != null">
+        NOTE,
+      </if>
+      <if test="intercomCode != null">
+        INTERCOM_CODE,
+      </if>
+      <if test="intercomGroupId != null">
+        INTERCOM_GROUP_ID,
+      </if>
+      <if test="organId != null">
+        ORGAN_ID,
+      </if>
+      <if test="gpsDeviceId != null">
+        GPS_DEVICE_ID,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=DECIMAL},
+      </if>
+      <if test="identification != null">
+        #{identification,jdbcType=VARCHAR},
+      </if>
+      <if test="modelNum != null">
+        #{modelNum,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null">
+        #{state,jdbcType=DECIMAL},
+      </if>
+      <if test="note != null">
+        #{note,jdbcType=VARCHAR},
+      </if>
+      <if test="intercomCode != null">
+        #{intercomCode,jdbcType=VARCHAR},
+      </if>
+      <if test="intercomGroupId != null">
+        #{intercomGroupId,jdbcType=DECIMAL},
+      </if>
+      <if test="organId != null">
+        #{organId,jdbcType=DECIMAL},
+      </if>
+      <if test="gpsDeviceId != null">
+        #{gpsDeviceId,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.tianyi.bph.domain.base.Intercom">
+    update INTERCOM
+    <set>
+      <if test="identification != null">
+        IDENTIFICATION = #{identification,jdbcType=VARCHAR},
+      </if>
+      <if test="modelNum != null">
+        MODEL_NUM = #{modelNum,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null">
+        STATE = #{state,jdbcType=DECIMAL},
+      </if>
+      <if test="note != null">
+        NOTE = #{note,jdbcType=VARCHAR},
+      </if>
+      <if test="intercomCode != null">
+        INTERCOM_CODE = #{intercomCode,jdbcType=VARCHAR},
+      </if>
+      <if test="intercomGroupId != null">
+        INTERCOM_GROUP_ID = #{intercomGroupId,jdbcType=DECIMAL},
+      </if>
+      <if test="organId != null">
+        ORGAN_ID = #{organId,jdbcType=DECIMAL},
+      </if>
+      <if test="gpsDeviceId != null">
+        GPS_DEVICE_ID = #{gpsDeviceId,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.tianyi.bph.domain.base.Intercom">
+    update INTERCOM
+    set IDENTIFICATION = #{identification,jdbcType=VARCHAR},
+      MODEL_NUM = #{modelNum,jdbcType=VARCHAR},
+      STATE = #{state,jdbcType=DECIMAL},
+      NOTE = #{note,jdbcType=VARCHAR},
+      INTERCOM_CODE = #{intercomCode,jdbcType=VARCHAR},
+      INTERCOM_GROUP_ID = #{intercomGroupId,jdbcType=DECIMAL},
+      ORGAN_ID = #{organId,jdbcType=DECIMAL},
+      GPS_DEVICE_ID = #{gpsDeviceId,jdbcType=DECIMAL}
+    where ID = #{id,jdbcType=DECIMAL}
+  </update>
+  
+</mapper>

@@ -1,0 +1,335 @@
+package com.tianyi.bph.domain.base;
+
+import java.sql.Date;
+import java.util.List;
+
+import com.tianyi.bph.domain.system.Organ;
+
+public class Police {
+    private Integer id;
+
+    private Date createTime;
+
+    private Integer state;
+   
+   
+
+    private String name;
+
+    private String quickCode;
+
+    private String note;
+
+    private String phone;
+
+    private String policeId;
+
+    private String position;
+
+    private Integer sex;
+
+    private String shortCode;
+
+    private Date updateTime;
+   
+    //警员里面的机构id
+    private Integer organId;
+    
+    //人员类型
+    private String manTypeCode;
+    
+    
+    //对讲机编号
+    private Integer intercomId;
+    
+  //gps设备id
+    private Integer gpsDeviceId;
+    
+    //警种
+    private String policeTypeCode;
+    
+   
+    //人员类型实体类
+    private ManType manType;
+    
+    //对讲机实体类
+    private Intercom intercom;
+    
+    //gpsDevice实体类
+    private GpsDevice gpsDevice;
+   
+    //警种实体类
+    private PoliceType policeType;
+   
+	 //勤务类型
+    private List<DutyType> dutyTypes;
+
+	public List<DutyType> getDutyTypes() {
+		return dutyTypes;
+	}
+
+	public void setDutyTypes(List<DutyType> dutyTypes) {
+		this.dutyTypes = dutyTypes;
+	}
+
+	//机构实体类
+	  private Organ organ;
+    
+    public Organ getOrgan() {
+		return organ;
+	}
+
+	public void setOrgan(Organ organ) {
+		this.organ = organ;
+	}
+
+	private String ethnic;
+
+    private String address;
+
+    private String email;
+
+    private Integer isParty;
+
+   
+	private Integer markStatus;
+
+    private Integer sortNo;
+
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public Integer getState() {
+        return state;
+    }
+    public Integer getIsParty() {
+		return isParty;
+	}
+
+	public void setIsParty(Integer isParty) {
+		this.isParty = isParty;
+	}
+	 public Integer getGpsDeviceId() {
+			return gpsDeviceId;
+		}
+
+		public void setGpsDeviceId(Integer gpsDeviceId) {
+			this.gpsDeviceId = gpsDeviceId;
+		}
+
+		private String identityCard;
+	  
+	    
+
+	    public Integer getIntercomId() {
+			return intercomId;
+		}
+
+		public void setIntercomId(Integer intercomId) {
+			this.intercomId = intercomId;
+		}
+
+
+
+    public void setState(Integer state) {
+        this.state = state;
+    }
+
+
+    public String getIdentityCard() {
+        return identityCard;
+    }
+
+    public void setIdentityCard(String identityCard) {
+        this.identityCard = identityCard == null ? null : identityCard.trim();
+    }
+
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name == null ? null : name.trim();
+    }
+
+    public String getQuickCode() {
+        return quickCode;
+    }
+
+    public void setQuickCode(String quickCode) {
+        this.quickCode = quickCode == null ? null : quickCode.trim();
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note == null ? null : note.trim();
+    }
+    public GpsDevice getGpsDevice() {
+  		return gpsDevice;
+  	}
+
+  	public void setGpsDevice(GpsDevice gpsDevice) {
+  		this.gpsDevice = gpsDevice;
+  	}
+
+  	public ManType getManType() {
+  		return manType;
+  	}
+
+  	public void setManType(ManType manType) {
+  		this.manType = manType;
+  	}
+
+  	public Intercom getIntercom() {
+  		return intercom;
+  	}
+
+  	public void setIntercom(Intercom intercom) {
+  		this.intercom = intercom;
+  	}
+
+
+  
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone == null ? null : phone.trim();
+    }
+
+    public String getPoliceId() {
+        return policeId;
+    }
+
+    public void setPoliceId(String policeId) {
+        this.policeId = policeId == null ? null : policeId.trim();
+    }
+
+    public String getPosition() {
+        return position;
+    }
+
+    public void setPosition(String position) {
+        this.position = position == null ? null : position.trim();
+    }
+
+    public Integer getSex() {
+        return sex;
+    }
+
+    public void setSex(Integer sex) {
+        this.sex = sex;
+    }
+
+    public String getShortCode() {
+        return shortCode;
+    }
+
+    public void setShortCode(String shortCode) {
+        this.shortCode = shortCode == null ? null : shortCode.trim();
+    }  public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
+    }
+
+    public Integer getOrganId() {
+        return organId;
+    }
+
+    public void setOrganId(Integer organId) {
+        this.organId = organId;
+    }
+
+    public String getManTypeCode() {
+        return manTypeCode;
+    }
+
+    public void setManTypeCode(String manTypeCode) {
+        this.manTypeCode = manTypeCode == null ? null : manTypeCode.trim();
+    }
+
+    public String getPoliceTypeCode() {
+        return policeTypeCode;
+    }
+
+    public void setPoliceTypeCode(String policeTypeCode) {
+        this.policeTypeCode = policeTypeCode == null ? null : policeTypeCode.trim();
+    }
+
+    public String getEthnic() {
+        return ethnic;
+    }
+
+    public void setEthnic(String ethnic) {
+        this.ethnic = ethnic == null ? null : ethnic.trim();
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address == null ? null : address.trim();
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email == null ? null : email.trim();
+    }
+
+  
+
+    public Integer getMarkStatus() {
+        return markStatus;
+    }
+
+    public void setMarkStatus(Integer markStatus) {
+        this.markStatus = markStatus;
+    }
+
+    public Integer getSortNo() {
+        return sortNo;
+    }
+
+    public void setSortNo(Integer sortNo) {
+        this.sortNo = sortNo;
+    }
+    
+    public PoliceType getPoliceType() {
+    	return policeType;
+    }
+
+    public void setPoliceType(PoliceType policeType) {
+    	this.policeType = policeType;
+    }
+
+    
+ 
+}

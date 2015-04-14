@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.tianyi.bph.dao.system.OrgPcCgyDAO" >
+  <resultMap id="BaseResultMap" type="com.tianyi.bph.domain.system.OrgPcCgy" >
+    <result column="CODE" property="code" jdbcType="VARCHAR" />
+    <result column="NAME" property="name" jdbcType="VARCHAR" />
+    <result column="SORT_NO" property="sortNo" jdbcType="DECIMAL" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    CODE, NAME, SORT_NO
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from ORG_PC_CGY
+    where CODE = #{id,jdbcType=VARCHAR}
+  </select>
+  <insert id="insert" parameterType="com.tianyi.bph.domain.system.OrgPcCgy" >
+    insert into ORG_PC_CGY (CODE, NAME, SORT_NO
+      )
+    values (#{code,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{sortNo,jdbcType=DECIMAL}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.tianyi.bph.domain.system.OrgPcCgy" >
+    insert into ORG_PC_CGY
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="code != null" >
+        CODE,
+      </if>
+      <if test="name != null" >
+        NAME,
+      </if>
+      <if test="sortNo != null" >
+        SORT_NO,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="code != null" >
+        #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="sortNo != null" >
+        #{sortNo,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  
+  <sql id="find">
+		select <include refid="Base_Column_List" />
+    	from ORG_PC_CGY OPC
+	</sql>
+  <select id="findByQuery"   resultMap="BaseResultMap" >
+		<include refid="find" />
+  </select>
+</mapper>

@@ -1,0 +1,16 @@
+package com.tianyi.bph.query.base;
+
+import com.tianyi.bph.query.BaseQuery;
+
+public class WeaponQuery extends BaseQuery{
+private String gunCode;
+
+public String getGunCode() {
+	return gunCode;
+}
+
+public void setGunCode(String gunCode) {
+	this.gunCode = gunCode;
+}
+	
+}

@@ -1,0 +1,76 @@
+package com.tianyi.bph.domain.base;
+
+public class GpsDevice {
+    private Integer id;
+
+    private String identification;
+
+    private String modelNum;
+
+   private String gpsSourceTypeCode;
+
+ 
+    private Integer state;
+
+    private String note;
+    
+    private String iconCode;
+    
+
+	public String getIconCode() {
+		return iconCode;
+	}
+
+	public void setIconCode(String iconCode) {
+		this.iconCode = iconCode;
+	}
+
+	public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getIdentification() {
+        return identification;
+    }
+
+    public void setIdentification(String identification) {
+        this.identification = identification == null ? null : identification.trim();
+    }
+
+    public String getModelNum() {
+        return modelNum;
+    }
+
+    public void setModelNum(String modelNum) {
+        this.modelNum = modelNum == null ? null : modelNum.trim();
+    }
+
+  
+
+    public Integer getState() {
+        return state;
+    }
+
+    public void setState(Integer state) {
+        this.state = state;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note == null ? null : note.trim();
+    }
+	public String getGpsSourceTypeCode() {
+	return gpsSourceTypeCode;
+}
+
+public void setGpsSourceTypeCode(String gpsSourceTypeCode) {
+	this.gpsSourceTypeCode = gpsSourceTypeCode;
+}
+}

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tianyi.bph.dao.base.WeaponDAO">
+  <resultMap id="BaseResultMap" type="com.tianyi.bph.domain.base.Weapon">
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="GUN_CODE" jdbcType="VARCHAR" property="gunCode" />
+    <result column="SHOT" jdbcType="VARCHAR" property="shot" />
+    <result column="NOMAL_SHOT" jdbcType="DECIMAL" property="nomalShot" />
+    <result column="STANDARD" jdbcType="VARCHAR" property="standard" />
+    <result column="TYPE" jdbcType="DECIMAL" property="type" />
+    <result column="ORGAN_ID" jdbcType="DECIMAL" property="organId" />
+    <result column="STATE" jdbcType="DECIMAL" property="state" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    ID, GUN_CODE, SHOT, NOMAL_SHOT, STANDARD, TYPE, ORGAN_ID, STATE
+  </sql>
+  
+  <!-- 查询操作 -->
+  <select id="select" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from WEAPON
+    where ID = #{id,jdbcType=DECIMAL}
+  </select>
+  
+  <!-- 删除操作 -->
+  <delete id="delete" parameterType="java.lang.Long">
+    delete from WEAPON
+    where ID = #{id,jdbcType=DECIMAL}
+  </delete>
+  
+  <!-- 插入操作 -->
+  <insert id="insert" parameterType="com.tianyi.bph.domain.base.Weapon">
+    insert into WEAPON (ID, GUN_CODE, SHOT, 
+      NOMAL_SHOT, STANDARD, TYPE, 
+      ORGAN_ID, STATE)
+    values (#{id,jdbcType=DECIMAL}, #{gunCode,jdbcType=VARCHAR}, #{shot,jdbcType=VARCHAR}, 
+      #{nomalShot,jdbcType=DECIMAL}, #{standard,jdbcType=VARCHAR}, #{type,jdbcType=DECIMAL}, 
+      #{organId,jdbcType=DECIMAL}, #{state,jdbcType=DECIMAL})
+  </insert>
+ 
+ <!-- 更新操作 -->
+  
+  <update id="update" parameterType="com.tianyi.bph.domain.base.Weapon">
+    update WEAPON
+    set GUN_CODE = #{gunCode,jdbcType=VARCHAR},
+      SHOT = #{shot,jdbcType=VARCHAR},
+      NOMAL_SHOT = #{nomalShot,jdbcType=DECIMAL},
+      STANDARD = #{standard,jdbcType=VARCHAR},
+      TYPE = #{type,jdbcType=DECIMAL},
+      ORGAN_ID = #{organId,jdbcType=DECIMAL},
+      STATE = #{state,jdbcType=DECIMAL}
+    where ID = #{id,jdbcType=DECIMAL}
+  </update>
+  
+  <!-- 条件、分页 -->
+ 	<sql id="find">
+		select <include refid="Base_Column_List" />
+    	from WEAPON W
+		where 1=1 
+		<if test="gunCode != null">
+			AND W.GUN_CODE LIKE '%'||#{gunCode,jdbcType=VARCHAR}||'%'
+		</if>
+	</sql>
+	
+	<select id="findByPage" parameterType="com.tianyi.bph.query.base.WeaponQuery"  resultMap="BaseResultMap" >
+		select * from ( select r.*, rownum ro from (
+			<include refid="find" />
+			) r  where rownum &lt;=#{end}) where ro &gt;#{begin}
+	</select>
+	
+	<select id="findCount"  resultType="Integer">
+		select count(1) from (
+			<include refid="find" />
+		) count_
+	</select>
+	
+	<select id="findByQuery" parameterType="com.tianyi.bph.query.base.WeaponQuery"  resultMap="BaseResultMap" >
+		<include refid="find" />
+	</select>
+  
+</mapper>
