@@ -2,6 +2,7 @@
 
 <script type="text/javascript"> 
 var sessionId = $("#token").val(); 
+var opteType = "";
 $(function() {
 	$("#dtGpsGroup").empty();
 	loadData(1);
@@ -68,6 +69,17 @@ var GpsgroupManage = {
 		});
 	},  
 	createGroup:function(){
+		opteType = optType;
+		var pg = {};
+		pg.shareOrgs = [];
+		pg.id = 0;
+		pg.shareType = 0;
+		var po = {};
+		po.orgId = m_gpsGroup_Org.id;
+		pg.shareOrgs.push(po);
+
+		GpsGroupManage.displayGpsGroup(pg);
+	//	GpsGroupManage.showGpsGroupDlg();
 	},
 	editGroup:function(){
 	},

@@ -1,4 +1,4 @@
-<%@ page language="java" import="java.util.*" pageEncoding="ISO-8859-1"%>
+<%@ page language="java" import="java.util.*" pageEncoding="utf-8"%>
 <%
 String path = request.getContextPath();
 String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
@@ -20,9 +20,178 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	<link rel="stylesheet" type="text/css" href="styles.css">
 	-->
 
+	<script type="text/javascript">
+	$(function() {
+		$("#winPGMember").kendoWindow({});
+		var kGrid = $("#dtPoliceGroup").data("kendoGrid");
+//		var row = treelist.select();
+		var row = kGrid.dataItem(kGrid.select());
+		var groupId = row.id;
+
+		PoliceGroupManage.getloadorgTree();
+		$.ajax({
+			type: "post",
+			url: "policeGroupTest/loadMemberByGroupId.do?groupId="+groupId,
+			dataType: "json", 
+			success: function(req) {
+				if (req.code==200) {
+					var pdata = req.data;
+
+					var dataSo = new kendo.data.DataSource({
+						data: pdata
+					});
+					$("#dtSelGroupMember").kendoGrid({
+						dataSource: dataSo,
+						columns : [ {
+							title : 'id',
+							field : 'id',
+							align : 'left',
+							width : 10,
+							hidden : true
+						}, {
+							title : '姓名',
+							field : 'name',
+							align : 'left',
+							width : 100
+						}, {
+							title : '警号',
+							field : 'number',
+							align : 'left',
+							width : 100
+						}, {
+							title : '上级节点',
+							field : 'parentId',
+							align : 'left',
+							width : 100,
+							hidden : true
+						} ],
+						selectable: "row"
+					});
+					//PoliceGroupManage.showGroupMemberDlg();
+				}
+			}
+		});
+		
+		
+	});
+	var PoliceGroupManage ={
+			// >>
+			selectMember:function() {
+				var rows = $("#treeOrgWithPolice").data("kendoTreeView");
+				var node = rows.dataItem(rows.select());
+				//alert(node.name);
+				PoliceGroupManage.selectMemberModel(node);
+			},
+			// <<
+			unselectMember:function() {
+				
+			},
+			selectMemberModel:function(node) {
+				 if (node != null && node.dataType == 2) {
+
+					var datas = $("#dtSelGroupMember").data("kendoGrid");
+
+					var count = datas.rows.length;
+
+					var exists = false;
+
+					for ( var i = 0; i < count; i++) {
+						var row = datas.rows[i];
+						if (row.id == node.rid) {
+							exists = true;
+							break;
+						}
+					}
+
+					if (!exists) {
+						var treeview = $("#dtSelGroupMember").data("kendoGrid");
+						treeview.append({});
+						$('#dtSelGroupMember').datagrid('appendRow', {
+							id : node.rid,
+							name : node.name,
+							code : node.code
+						});
+					}
+					var targets = node.target;
+					$('#treeOrgWithPolice').tree('remove', targets);
+				} 
+			},
+			//组员保存
+			appendMember:function() {
+				var members = [];
+				var groupid = $("#txtPoliceGroupId").val();
+
+				var rows = $("#dtSelGroupMember").data("kendoGrid");
+				var count = rows.length;
+
+				for ( var i = 0; i < count; i++) {
+					var row = rows[i];
+					var member = {};
+					member.id = 0;
+					member.groupId = groupid;
+					member.policeId = row.id;
+					members.push(member);
+				}
+
+				$.ajax({
+					url : "policeGroup/appendMember.do",
+					type : "POST",
+					dataType : "json",
+					data : {
+						"members" : JSON.stringify(members)
+					},
+					async : false,
+					success : function(req) {
+						if (req.isSuccess) {
+							alert("提示, 保存成功!");
+						//	$('#dtGroupMember').datagrid('reload');
+							PoliceGroupManage.getMemberBygroupId(m_policegroup_Id);
+							$("#winPGMember").data("kendoWindow").close();
+						} else {
+							alert("提示, "+req.msg+", warning");
+						}
+					}
+				});
+			},
+	};
+	</script>
   </head>
   
   <body>
-    This is my JSP page. <br>
+    <div id="winPGMember" class="easyui-window" title="组成员选择"
+		style="width:650px;height:400px;"
+		data-options="iconCls:'icon-save',modal:true" closed="true"
+		collapsible="false" minimizable="false" maximizable="false"
+		resizable="false" shadow="false">
+
+		<input id="txtPoliceGroupId" type="hidden"></input>
+		<table>
+			<tr>
+				<td class="groupmemberwindowtdf">
+
+					<div class="groupmemberwindowdiv">
+						<label id="treetitle" class="treetitle"></label>
+						<ul id="treeOrgWithPolice" 
+							style="overflow:auto"></ul>
+					</div>
+				</td>
+				<td class="groupmemberwindowtds">
+					<button onclick="PoliceGroupManage.selectMember()">&gt&gt</button>
+					<button onclick="PoliceGroupManage.unselectMember()">&lt&lt</button>
+				</td>
+
+				<td class="groupmemberwindowtdt">
+					<div id="dtSelGroupMember" fit="true"></div>
+				</td>
+			</tr>
+		</table>
+		<div id="tbGroup" class="btn-toolbar groupwindowtoolbar">
+			<div class="btn-group groupwindowtoolbar">
+				<a id="btnSavePoliceGroup" href="javascript:void(0);"
+					class="easyui-linkbutton groupwindowbtn" onclick="PoliceGroupManage.appendMember()">
+					保 存 </a>
+			</div>
+		</div>
+	</div>
   </body>
 </html>

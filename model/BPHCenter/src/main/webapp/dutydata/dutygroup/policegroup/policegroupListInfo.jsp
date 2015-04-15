@@ -68,8 +68,10 @@ var PolicegroupManage = {
 		});
 	},  
 	createGroup:function(){
+	
 	},
 	editGroup:function(){
+		
 	},
 	deleteGroup:function(){
 		
