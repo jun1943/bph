@@ -142,40 +142,34 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
   </head>
   
   <body>
-    <div id="winPGMember" class="easyui-window" title="组成员选择"
-		style="width:450px;height:400px;"
-		data-options="iconCls:'icon-save',modal:true" closed="true"
-		collapsible="false" minimizable="false" maximizable="false"
-		resizable="false" shadow="false">
-
-		<input id="txtVehicleGroupId" type="hidden"></input>
-		<table>
-			<tr>
-				<td class="groupmemberwindowtdf">
-
-					<div style="border:1px solid #000;overflow:auto;height:300px">
-						<label id="treetitle" class="treetitle"></label>
-						<ul id="treeOrgWithVehicle" class="easyui-tree"
-							style="overflow:auto"></ul>
-					</div>
-				</td>
-				<td class="groupmemberwindowtds">
-					<button onclick="VehicleGroupManage.selectMember()">&gt&gt</button>
-					<button onclick="VehicleGroupManage.unselectMember()">&lt&lt</button>
-				</td>
-
-				<td class="groupmemberwindowtdt">
-					<div id="dtSelGroupMember" fit="true"></div>
-				</td>
-			</tr>
-		</table>
-		<div id="tbGroup" class="btn-toolbar groupwindowtoolbar">
-			<div class="btn-group groupwindowtoolbar">
-				<a id="btnSaveVehicleGroup" href="javascript:void(0);"
-					class="easyui-linkbutton groupwindowbtn" onclick="VehicleGroupManage.appendMember()">
-					保 存 </a>
+	<!-- <div id="vertical" style="overflow-x:hidden;"> -->
+		<div id="winPGMember" title="组成员选择" style="width:450px;height:400px;">
+			<div class="pane-content">
+				<!-- 左开始 -->
+				<div class="demo-section k-header"> 
+					<input id="txtVehicleGroupId"  type="hidden"></input>
+					<ul>
+						<li class="ty-input">
+							<div class="groupmemberwindowdiv">
+								<label id="treetitle" class="treetitle"></label>
+								<ul id="treeOrgWithVehicle" style="overflow:auto"></ul>
+							</div>
+						</li>
+						<li class="ty-input">
+							<button onclick="VehicleGroupManage.selectMember()">&gt&gt</button>
+							<button onclick="VehicleGroupManage.unselectMember()">&lt&lt</button>
+						</li>
+						<li class="ty-input">
+							<div id="dtSelGroupMember" fit="true"></div>
+						</li>
+						
+					</ul>
+					<p style="float:left;width:100%;margin-top:10px;">
+						<span class="k-button"  onclick="VehicleGroupManage.appendMember()">保存</span>
+					</p>
+				</div>
 			</div>
-		</div>
+		<!-- </div> -->
 	</div>
   </body>
 </html>

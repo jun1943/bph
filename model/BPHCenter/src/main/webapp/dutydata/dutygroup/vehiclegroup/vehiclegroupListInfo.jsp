@@ -106,67 +106,68 @@ var VehicleGroupManage = {
 	},
 	deleteGroup:function(){
 		
-			var kGrid = $("#dtGpsGroup").data("kendoGrid");
+			var kGrid = $("#dtVehicleGroup").data("kendoGrid");
 			var row = kGrid.dataItem(kGrid.select());
 			if (row != null) {
 				$.ajax({
-					url : "gpsGroupTest/deleteGpsGroup.do",
+					url : "vehicleGroupTest/deleteVehicleGroup.do",
 					type : "POST",
 					dataType : "json",
 					data : {
-						"gpsGroupId" : row.id
+						"vehicleGroupId" : row.id
 					},
 					async : false,
 					success : function(req) {
 						if (req.isSuccess) {
 							alert('提示, 删除成功!');
-							//$('#dtGpsGroup').datagrid('reload');
-							bindDtGroup("gpsGroupTest/list.do");
-							GpsGroupManage.getMemberBygroupId(m_gpsgroup_Id);
+							VehicleGroupManage.bindDtGroup("vehicleGroupTest/list.do");
+							VehicleGroupManage.getMemberBygroupId(m_vehiclegroup_Id);
+							//$('#dtVehicleGroup').datagrid('reload');
 						} else {
-							$.messager.alert("提示,"+req.msg+", "+warning+"");
+							alert("提示, " + req.msg + ", warning");
 						}
 					}
 				});
-	}
+			}
 	},
-	loadMemberData:function(gId){
+	loadMemberData:function(groupId){
 		$.ajax({
-					type: "post",
-					url: "gpsGroupTest/loadMemberByGroupId.do?groupId="+groupId,
-					dataType: "json", 
-					success: function(req) {
-						if (req.code==200) {
-							var pdata = req.data;
-	 
-										var dataSo = new kendo.data.DataSource({
-											data: pdata
-										});
-										$("#dtGroupMember").kendoGrid({
-											dataSource: dataSo,
-											columns : [ {
-												title : 'id',
-												field : 'id',
-												hidden : true
-											}, {
-												title : '所属单位',
-												field : 'orgShortName'
-											}, {
-												title : '设备类型',
-												field : 'typeName'
-											}, {
-												title : '设别编号',
-												field : 'number'
-											}, {
-												title : '设备名称',
-												field : 'gpsName'
-											}, ],
-											selectable: "row"
-										});
-									}
-								}
-							});
-						} ,
+				type : "post",
+				url : "vehicleGroupTest/loadMemberByGroupId.do?groupId="
+						+ groupId,
+				dataType : "json",
+				success : function(req) {
+					if (req.code == 200) {
+						var pdata = req.data;
+
+						var dataSo = new kendo.data.DataSource({
+							data : pdata
+						});
+						$("#dtGroupMember").kendoGrid({
+							dataSource : dataSo,
+							columns : [ {
+								title : 'id',
+								field : 'id',
+								hidden : true
+							}, {
+								title : '所属单位',
+								field : 'orgShortName'
+							}, {
+								title : '车辆类型',
+								field : 'typeName'
+							}, {
+								title : '车牌号码',
+								field : 'number'
+							}, {
+								title : '车辆用途',
+								field : 'purpose'
+							}, ],
+							selectable : "row"
+						});
+					}
+				}
+			});
+	} ,
 	addMember:function(){
 		var organId = $("#organId").val();
 		$("#dialog").kendoWindow({
@@ -185,59 +186,59 @@ var VehicleGroupManage = {
 	},
 	deleteMember:function(){
 		var kGrid = $("#dtGroupMember").data("kendoGrid");
-		var row = kGrid.dataItem(kGrid.select());
-		if (row != null) {
-			$.ajax({
-				url : "gpsGroupTest/delMemberById.do",
-				type : "POST",
-				dataType : "json",
-				data : {
-					'memberId' : row.id
-				},
-				async : false,
-				success : function(req) {
-					if (req.isSuccess) {
-						alert("删除成功！");
-						GpsGroupManage.getMemberBygroupId(m_gpsgroup_Id);
-						//$('#dtGroupMember').datagrid('reload');
+			var row = kGrid.dataItem(kGrid.select());
+			if (row != null) {
+				$.ajax({
+					url : "vehicleGroupTest/delMemberById.do",
+					type : "POST",
+					dataType : "json",
+					data : {
+						'memberId' : row.id
+					},
+					async : false,
+					success : function(req) {
+						if (req.isSuccess) {
+							alert("删除成功！");
+							VehicleGroupManage.getMemberBygroupId(m_vehiclegroup_Id);
+							//$('#dtGroupMember').datagrid('reload');
+						}
 					}
-				}
-			});
-		} else {
-			alert('提示, 请先选择警员!!');
-		}
+				});
+			} else {
+				alert('提示, 请先选择车辆!!');
+			}
 	},
 	clearUpMember:function(){
-	var kGrid = $("#dtGpsGroup").data("kendoGrid");
-	var row = kGrid.dataItem(kGrid.select());
+	var kGrid = $("#dtVehicleGroup").data("kendoGrid");
+			var row = kGrid.dataItem(kGrid.select());
 
-	if (row != null) {
-						$.ajax({
-							url : "gpsGroupTest/cleanMemberByGroupId.do",
-							type : "POST",
-							dataType : "json",
-							data : {
-								"gpsGroupId" : row.id
-							},
-							async : false,
-							success : function(req) {
-								if (req.isSuccess) {
-									alert("清空完成！");
-									GpsGroupManage.getMemberBygroupId(m_gpsgroup_Id);
-									//$('#dtGroupMember').datagrid('reload');
-								}
-							}
-						});
-	} else {
-		alert('提示, 请先选择车辆组!!');
-	}
+			if (row != null) {
+				$.ajax({
+					url : "vehicleGroupTest/cleanMemberByGroupId.do",
+					type : "POST",
+					dataType : "json",
+					data : {
+						"vehicleGroupId" : row.id
+					},
+					async : false,
+					success : function(req) {
+						if (req.isSuccess) {
+							alert("清空完成！");
+							VehicleGroupManage.getMemberBygroupId(m_vehiclegroup_Id);
+							//$('#dtGroupMember').datagrid('reload');
+						}
+					}
+				});
+			} else {
+				alert('提示, 请先选择车辆组!!');
+			}
 	},
 	
 	onCloseMember:function(e){
-		GpsgroupManage.loadMemberData(GpsgroupManage.pageNo);  
+		VehiclegroupManage.loadMemberData(VehiclegroupManage.pageNo);  
 	},
 	onCloseGorup:function(e){
-		GpsgroupManage.loadGroupData(GpsgroupManage.pageNo);  
+		VehiclegroupManage.loadGroupData(VehiclegroupManage.pageNo);  
 	}
 };
 

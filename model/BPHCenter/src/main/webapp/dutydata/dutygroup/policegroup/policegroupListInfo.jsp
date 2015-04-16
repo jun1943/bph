@@ -125,7 +125,7 @@ var PolicegroupManage = {
 				});
 	}
 	},
-	loadMemberData:function(gId){
+	loadMemberData:function(groupId){
 		$.ajax({
 					type: "post",
 					url: "gpsGroupTest/loadMemberByGroupId.do?groupId="+groupId,
@@ -229,15 +229,15 @@ var PolicegroupManage = {
 	},
 	
 	onCloseMember:function(e){
-		GpsgroupManage.loadMemberData(GpsgroupManage.pageNo);  
+		PolicegroupManage.loadMemberData(PolicegroupManage.pageNo);  
 	},
 	onCloseGorup:function(e){
-		GpsgroupManage.loadGroupData(GpsgroupManage.pageNo);  
+		PolicegroupManage.loadGroupData(PolicegroupManage.pageNo);  
 	}
 };
 
 </script>
-<div id="dtGpsGroup" style="width:70%"></div>   
+<div id="dtPoliceGroup" style="width:70%"></div>   
 <div id="dtGroupMember" style="width:60%"></div> 
 <div id="dialog"></div> 
 

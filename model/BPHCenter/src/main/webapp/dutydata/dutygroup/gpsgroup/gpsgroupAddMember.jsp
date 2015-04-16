@@ -115,40 +115,34 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
   </head>
   
   <body>
-    <div id="winPGMember" class="easyui-window groupmemberwindow" title="组成员选择"  
-	style="width:450px;height:400px;"
-        data-options="iconCls:'icon-save',modal:true" closed="true" 
-        collapsible="false" minimizable="false" maximizable="false" resizable="false" shadow="false">    
-   	 		
-			<input id="txtGpsGroupId"  type="hidden"></input>
-			<table>
-				<tr>
-					<td class="groupmemberwindowtdf">
+    <!-- <div id="vertical" style="overflow-x:hidden;"> -->
+		<div id="winPGMember" title="组成员选择" style="width:450px;height:400px;">
+			<div class="pane-content">
+				<!-- 左开始 -->
+				<div class="demo-section k-header"> 
+					<input id="txtGpsGroupId"  type="hidden"></input>
+					<ul>
+						<li class="ty-input">
+							<div class="groupmemberwindowdiv">
+								<label id="treetitle" class="treetitle"></label>
+								<ul id="treeOrgWithGps" style="overflow:auto"></ul>
+							</div>
+						</li>
+						<li class="ty-input">
+							<button onclick="GpsGroupManage.selectMember()">&gt&gt</button>
+							<button onclick="GpsGroupManage.unselectMember()">&lt&lt</button>
+						</li>
+						<li class="ty-input">
+							<div id="dtSelGroupMember" fit="true"></div>
+						</li>
 						
-						<div class="groupmemberwindowdiv" >
-						<label id="treetitle" class="treetitle"></label>
-							<ul id="treeOrgWithGps" class="easyui-tree"
-								style="overflow:auto"></ul>
-						</div>
-					</td>
-					<td class="groupmemberwindowtds">
-						<button onclick="selectMember()">&gt&gt</button>
-						<button onclick="unselectMember()">&lt&lt</button>
-					</td>
-
-					<td class="groupmemberwindowtdt">
-						<div id="dtSelGroupMember" fit="true"></div>
-					</td>
-				</tr>
-			</table>   
-			<div id="tbGroup" class="btn-toolbar groupwindowtoolbar" >
-				<div class="btn-group groupwindowtoolbar" >
-					<a id="btnSaveGpsGroup" href="javascript:void(0);"
-						class="easyui-linkbutton groupwindowbtn" 
-						onclick="GpsGroupManage.appendMember()">保存</a> 
+					</ul>
+					<p style="float:left;width:100%;margin-top:10px;">
+						<span class="k-button"  onclick="GpsGroupManage.appendMember()">保存</span>
+					</p>
 				</div>
 			</div>
-	</div> 
-    
+		<!-- </div> -->
+	</div>
   </body>
 </html>

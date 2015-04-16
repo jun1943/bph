@@ -126,7 +126,7 @@ var GpsgroupManage = {
 				});
 	}
 	},
-	loadMemberData:function(gId){
+	loadMemberData:function(groupId){
 		$.ajax({
 					type: "post",
 					url: "gpsGroupTest/loadMemberByGroupId.do?groupId="+groupId,

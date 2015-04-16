@@ -57,7 +57,7 @@ $(document).ready(function() {
 	</div>
 	<div class="fl set-hei48">
 		<div class="ty-decorate1"></div>
-		<button id="undo" class="ty-btn-add ty-btn-offset" onclick="VehicleManage.addVehicle()"></button>
+		<button id="undo" class="ty-btn-add ty-btn-offset" onclick="GpsManage.addGps()"></button>
                     
                    <span id="btncreateGroup" class="k-button"  onclick="GpsgroupManage.createGroup()">创建分组</span>
                    <span id="btneditGroup" class="k-button"  onclick="GpsgroupManage.editGroup()">修改分组</span> 

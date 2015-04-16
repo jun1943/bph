@@ -191,45 +191,37 @@ var WeaponGroupManage ={
   </head>
   
   <body>
-    <div id="winPG" class="easyui-window" title="武器分组管理"  
-	style="width:330px;height:320px;"
-        data-options="iconCls:'icon-tianyi-save',modal:true" closed="true" 
-        collapsible="false" minimizable="false" maximizable="false" resizable="false" shadow="false">
-			
-			<input type="hidden" id="txtWeaponGroupId"></input>
-			<table class="groupwindowtable">
-				<tr>
-					<td style="text-align:right"><lable>组名称:</lable></td>
-					<td><input id="txtWeaponGroupName" type="text"
-						class="easyui-validatebox"  data-options="required:true,validType:['length[1,20]']"></input></td>
-				</tr>
-				<tr>
-					<td style="text-align:right"><lable>共享类型:</lable></td>
-					<td><label><input id="radioShare1" name="shareType"
-							type="radio" value="0" onclick="WeaponGroupManage.changeShareType()"></input>不共享</label> 
-							<label><input
-							id="radioShare2" name="shareType" type="radio" value="1"
-							onclick="WeaponGroupManage.changeShareType()"></input>共享到下级</label></td>
-				</tr>
-
-				<tr>
-					<td colspan="2">
-						<div class="groupwindowdiv">
-							<div id="divOrg">
-								<ul id="treeOrg" class="easyui-tree" style="overflow:auto"></ul>
+		<!-- <div id="vertical" style="overflow-x:hidden;"> -->
+		<div id="winPG" style="width:330px;height:320px;" title="武器分组管理">
+			<div class="pane-content">
+				<!-- 左开始 -->
+				<div class="demo-section k-header"> 
+					<input type="hidden" id="txtWeaponGroupId"></input>
+					<ul>
+						<li class="ty-input"><label class="ty-input-label" for="txtWeaponGroupName">组名称:</label><input
+							type="text" class="k-textbox" name="txtWeaponGroupName"
+							id="txtWeaponGroupName" /></li>
+						<li class="ty-input"><label class="ty-input-label" for="shareType">共享类型:</label>
+							<label><input type="radio" class="k-textbox" name="shareType" value="0"
+							onclick="WeaponGroupManage.changeShareType()" id="radioShare1" />不共享</label>
+							<label><input type="radio" class="k-textbox" name="shareType" value="1"
+							onclick="WeaponGroupManage.changeShareType()" id="radioShare2" />共享到下级</label>
+							</li>
+						<li class="ty-input">
+							<div class="groupwindowdiv">
+								<div id="divOrg">
+									<ul id="treeOrg" style="overflow:auto"></ul>
+								</div>
 							</div>
-
-						</div>
-					</td>
-				</tr>
-			</table>
-			<div id="tbGroup" class="btn-toolbar groupwindowtoolbar">
-				<div class="btn-group groupwindowtoolbar">
-					<a id="btnSaveWeaponGroup" href="javascript:void(0);"
-						class="easyui-linkbutton groupwindowbtn"
-						onclick="WeaponGroupManage.saveWeaponGroup()">保存</a>  
+						</li>
+						
+					</ul>
+					<p style="float:left;width:100%;margin-top:10px;">
+						<span class="k-button"  onclick="WeaponGroupManage.saveWeaponGroup()">保存</span>
+					</p>
 				</div>
 			</div>
-		</div>
+		<!-- </div> -->
+	</div>
   </body>
 </html>
