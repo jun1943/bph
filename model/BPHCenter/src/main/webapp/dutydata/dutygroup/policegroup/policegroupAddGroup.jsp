@@ -23,6 +23,37 @@
 	-->
 
 <script type="text/javascript">
+
+	$(function() {
+		//获取树的所有信息
+		$.ajax({
+			url : "orgTest/treelist.do",
+			type : "POST",
+			dataType : "json",
+			data : {
+				orgId : m_policeGroup_Org.id,
+				orgCode : m_policeGroup_Org.code,
+				orgPath : m_policeGroup_Org.path
+			},
+			// async : false,
+			success : function(req) {
+				if (req.code==200) {
+
+					var json_data = JSON.stringify(req.data);
+					
+					$("#treeOrg").kendoTreeView({ 
+					    checkboxes: true,
+					    dataTextField: "shortName",
+					    check : PoliceGroupManage.onCheck,//check复选框
+					    dataSource: [eval('(' + json_data + ')')]
+					}).data("kendoTreeView");
+				} else {
+					alert("提示, "+req.msg+"", "warning");
+				}
+			}
+		});
+	});
+	
 	var PoliceGroupManage = {
 			//是否共享（单选）事件
 			changeShareType:function() {
@@ -33,37 +64,8 @@
 //					cleanShareOrgs();
 				} else {
 					$("#divOrg").css("visibility", "visible");
-					PoliceGroupManage.loadOrgs();
+					//PoliceGroupManage.loadOrgs();
 				}
-			},
-			//获取树的所有信息
-			loadOrgs:function() {
-				$.ajax({
-					url : "orgTest/treelist.do",
-					type : "POST",
-					dataType : "json",
-					data : {
-						orgId : m_policeGroup_Org.id,
-						orgCode : m_policeGroup_Org.code,
-						orgPath : m_policeGroup_Org.path
-					},
-					// async : false,
-					success : function(req) {
-						if (req.code==200) {
-
-							var json_data = JSON.stringify(req.data);
-							
-							$("#treeOrg").kendoTreeView({ 
-							    checkboxes: true,
-							    dataTextField: "shortName",
-							    check : PoliceGroupManage.onCheck,//check复选框
-							    dataSource: [eval('(' + json_data + ')')]
-							}).data("kendoTreeView");
-						} else {
-							alert("提示, "+req.msg+"", "warning");
-						}
-					}
-				});
 			},
 			onCheck : function(e) {
 				var checkedNodes = [], treeView = $("#treeOrg").data(

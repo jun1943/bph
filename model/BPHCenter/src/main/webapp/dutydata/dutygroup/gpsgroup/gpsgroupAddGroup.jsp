@@ -27,22 +27,14 @@
 
 <script type="text/javascript">
 
-var GpsGroupManage ={
-	addGpsGroup:function(optType) {
-		opteType = optType;
-		var pg = {};
+$(function() {
+	var pg = {};
 		pg.shareOrgs = [];
 		pg.id = 0;
 		pg.shareType = 0;
 		var po = {};
 		po.orgId = m_gpsGroup_Org.id;
 		pg.shareOrgs.push(po);
-
-		GpsGroupManage.displayGpsGroup(pg);
-		//GpsGroupManage.showGpsGroupDlg();
-	},
-	//显示gps组信息
-	displayGpsGroup:function(pg) {
 		$("#txtGpsGroupId").val(pg.id);
 		$("#txtGpsGroupName").val(pg.name);
 
@@ -53,7 +45,7 @@ var GpsGroupManage ={
 		} else {
 			$("#radioShare2").prop("checked", true);
 			$("#divOrg").css("visibility", "visible");
-			GpsGroupManage.loadOrgs();
+			//GpsGroupManage.loadOrgs();
 		}
 //		cleanShareOrgs();
 		var count = pg.shareOrgs.length;
@@ -62,21 +54,7 @@ var GpsGroupManage ={
 			var node = $("#treeOrg").tree('find', pgo.orgId);
 			$('#treeOrg').tree('check', node.target);
 		} */
-	},
-	//判断是否共享事件
-	changeShareType:function() {
-		var val = $('input:radio[name="shareType"]:checked').val();
-
-		if (val == 0) {
-			$("#divOrg").css("visibility", "hidden");
-//			cleanShareOrgs();
-		} else {
-			$("#divOrg").css("visibility", "visible");
-			GpsGroupManage.loadOrgs();
-		}
-	},
-	//显示创建共享单位树信息
-	loadOrgs:function() {
+		//显示创建共享单位树信息
 		$.ajax({
 			url : "orgTest/treelist.do",
 			type : "POST",
@@ -103,7 +81,23 @@ var GpsGroupManage ={
 				}
 			}
 		});
+});
+
+var GpsGroupManage ={
+	
+	//判断是否共享事件
+	changeShareType:function() {
+		var val = $('input:radio[name="shareType"]:checked').val();
+
+		if (val == 0) {
+			$("#divOrg").css("visibility", "hidden");
+//			cleanShareOrgs();
+		} else {
+			$("#divOrg").css("visibility", "visible");
+			//GpsGroupManage.loadOrgs();
+		}
 	},
+	
 	onCheck:function(e) {
 		var checkedNodes = [],treeView = $("#treeOrg").data("kendoTreeView"),message;
 
@@ -207,6 +201,26 @@ var GpsGroupManage ={
 					alert("提示, 保存成功!");
 				} else {
 					alert("提示, "+req.msg+", warning");
+				}
+			}
+		});
+	},
+	
+	//创建时，判断GPS组名是否存在
+	isExistGroup:function(name, orgId) {
+		isExist = false;
+		$.ajax({
+			url : "gpsGroup/isExistGroup.do",
+			type : "POST",
+			dataType : "json",
+			async : false,
+			data : {
+				"name" : name,
+				"orgId" : orgId
+			},
+			success : function(req) {
+				if (req.isSuccess && req.Message == "UnExits") {
+					isExist = true;
 				}
 			}
 		});

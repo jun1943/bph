@@ -68,10 +68,36 @@ var PolicegroupManage = {
 		});
 	},  
 	createGroup:function(){
-	
+		var organId = $("#organId").val();
+		$("#dialog").kendoWindow({
+			width : "680px",
+			height : "500px",
+			title : "警员信息",
+			position : {
+				top : "100px"
+			},
+		content: "<%=basePath%>policeGroupWeb/gotoPolicegroupCreate.do?gpsId="
+							+ gpsId + "&organId=" + organId+"&sessionId="+sessionId,
+					iframe : true,
+					closeCallback :PolicegroupManage.onClose,
+					okCallback:PolicegroupManage.onClose
+				});
 	},
 	editGroup:function(){
-		
+		var organId = $("#organId").val();
+		$("#dialog").kendoWindow({
+			width : "680px",
+			height : "500px",
+			title : "警员信息",
+			position : {
+				top : "100px"
+			},
+		content: "<%=basePath%>policeGroupWeb/gotoPolicegroupEdit.do?gpsId="
+							+ gpsId + "&organId=" + organId+"&sessionId="+sessionId,
+					iframe : true,
+					closeCallback :PolicegroupManage.onClose,
+					okCallback:PolicegroupManage.onClose
+				});
 	},
 	deleteGroup:function(){
 		
@@ -137,6 +163,20 @@ var PolicegroupManage = {
 							});
 						} ,
 	addMember:function(){
+		var organId = $("#organId").val();
+		$("#dialog").kendoWindow({
+			width : "680px",
+			height : "500px",
+			title : "警员信息",
+			position : {
+				top : "100px"
+			},
+		content: "<%=basePath%>policeGroupWeb/gotoPolicegroupAdd.do?gpsId="
+							+ gpsId + "&organId=" + organId+"&sessionId="+sessionId,
+					iframe : true,
+					closeCallback :PolicegroupManage.onClose,
+					okCallback:PolicegroupManage.onClose
+				});
 	},
 	deleteMember:function(){
 		var kGrid = $("#dtGroupMember").data("kendoGrid");

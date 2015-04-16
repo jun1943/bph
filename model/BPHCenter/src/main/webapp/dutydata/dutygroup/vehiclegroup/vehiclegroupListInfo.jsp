@@ -3,73 +3,106 @@
 <script type="text/javascript"> 
 var sessionId = $("#token").val(); 
 $(function() {
-	$("#dtGpsGroup").empty();
+	$("#dtVehicleGroup").empty();
 	loadData(1);
 });
 function loadData(pageNo){  
-	GpsgroupManage.pageNo = pageNo;
-	GpsgroupManage.loadGroupData(pageNo); 
+	VehicleGroupManage.pageNo = pageNo;
+	VehicleGroupManage.loadGroupData(pageNo); 
 	
 }
 var m_gpsGroup_Query = {};
 
-var GpsgroupManage = { 
+var VehicleGroupManage = { 
 	pageNo:1,
 	loadGroupData : function(pageNo) {
 		$.ajax({
-		type: "post",
-		url: "",
-		dataType: "json",
-		data: {
-			"gpsGroup_Query": JSON.stringify(m_gpsGroup_Query),
-			page: 0,
-			rows: 500 //最大500条（必须是最大值）
-		},
-		success: function(req) {
-			if (req.code == 200) { 
-				if(req.data != null){
-				var rows =req.data; 
-				var dataSource = new kendo.data.DataSource({
-					data: rows,
-					batch: true,
-					pageSize: 20
-				});
-				
-				$("#dtGpsGroup").kendoGrid({
-					dataSource: dataSource,
-					pageable: true,
-					columns : [ {
-						title : 'Id',
-						field : 'id',
-						align : 'left',
-						width : 10,
-						hidden : true
-					}, {
-						title : '组名称',
-						field : 'name',
-						align : 'left',
-						width : 150
-					}, {
-						title : '共享类型',
-						field : 'shareTypeDesc',
-						align : 'left',
-						width : 200
-					} ],
-					selectable: "row",
-					change : function(e) {
-						var groupId = e.sender.selectable.userEvents.currentTarget.cells[0].innerHTML; 
-						m_gpsgroup_Id = groupId;
-						GpsgroupManage.loadMemberData(groupId);
-					}
-				}); 
-					} 
-				}
-			}
-		});
+						type : "post",
+						url : url,
+						dataType : "json",
+						data : {
+							"vehicleGroup_Query" : JSON
+									.stringify(m_vehicleGroup_Query),
+							page : 0,
+							rows : 500
+						//最大500条（必须是最大值）
+						},
+						success : function(req) {
+							if (req.code == 200) {
+								var rows = req.data;
+								var dataSource = new kendo.data.DataSource({
+									data : rows,
+									batch : true,
+									pageSize : 20
+								});
+
+								$("#dtVehicleGroup")
+										.kendoGrid(
+												{
+													dataSource : dataSource,
+													pageable : true,
+													columns : [
+															{
+																title : 'Id',
+																field : 'id',
+																align : 'left',
+																width : 10,
+																hidden : true
+															},
+															{
+																title : '组名称',
+																field : 'name',
+																align : 'left',
+																width : 150
+															},
+															{
+																title : '共享类型',
+																field : 'shareTypeDesc',
+																align : 'left',
+																width : 200
+															} ],
+													selectable : "row",
+													change : function(e) {
+														var groupId = e.sender.selectable.userEvents.currentTarget.cells[0].innerHTML;
+														m_vehiclegroup_Id = groupId;
+														VehicleGroupManage.getMemberBygroupId(groupId);
+													}
+												});
+							}
+						}
+					});
 	},  
 	createGroup:function(){
+		var organId = $("#organId").val();
+		$("#dialog").kendoWindow({
+			width : "680px",
+			height : "500px",
+			title : "车辆信息",
+			position : {
+				top : "100px"
+			},
+		content: "<%=basePath%>VehicleGroupWeb/gotoVehiclegroupCreate.do?gpsId="
+							+ gpsId + "&organId=" + organId+"&sessionId="+sessionId,
+					iframe : true,
+					closeCallback :VehiclegroupManage.onClose,
+					okCallback:VehiclegroupManage.onClose
+				});
 	},
 	editGroup:function(){
+		var organId = $("#organId").val();
+		$("#dialog").kendoWindow({
+			width : "680px",
+			height : "500px",
+			title : "车辆信息",
+			position : {
+				top : "100px"
+			},
+		content: "<%=basePath%>VehicleGroupWeb/gotoVehiclegroupEdit.do?gpsId="
+							+ gpsId + "&organId=" + organId+"&sessionId="+sessionId,
+					iframe : true,
+					closeCallback :VehiclegroupManage.onClose,
+					okCallback:VehiclegroupManage.onClose
+				});
 	},
 	deleteGroup:function(){
 		
@@ -135,6 +168,20 @@ var GpsgroupManage = {
 							});
 						} ,
 	addMember:function(){
+		var organId = $("#organId").val();
+		$("#dialog").kendoWindow({
+			width : "680px",
+			height : "500px",
+			title : "车辆信息",
+			position : {
+				top : "100px"
+			},
+		content: "<%=basePath%>VehicleGroupWeb/gotoVehiclegroupAdd.do?gpsId="
+							+ gpsId + "&organId=" + organId+"&sessionId="+sessionId,
+					iframe : true,
+					closeCallback :VehiclegroupManage.onClose,
+					okCallback:VehiclegroupManage.onClose
+				});
 	},
 	deleteMember:function(){
 		var kGrid = $("#dtGroupMember").data("kendoGrid");
@@ -195,7 +242,7 @@ var GpsgroupManage = {
 };
 
 </script>
-<div id="dtGpsGroup" style="width:70%"></div>   
+<div id="dtVehicleGroup" style="width:70%"></div>   
 <div id="dtGroupMember" style="width:60%"></div> 
 <div id="dialog"></div> 
 

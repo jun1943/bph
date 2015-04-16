@@ -21,7 +21,65 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	-->
 
 	<script type="text/javascript">
+	
+	$(function() {
+		var opteType = "";
+//		var row = $("#dtPoliceGroup").datagrid("getSelected");
+		var kGrid = $("#dtPoliceGroup").data("kendoGrid");
+		var row = kGrid.dataItem(kGrid.select());
+		if (row !== null) {
+			var id = row.id;
+			m_police_GroupId = id;
+			PoliceGroupManage.loadPoliceGroup(id, PoliceGroupManage.displayPoliceGroup);
+
+			///PoliceGroupManage.showPoliceGroupDlg();
+		}
+		
+		$.ajax({
+			url : "orgTest/treelist.do",
+			type : "POST",
+			dataType : "json",
+			data : {
+				orgId : m_policeGroup_Org.id,
+				orgCode : m_policeGroup_Org.code,
+				orgPath : m_policeGroup_Org.path
+			},
+			// async : false,
+			success : function(req) {
+				if (req.code==200) {
+
+					var json_data = JSON.stringify(req.data);
+					
+					$("#treeOrg").kendoTreeView({ 
+					    checkboxes: true,
+					    dataTextField: "shortName",
+					    check : PoliceGroupManage.onCheck,//check复选框
+					    dataSource: [eval('(' + json_data + ')')]
+					}).data("kendoTreeView");
+				} else {
+					alert("提示, "+req.msg+"", "warning");
+				}
+			}
+		});
+		
+		
+	});
+	
 	var PoliceGroupManage ={
+			loadPoliceGroup:function(id, callback) {
+				$.ajax({
+					url : "policeGroup/loadPoliceGroup.do",
+					type : "POST",
+					dataType : "json",
+					data : {
+						'policeGroupId' : id
+					},
+					// async : false,
+					success : function(req) {
+						callback(req);
+					}
+				});
+			},
 		//显示警员组信息
 		displayPoliceGroup:function(pg) {
 			$("#txtPoliceGroupId").val(pg.id);
@@ -57,37 +115,8 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 //					cleanShareOrgs();
 				} else {
 					$("#divOrg").css("visibility", "visible");
-					PoliceGroupManage.loadOrgs();
+					//PoliceGroupManage.loadOrgs();
 				}
-			},
-			//获取树的所有信息
-			loadOrgs:function() {
-				$.ajax({
-					url : "orgTest/treelist.do",
-					type : "POST",
-					dataType : "json",
-					data : {
-						orgId : m_policeGroup_Org.id,
-						orgCode : m_policeGroup_Org.code,
-						orgPath : m_policeGroup_Org.path
-					},
-					// async : false,
-					success : function(req) {
-						if (req.code==200) {
-
-							var json_data = JSON.stringify(req.data);
-							
-							$("#treeOrg").kendoTreeView({ 
-							    checkboxes: true,
-							    dataTextField: "shortName",
-							    check : PoliceGroupManage.onCheck,//check复选框
-							    dataSource: [eval('(' + json_data + ')')]
-							}).data("kendoTreeView");
-						} else {
-							alert("提示, "+req.msg+"", "warning");
-						}
-					}
-				});
 			},
 			onCheck : function(e) {
 				var checkedNodes = [], treeView = $("#treeOrg").data(

@@ -20,7 +20,95 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	<link rel="stylesheet" type="text/css" href="styles.css">
 	-->
 	<script type="text/javascript">
-	
+	$(function() {
+		var kGrid = $("#dtGpsGroup").data("kendoGrid");
+		var row = kGrid.dataItem(kGrid.select());
+		var groupId = row.id;
+		
+		//GpsGroupManage.getloadorgTree();
+		$.ajax({
+			type: "post",
+			url: "gpsGroupTest/loadMemberByGroupId.do?groupId="+groupId,
+			dataType: "json", 
+			success: function(req) {
+				if (req.code==200) {
+					var pdata = req.data;
+
+								var dataSo = new kendo.data.DataSource({
+									data: pdata
+								});
+								$("#dtSelGroupMember").kendoGrid({
+									dataSource: dataSo,
+									columns : [ {
+										title : 'id',
+										field : 'id',
+										hidden : true
+									}, {
+										title : '设备类型',
+										field : 'typeName'
+									}, {
+										title : '设别编号',
+										field : 'number'
+									}, ],
+									selectable: "row"
+								});
+								//GpsGroupManage.showGroupMemberDlg();
+							}
+						}
+			});
+			var = rootId = m_gpsGroup_Org.id
+		 $.ajax({
+			url : "orgTest/listWithGps.do?rootId=" + rootId,
+			type : "POST",
+			dataType : "json", 
+			success:function(req){
+				var count = req.length;
+		//		alert(count);
+				 for(var j=0; j<count;j++) {
+					var r = req[j];  
+					r.ReportsTo = r.reportsTo; 
+					if(r.state=="colsed") {
+						$.ajax({
+							url : "orgTest/listWithGps.do?rootId=" + r.rid,
+							type : "post",
+							dataType : "json",
+							success:function(req){
+								var childOrg = req;
+							}
+							
+						});
+					}
+				} 
+				var s  = req;
+				/* m_orgPolicepackage = req;
+				 var inline = new kendo.data.HierarchicalDataSource({
+					 data:s,
+					 schema: {
+						    model: {
+						      id: "rid",
+						      hasChildren: "state"
+						    }
+						  }
+
+				 }); */ 
+				$("#treeOrgWithGps").kendoTreeView({
+					dataSource:s,
+					dataTextField: "name",
+					dataUrlField:"rid",
+					selectable: "row"
+					  /* expand: function(e) {
+						  var baseurl  = e.node.baseURI;
+						  var innertext = e.node.childNodes[0].childNodes[1].childNodes[0].data;
+						  var subStr = e.node.childNodes[0].childNodes[1].href;
+						  var rid = subStr.replace(baseurl,"");
+						  //var rid =
+						  getsubOrgTree(rid,innertext);
+					}  */
+				});
+			}
+		});	
+				
+	});
 	
 	</script>
 	

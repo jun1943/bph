@@ -69,19 +69,36 @@ var GpsgroupManage = {
 		});
 	},  
 	createGroup:function(){
-		opteType = optType;
-		var pg = {};
-		pg.shareOrgs = [];
-		pg.id = 0;
-		pg.shareType = 0;
-		var po = {};
-		po.orgId = m_gpsGroup_Org.id;
-		pg.shareOrgs.push(po);
-
-		GpsGroupManage.displayGpsGroup(pg);
+		var organId = $("#organId").val();
+		$("#dialog").kendoWindow({
+			width : "680px",
+			height : "500px",
+			title : "GPS组创建",
+			position : {
+				top : "100px"
+			},
+		content: "<%=basePath%>gpsGroupWeb/gotoGpsgroupCreate.do?organId=" + organId+"&sessionId="+sessionId,
+					iframe : true, 
+					closeCallback :GpsgroupManage.onClose,
+					okCallback:GpsgroupManage.onClose
+				});
 	//	GpsGroupManage.showGpsGroupDlg();
 	},
 	editGroup:function(){
+		var organId = $("#organId").val();
+		$("#dialog").kendoWindow({
+			width : "680px",
+			height : "500px",
+			title : "编辑定位设备信息",
+			position : {
+				top : "100px"
+			},
+		content: "<%=basePath%>gpsGroupWeb/gotoGpsgroupEdit.do?gpsId="
+							+ gpsId + "&organId=" + organId+"&sessionId="+sessionId,
+					iframe : true,
+					closeCallback :GpsgroupManage.onClose,
+					okCallback:GpsgroupManage.onClose
+				});
 	},
 	deleteGroup:function(){
 		
@@ -147,6 +164,20 @@ var GpsgroupManage = {
 							});
 						} ,
 	addMember:function(){
+		var organId = $("#organId").val();
+		$("#dialog").kendoWindow({
+			width : "680px",
+			height : "500px",
+			title : "GPS组管理",
+			position : {
+				top : "100px"
+			},
+		content: "<%=basePath%>gpsGroupWeb/gotoGpsgroupAdd.do?gpsId="
+							+ gpsId + "&organId=" + organId+"&sessionId="+sessionId,
+					iframe : true,
+					closeCallback :GpsgroupManage.onClose,
+					okCallback:GpsgroupManage.onClose
+				});
 	},
 	deleteMember:function(){
 		var kGrid = $("#dtGroupMember").data("kendoGrid");
