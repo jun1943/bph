@@ -56,13 +56,13 @@
   </select>
     <select id="loadSubOrgList" parameterType="java.util.Map" resultMap="BaseResultMap">
   	select 
-		id, parent_id, name, short_name, code,path
+		ORGAN_ID, parent_id, name, short_name, code,path
 		
 	from t_organ as org
   	where
   		org.code =#{orgCode,jdbcType=VARCHAR} or
   		org.path like CONCAT(#{orgPath,jdbcType=VARCHAR},"/",#{orgCode,jdbcType=VARCHAR},"%")
-  	order by org.id
+  	order by org.ORGAN_ID
   		
   </select>
   
@@ -70,7 +70,7 @@
 	select      rid,     name,     data_type,id,code     
 	from 
 	 (    
-		select    id as rid,short_name as name,  1 as data_type,CONCAT("org_",id) as id,code  from t_organ as org    where  org.parent_id= #{id,jdbcType=INTEGER}  
+		select    ORGAN_ID as rid,short_name as name,  1 as data_type,CONCAT("org_",ORGAN_ID) as id,code  from t_organ as org    where  org.parent_id= #{id,jdbcType=INTEGER}  
 		 
 		union    
 		select     id as rid,name, 2 as data_type,CONCAT("pol_",id) as id,number as code    from t_police as p    where p.isUsed = 1 and p.org_id=#{id,jdbcType=INTEGER}  
@@ -82,7 +82,7 @@
 	select      rid,  typename,   name,     data_type,id,code     
 	from 
 	 (    
-		select    id as rid,"" as typename,short_name as name,  1 as data_type,CONCAT("org_",id) as id,code  from t_organ as org    where    org.parent_id= #{id,jdbcType=INTEGER}  
+		select    ORGAN_ID as rid,"" as typename,short_name as name,  1 as data_type,CONCAT("org_",ORGAN_ID) as id,code  from t_organ as org    where    org.parent_id= #{id,jdbcType=INTEGER}  
 		 
 		union    
 		 select     p.id as rid,t.name as typename,number as name,   2 as data_type,CONCAT("veh_",p.id) as id,number as code    from t_vehicle as p    
@@ -98,7 +98,7 @@
 	select      rid,   typename,  name,     data_type,id,code     
 	from 
 	 (    
-		select    id as rid,"" as typename,short_name as name,  1 as data_type,CONCAT("org_",id) as id,code  from t_organ as org    where      org.parent_id= #{id,jdbcType=INTEGER}  
+		select    ORGAN_ID as rid,"" as typename,short_name as name,  1 as data_type,CONCAT("org_",ORGAN_ID) as id,code  from t_organ as org    where      org.parent_id= #{id,jdbcType=INTEGER}  
 		 
 		union    
 		select     p.id as rid,t.name as typename,number as name, 2 as data_type,CONCAT("wea_",p.id) as id,number as code    from t_weapon as p  
@@ -114,7 +114,7 @@
 	select      rid,  typename,   name,     data_type,id,code     
 	from 
 	 (    
-		select    org.id as rid,"" as typename,short_name as name,  1 as data_type,CONCAT("org_",org.id) as id,code  from t_organ as org    where    org.parent_id= #{id,jdbcType=INTEGER}  
+		select    org.ORGAN_ID as rid,"" as typename,short_name as name,  1 as data_type,CONCAT("org_",org.ORGAN_ID) as id,code  from t_organ as org    where    org.parent_id= #{id,jdbcType=INTEGER}  
 		 
 		union    
 		
