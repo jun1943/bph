@@ -57,8 +57,6 @@ public class TestController {
 		return mv;
 	}
 	
-	
-	
 	@RequestMapping(value = "/listWithPolice.do",produces = "application/json;charset=UTF-8")
 	@ResponseBody
 	public  String listWithPolice(

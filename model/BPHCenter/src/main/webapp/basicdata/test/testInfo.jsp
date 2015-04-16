@@ -18,7 +18,7 @@
 			schema: {
 	 			model: {
 					id: "id",
-					hasChildren: "dataType"
+					hasChildren: "isOrg"
 	           	}
 			}
 		});
