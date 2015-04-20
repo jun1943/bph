@@ -21,14 +21,16 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	-->
 
 	<script type="text/javascript">
+	var objData = {};
 	$(function() {
 		$("#winPGMember").kendoWindow({});
 		var kGrid = $("#dtPoliceGroup").data("kendoGrid");
 //		var row = treelist.select();
 		var row = kGrid.dataItem(kGrid.select());
 		var groupId = row.id;
-
-		PoliceGroupManage.getloadorgTree();
+		
+		var sessionId = $("#token").val();	
+		
 		$.ajax({
 			type: "post",
 			url: "policeGroupTest/loadMemberByGroupId.do?groupId="+groupId,
@@ -36,7 +38,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			success: function(req) {
 				if (req.code==200) {
 					var pdata = req.data;
-
+					objData  =  pdata;
 					var dataSo = new kendo.data.DataSource({
 						data: pdata
 					});
@@ -72,19 +74,46 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			}
 		});
 		
-		
+		var testData = new kendo.data.HierarchicalDataSource({
+	        transport: {
+				read: {
+					url: "<%=basePath%>testWeb/listWithPolice.do?sessionId="+sessionId +"&rootId=" + 1,
+					dataType: "json"
+				}
+			},
+			schema: {
+	 			model: {
+					id: "id",
+					hasChildren: "dataType"
+	           	}
+			}
+		});
+	
+		$("#treeOrgWithPolice").kendoTreeView({
+			dataSource: testData,
+			dataTextField: "name",
+			selectable: "row"
+		});
 	});
 	var PoliceGroupManage ={
 			// >>
 			selectMember:function() {
 				var rows = $("#treeOrgWithPolice").data("kendoTreeView");
 				var node = rows.dataItem(rows.select());
-				//alert(node.name);
+				//objData.push(node);
 				PoliceGroupManage.selectMemberModel(node);
 			},
 			// <<
 			unselectMember:function() {
-				
+				var rows = $("#dtSelGroupMember").data("kendoGrid");
+				var row = rows.dataItem(rows.select());
+				//var row = "";
+				for (var i = 0; i<rows.length; i++) {
+					 if(row.id==rows[i].id){
+										
+						rows.removeRow("tr:eq(i)");	 
+					 }
+				}
 			},
 			selectMemberModel:function(node) {
 				 if (node != null && node.dataType == 2) {
@@ -104,17 +133,26 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 					}
 
 					if (!exists) {
-						var treeview = $("#dtSelGroupMember").data("kendoGrid");
+						objData.push(node);
+						var dataSource = new kendo.data.DataSource({
+  							data: objData
+						});
+						//替换以前的dataSource
+						var grid = $("#dtSelGroupMember").data("kendoGrid");
+						grid.setDataSource(dataSource);
+						/* var treeview = $("#dtSelGroupMember").data("kendoGrid");
 						treeview.append({});
 						$('#dtSelGroupMember').datagrid('appendRow', {
 							id : node.rid,
 							name : node.name,
-							code : node.code
-						});
+							code : node.code 
+						});  */
 					}
-					var targets = node.target;
-					$('#treeOrgWithPolice').tree('remove', targets);
-				} 
+					//var targets = node.target;
+					//$('#treeOrgWithPolice').tree('remove', targets);
+				} else {
+					alert("上级机构不能添加，请选择组成员！");
+				}
 			},
 			//组员保存
 			appendMember:function() {
