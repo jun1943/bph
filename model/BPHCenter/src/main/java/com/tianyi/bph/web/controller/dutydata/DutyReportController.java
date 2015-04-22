@@ -41,6 +41,8 @@ public class DutyReportController {
 	
 	
 	
+	
+	
 	@RequestMapping({ "/gotoDutyReport.do", "/gotoDutyReport.action" })
 	@ResponseBody
 	public ModelAndView gotoDutyReport(
