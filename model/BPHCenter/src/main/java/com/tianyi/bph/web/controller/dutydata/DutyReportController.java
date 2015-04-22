@@ -39,6 +39,8 @@ public class DutyReportController {
 	@Autowired
 	private OrganService organService;
 	
+	
+	
 	@RequestMapping({ "/gotoDutyReport.do", "/gotoDutyReport.action" })
 	@ResponseBody
 	public ModelAndView gotoDutyReport(
