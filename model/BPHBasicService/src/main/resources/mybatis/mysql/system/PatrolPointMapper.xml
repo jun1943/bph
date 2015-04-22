@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tianyi.bph.dao.system.PatrolPointDAO">
+  <!-- 必达点位 -->
+  <resultMap id="BaseResultMap" type="com.tianyi.bph.domain.system.PatrolPoint">
+    <id column="ID" 				jdbcType="DECIMAL" 		property="id" />
+    <result column="COORDINATE" 	jdbcType="VARCHAR" 		property="coordinate" />
+    <result column="NAME"	 		jdbcType="VARCHAR" 		property="name" />
+    <result column="NOTE"			jdbcType="VARCHAR" 		property="note" />
+    <result column="PATROL_AREA_ID" jdbcType="DECIMAL" 		property="patrolAreaId" />
+    <result column="RADIUS" 		jdbcType="VARCHAR" 		property="radius" />
+  </resultMap>
+  
+  <sql id="TABLE_NAME">B_PATROL_POINT</sql>
+  
+  <sql id="Base_Column_List">
+    ID, COORDINATE, NAME, NOTE, PATROL_AREA_ID, RADIUS
+  </sql>
+  
+  <!-- 根据ID查询 -->
+  <select id="selectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from <include refid="TABLE_NAME" />
+    where ID = #{id, jdbcType=DECIMAL}
+  </select>
+  
+  <!-- 修改卡点信息 -->
+  <update id="updateByPrimaryKeySelective" parameterType="com.tianyi.bph.domain.system.PatrolPoint">
+    update <include refid="TABLE_NAME" />
+    <set>
+      <if test="coordinate != null">	COORDINATE 		= #{coordinate,jdbcType=VARCHAR},	</if>
+      <if test="name != null">			NAME 			= #{name,jdbcType=DECIMAL},			</if>
+      <if test="note != null">			NOTE 			= #{note,jdbcType=DECIMAL},			</if>
+      <if test="patrolAreaId != null">	PATROL_AREA_ID 	= #{patrolAreaId,jdbcType=DECIMAL},	</if>
+      <if test="radius != null">		RADIUS 			= #{radius,jdbcType=VARCHAR},		</if>
+    </set>
+    where ID = #{id, jdbcType=DECIMAL}
+  </update>
+  
+  <!-- 添加卡点 -->
+  <insert id="insert" parameterType="com.tianyi.bph.domain.system.PatrolPoint">
+  	<!-- <selectKey statementType="STATEMENT" order="BEFORE" resultType="Integer" keyProperty="cardPointId" >  
+			SELECT ORGAN_SEQ.NEXTVAL FROM DUAL
+	</selectKey> -->
+	
+	<selectKey resultType="Integer" keyProperty="cardPointId" order="BEFORE">  
+        SELECT LAST_INSERT_ID()
+    </selectKey>
+    
+    insert into <include refid="TABLE_NAME" /> 
+    	(<include refid="Base_Column_List" />)
+    values (#{id, jdbcType=DECIMAL}, #{coordinate,jdbcType=VARCHAR}, #{name,jdbcType=DECIMAL}, 
+    	#{note,jdbcType=DECIMAL},#{patrolAreaId,jdbcType=DECIMAL}, #{radius,jdbcType=VARCHAR} 
+    )
+  </insert>
+  
+  <!-- 删除卡点 -->
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from <include refid="TABLE_NAME" />
+    where CARD_POINT_ID = #{id, jdbcType=DECIMAL}
+  </delete>
+  
+ <!-- 条件、分页 -->
+ 	<sql id="find">
+		select 
+			<include refid="Base_Column_List" />
+    	from <include refid="TABLE_NAME" />
+		where 1=1 
+		<if test="name != null and name != ''">
+			AND NAME LIKE #{name,jdbcType=VARCHAR}
+		</if>
+	</sql>
+	
+	<!-- 查询总数 -->
+	<select id="findCount"  resultType="Integer">
+		select 
+			count(distinct C.CARD_POINT_ID) 
+		from <include refid="TABLE_NAME" /> 
+		where 1=1
+		<if test="name != null and name != ''">
+			AND NAME =#{name,jdbcType=VARCHAR}
+		</if>
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="findByPage" parameterType="com.tianyi.bph.query.system.PatrolPointQuery"  resultMap="BaseResultMap" >
+		select * from <include refid="TABLE_NAME" /> where 1=1
+		<if test="name != null and name != ''">
+			AND NAME =#{name,jdbcType=VARCHAR}
+		</if>
+		limit #{begin}, #{end}
+	</select>
+	<!--oracle: select * from ( select c.*, rownum ro from B_CARD_POINT c where rownum &lt; =#{end}) where ro &gt; =#{begin} -->
+	
+	<!-- 条件查询 -->
+	<select id="findByQuery" parameterType="com.tianyi.bph.query.system.PatrolPointQuery"  resultMap="BaseResultMap" >
+		<include refid="find" />
+	</select>
+	
+	<!-- 重复验证 -->
+	<select id="getUniqueCountByQuery" parameterType="com.tianyi.bph.query.system.PatrolPointQuery" resultType="Integer">
+		select count(*) from <include refid="TABLE_NAME" /> 
+		where NAME = #{name,jdbcType=VARCHAR} 
+	</select>
+	
+</mapper>

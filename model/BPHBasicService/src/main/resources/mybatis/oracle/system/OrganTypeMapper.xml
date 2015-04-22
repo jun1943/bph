@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tianyi.bph.dao.system.OrganTypeDAO">
+  <resultMap id="BaseResultMap" type="com.tianyi.bph.domain.system.OrganType">
+    <id column="CODE" jdbcType="VARCHAR" property="code" />
+    <result column="TYPE_NAME" jdbcType="VARCHAR" property="typeName" />
+    <result column="SORT_NO" jdbcType="DECIMAL" property="sortNo" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    CODE, TYPE_NAME, SORT_NO
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from ORGAN_TYPE
+    where CODE = #{code,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from ORGAN_TYPE
+    where CODE = #{code,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.tianyi.bph.domain.system.OrganType">
+    insert into ORGAN_TYPE (CODE, TYPE_NAME, SORT_NO
+      )
+    values (#{code,jdbcType=VARCHAR}, #{typeName,jdbcType=VARCHAR}, #{sortNo,jdbcType=DECIMAL}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.tianyi.bph.domain.system.OrganType">
+    insert into ORGAN_TYPE
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="code != null">
+        CODE,
+      </if>
+      <if test="typeName != null">
+        TYPE_NAME,
+      </if>
+      <if test="sortNo != null">
+        SORT_NO,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="code != null">
+        #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="typeName != null">
+        #{typeName,jdbcType=VARCHAR},
+      </if>
+      <if test="sortNo != null">
+        #{sortNo,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.tianyi.bph.domain.system.OrganType">
+    update ORGAN_TYPE
+    <set>
+      <if test="typeName != null">
+        TYPE_NAME = #{typeName,jdbcType=VARCHAR},
+      </if>
+      <if test="sortNo != null">
+        SORT_NO = #{sortNo,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where CODE = #{code,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.tianyi.bph.domain.system.OrganType">
+    update ORGAN_TYPE
+    set TYPE_NAME = #{typeName,jdbcType=VARCHAR},
+      SORT_NO = #{sortNo,jdbcType=DECIMAL}
+    where CODE = #{code,jdbcType=VARCHAR}
+  </update>
+  
+  <sql id="find">
+		select <include refid="Base_Column_List" />
+    	from ORGAN_TYPE OT
+	</sql>
+  <select id="findByQuery"   resultMap="BaseResultMap" >
+		<include refid="find" />
+  </select>
+</mapper>

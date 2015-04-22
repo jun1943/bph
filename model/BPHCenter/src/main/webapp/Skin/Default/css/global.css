@@ -1,0 +1,140 @@
+@charset "utf-8";
+/* ============全局设置库============== */
+body{background:url(../images/bg.png); font-family:Arial, "微软雅黑", "宋体";}
+ul{margin:0; padding:0;}
+.clear{ clear:both;}
+.pull-left{float:left;}
+.pull-right{float:right;}
+
+
+/* ============头部============== */
+.head-logo{width:260px; height:28px; background:url(../images/logo-01.png);}
+
+.navbar-inner{
+	min-height:20px;
+}
+
+header .navbar .navbar-inner{
+	padding-right:0px;
+}
+
+header .navbar .navbar-inner .container-fluid{
+	padding-right:0px;
+}
+
+header .navbar .navbar-inner .container-fluid ul li{
+	float:left; padding:0 5px;
+}
+
+header .navbar .navbar-inner .container-fluid ul li a{
+	display:block; height:22px; padding:0 8px; margin:2px 0; float:left\9; text-align:center; line-height:22px; font-weight:600; color:#81c9f0;
+}
+
+header .navbar .navbar-inner .container-fluid ul li a:hover{
+	background:#feab6e; color:#ffffff; font-weight:900;
+}
+
+header .navbar .navbar-inner .container-fluid ul li a:focus{
+	background:#87020b; color:#ffffff; font-weight:900;
+}
+
+header .navbar .navbar-inner .container-fluid .pull-right a{
+	display:block; height:22px; padding:0 8px; margin:2px 0; float:right; text-align:center; line-height:22px; font-size:12px; color:#81c9f0;
+}
+header .navbar .navbar-inner .container-fluid .pull-right a:hover{
+	background:#feab6e; color:#FFFFFF;
+}
+
+header .line2{ margin-bottom:3px;}
+
+header .navbar .navbar-inner .container-fluid .box{ padding:3px; margin-bottom:0;}
+/* ============中部============== */
+section .container-fluid{padding-right:0;}
+
+#wrapper #main-nav .navigation .hide{
+	display:block; width:19px; height:19px; background:url(../images/button3.png); cursor:pointer; float:right; margin-top:-7px;
+}
+
+#wrapper #main-nav .show{
+	width:19px;height:19px;background-image:url(../images/button3-1.png);cursor:pointer;display:block;
+}
+
+#main-nav .title{ width:215px; font-size:16px; font-weight:400; letter-spacing:0.5em; line-height:16px; margin-top:-7px; float:left;}
+
+.tree-box{height:790px; border-right:solid #81c9f0 1px;}
+
+h2{float:left; width:100px; height:20px; padding:0 0 0 15px; margin:10px 0; font-size:17px; font-weight:normal; line-height:24px; color:#97c6dc; letter-spacing:0.1em; background:url(../images/ico.png) 0px -17px no-repeat;}
+/* ============底部============== */
+.footer{height:25px;}
+.footer .container-fluid{padding:0 10px;}
+.footer .container-fluid ul li{ margin-right:10px; float:left;}
+.footer .container-fluid .box{ padding:4px; margin-bottom:0;}
+
+/* ============线段样式============== */
+.t1-start{ background:url(../images/t1-left.png) no-repeat; width:24px; height:3px; float:left;}
+.t1-end{ background:url(../images/t1-end.png) no-repeat; width:28px; height:3px; float:right;}
+.b1-start{ background:url(../images/b1-left.png) no-repeat; width:24px; height:3px; float:left;}
+.b1-end{ background:url(../images/b1-end.png) no-repeat; width:28px; height:3px; float:right;}
+.b2-left{ background:url(../images/b2-left.png) no-repeat; width:112px; height:3px; float:left;}
+.b2-mid{ background:url(../images/b2-mid.png) repeat-x; height:3px; margin:0 0 5px 250px; }
+.b2-end{background:url(../images/b1-button1.png) no-repeat; width:48px; height:3px;}
+.line1-mid{ background:url(../images/line1-mid.png) repeat-x; height:3px;}
+.end{ background:url(../images/line-end.png) no-repeat; width:28px; height:3px; float:right;}
+.line2{ background:url(../images/line2.png) no-repeat; width:240px; height:19px; margin:10px 0 15px;}
+.line5{background:url(../images/line5.png) no-repeat; width:19px; height:803px; float:left; margin:0 8px;}
+.hr{ height:2px; margin:0; border:none; background:#416578;}
+.lv1{ margin-top:16px; width:3px; height:10px; background:url(../images/guanli-14.png); float:left;}
+.line6{margin-left:-20px; width:260px; height:3px; background:url(../images/line6.png); float:left;}
+.line7{ width:3px; height:63px; background:url(../images/button4.png); margin-top:-10px;}
+.line8{ width:240px; height:13px; background:url(../images/line8.png);}
+
+
+
+/* ============菜单栏样式============== */
+.navbar .lv2{ margin:3px 10px 0 25px; background:url(../images/lv2-bg.png) repeat-x;}
+
+/* ============结构树样式============== */
+
+
+/* ============表格样式============== */
+
+/* ============字体样式============== */
+
+/* ============按钮样式============== */
+.button-red{display:block; width:450px; height:48px; margin:0 auto; margin-top:30px; background:#b7202a; text-align:center; line-height:48px; color:#ffffff; border:none; cursor:pointer; font-family:"微软雅黑", "宋体"; font-size:24px; letter-spacing:0.3em;}
+.button-red:hover{background:#d23131;}
+
+/* =============功能模块============== */
+.set h1{ float:left; height:39px; padding:0 0 0 15px; margin:10px 5px 15px 0; width:220px; line-height:38px; letter-spacing:0.1em; font-size:31px; color:#97c6dc; font-weight:600;  background:url(../images/ico.png) no-repeat 0 15px;}
+
+/* =============表单样式============== */
+
+/* =============权限管理============== */
+.pow{ min-width:100px; height:816px; background:url(../images/line5.png) no-repeat; padding-left:20px;}
+.pow .box{margin:10px;}
+.pow .box .box-content{ background:#131e24; margin:10px; height:740px; border:none;}
+/* =============弹出窗口样式============== */
+
+/* ============消息提示样式============== */
+
+/* =============登录界面样式============== */
+.login{padding:0; margin:0;}
+.logo1{ width:502px; height:194px; float:left; margin:20px; background:url(../images/login-logo1.png);}
+.logo2{ width:451px; height:136px; background:url(../images/login-logo2.png);}
+.close-area{width:301px; height:120px; float:right; position:relative;}
+.login-close2{ width:64px; height:3px; background:url(../images/login-close2.png); float:right; margin:2px 5px 0 0;}
+.login-close1{ width:148px; height:3px; margin-right:84px; background:url(../images/login-close1.png); float:right; margin-top:2px;}
+.login-close3{ width:3px; height:115px; margin-right:3.5px; background:url(../images/login-close3.png); float:right;}
+.login-close4{width:4px; height:4px; margin:3px; background:url(../images/login-close4.png); float:right;}
+.login-line1{width:7px; height:114px; background:url(../images/login-line1.png);}
+.login-title{width:424px; height:33px; background:url(../images/login-title.png); margin:0 auto; margin-top:60px; margin-bottom:30px;}
+
+.login-close{display:block; width:130px; height:65px; position:absolute; right:46px; top:0px; background:url(../images/buttons.png) -146px -872px no-repeat;}
+.login-close:hover{background:url(../images/buttons.png) -146px -986px no-repeat;}
+
+.login .box{width:460px; margin:0 auto;}
+.h114{height:114px;}
+
+.login-input{ display:block; width:450px; height:32px; padding:0 8px; border:none; background:#1f4356; color:#000000; line-height:32px; margin:0 auto; margin-top:12px;}
+.login-input:hover{background:#2f5c74;}
+.login-input:focus{color:#97c6dc;}

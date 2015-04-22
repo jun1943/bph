@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tianyi.bph.dao.system.ModuleDAO">
+  <resultMap id="BaseResultMap" type="com.tianyi.bph.domain.system.Module">
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="CODE" jdbcType="VARCHAR" property="code" />
+    <result column="NAME" jdbcType="VARCHAR" property="name" />
+    <result column="PARAM" jdbcType="VARCHAR" property="param" />
+    <result column="PARENT_ID" jdbcType="DECIMAL" property="parentId" />
+    <result column="MTYPE" jdbcType="DECIMAL" property="mtype" />
+    <result column="OP_TYPE" jdbcType="DECIMAL" property="opType" />
+    <result column="SORT_NO" jdbcType="DECIMAL" property="sortNo" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    ID, CODE, NAME, PARAM, PARENT_ID, MTYPE, OP_TYPE, SORT_NO
+  </sql>
+  
+  
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from MODULE
+    where ID = #{id,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.tianyi.bph.domain.system.Module">
+  	<selectKey statementType="STATEMENT" order="BEFORE" resultType="Integer" keyProperty="id" >  
+			SELECT MODULE_SEQ.NEXTVAL FROM DUAL
+	</selectKey>
+    insert into MODULE (ID, CODE, NAME, 
+      PARAM, PARENT_ID, MTYPE, 
+      OP_TYPE, SORT_NO)
+    values (#{id,jdbcType=DECIMAL}, #{code,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, 
+      #{param,jdbcType=VARCHAR}, #{parentId,jdbcType=DECIMAL}, #{mtype,jdbcType=DECIMAL}, 
+      #{opType,jdbcType=DECIMAL}, #{sortNo,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.tianyi.bph.domain.system.Module">
+    insert into MODULE
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="code != null">
+        CODE,
+      </if>
+      <if test="name != null">
+        NAME,
+      </if>
+      <if test="param != null">
+        PARAM,
+      </if>
+      <if test="parentId != null">
+        PARENT_ID,
+      </if>
+      <if test="mtype != null">
+        MTYPE,
+      </if>
+      <if test="opType != null">
+        OP_TYPE,
+      </if>
+      <if test="sortNo != null">
+        SORT_NO,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=DECIMAL},
+      </if>
+      <if test="code != null">
+        #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="param != null">
+        #{param,jdbcType=VARCHAR},
+      </if>
+      <if test="parentId != null">
+        #{parentId,jdbcType=DECIMAL},
+      </if>
+      <if test="mtype != null">
+        #{mtype,jdbcType=DECIMAL},
+      </if>
+      <if test="opType != null">
+        #{opType,jdbcType=DECIMAL},
+      </if>
+      <if test="sortNo != null">
+        #{sortNo,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.tianyi.bph.domain.system.Module">
+    update MODULE
+    <set>
+      <if test="code != null">
+        CODE = #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null">
+        NAME = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="param != null">
+        PARAM = #{param,jdbcType=VARCHAR},
+      </if>
+      <if test="parentId != null">
+        PARENT_ID = #{parentId,jdbcType=DECIMAL},
+      </if>
+      <if test="mtype != null">
+        MTYPE = #{mtype,jdbcType=DECIMAL},
+      </if>
+      <if test="opType != null">
+        OP_TYPE = #{opType,jdbcType=DECIMAL},
+      </if>
+      <if test="sortNo != null">
+        SORT_NO = #{sortNo,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.tianyi.bph.domain.system.Module">
+    update MODULE
+    set CODE = #{code,jdbcType=VARCHAR},
+      NAME = #{name,jdbcType=VARCHAR},
+      PARAM = #{param,jdbcType=VARCHAR},
+      PARENT_ID = #{parentId,jdbcType=DECIMAL},
+      MTYPE = #{mtype,jdbcType=DECIMAL},
+      OP_TYPE = #{opType,jdbcType=DECIMAL},
+      SORT_NO = #{sortNo,jdbcType=DECIMAL}
+    where ID = #{id,jdbcType=DECIMAL}
+  </update>
+  
+  
+  <!-- 非自动生成，更新时copy -->
+  <sql id="Base_Self_Column_List">
+    M.ID, M.CODE, M.NAME, M.PARAM, M.PARENT_ID, M.MTYPE, M.OP_TYPE, M.SORT_NO
+  </sql>
+  
+  <select id="getModulesByUserId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Self_Column_List" />
+    from MODULE M inner join ROLE_MODULE_FUCTION RMF on M.ID = RMF.MOD_FUN_ID 
+    inner join USER_ROLE UR on UR.ROLE_ID = RMF.ROLEID  
+    where UR.USER_ID = #{userId,jdbcType=DECIMAL} 
+    union 
+    select <include refid="Base_Self_Column_List" /> 
+    from MODULE M inner join USER_ADD_MODULE UAM on UAM.MOD_FUN_ID = M.ID 
+    and UAM.USER_ID = #{userId,jdbcType=DECIMAL}
+  </select>
+  
+
+	<!-- 条件查询-->
+ 	<sql id="find">
+		select <include refid="Base_Column_List" />
+    	from MODULE M
+		where 1=1 
+		<if test="name != null and name !=''">
+			AND R.NAME LIKE '%'||#{name,jdbcType=VARCHAR}||'%'
+		</if>
+	</sql>
+	
+	<select id="findByQuery" parameterType="com.tianyi.bph.query.system.ModuleQuery"  resultMap="BaseResultMap" >
+		<include refid="find" />
+	</select>
+</mapper>

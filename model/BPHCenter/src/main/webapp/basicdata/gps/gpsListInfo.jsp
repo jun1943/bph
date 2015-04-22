@@ -1,0 +1,208 @@
+<jsp:directive.page language="java" pageEncoding="UTF-8"/>
+
+<script>	
+var bph_gps_query ={};
+
+var iconUrl;
+var sessionId = $("#token").val();
+$(function() {
+	loadData(1);	
+	$("#gpsNumber").keyup(function(){
+        if(event.keyCode == 13){
+            GpsManage.search();
+        }
+    });	
+	$("#gpsName").keyup(function(){
+        if(event.keyCode == 13){
+            GpsManage.search();
+        }
+    });
+});
+
+function loadData(pageNo){ 
+	GpsManage.gps_pageNo= pageNo;
+	GpsManage.packageQuery(pageNo);
+	GpsManage.loadData(pageNo); 
+}
+var GpsManage = {
+	gps_pageNo:1,
+	packageQuery:function(pageNo){
+		bph_gps_query.isSubOrg = $("#organLevel").val();
+        bph_gps_query.name = $("#gpsName").val(); 
+        bph_gps_query.number = $("#gpsNumber").val(); 
+        bph_gps_query.orgId = $("#organId").val();
+        bph_gps_query.orgPath = $("#organPath").val();
+        bph_gps_query.pageSize = $("#pageSize").val();
+        bph_gps_query.pageStart = pageNo; 
+	},
+	loadData : function(pageNo) {
+		$.ajax({
+					url : "<%=basePath%>gpsWeb/getGpsList.do?sessionId="+sessionId,
+					type : "post",
+					data : {
+						"gps_Query" : JSON.stringify(bph_gps_query)
+					},
+					dataType : "json",
+					success : function(req) {
+						if (req.code == 200) {
+							if (req.data != null) {
+								var udata = req.data;
+               						var total = req.totalRows;
+               						$("#gridListTotal").html(total+"台");
+								$("#gpsgrid").kendoGrid({
+							dataSource : {
+								data : udata
+							},
+							height : 550,
+							sortable : true,
+							selectable : "multiple",
+							
+							columns:[{
+									title : 'Id',
+									field : 'id', 
+									width : 10 
+								},{
+             							field: "操作",
+             							template: "<button type='button' class='ty-edit-btn' id='#: id #' title='修改' onclick='GpsManage.editGps(#: id #)'>修改</button> "+
+             							"<button type='button' class='ty-delete-btn' id='#: id #' title='删除' onclick='GpsManage.deleteGps(#: id #)'>删除</button> ",
+             							width:120
+             					},{
+									title : '定位设备类型',
+									field : 'typeName' 
+								},{
+									title : '机构',
+									field : 'orgId',
+									hidden:true 
+								},{
+									title : 'GPS编号',
+									field : 'number'  
+								},{
+									title : 'GPS名称',
+									field : 'gpsName' 
+								},{
+									title : 'GPS图标',
+									template: "<img width='25px' height='25px' src='<%=basePath%>#: iconUrl #'> ",
+             							width:120
+								}
+							],
+							change: function (e) {
+                                var userId = e.sender.selectable.userEvents.currentTarget.cells[0].innerHTML; 
+                            }
+						});
+									$("#gpsgrid .k-grid-content").mCustomScrollbar( {scrollButtons:{enable:true},advanced:{ updateOnContentResize: true } });
+               						//alert(pageNo);
+               						//alert(total);
+               						//alert("size="+pageSize);
+               						//var pg = pagination(pageNo,total,'loadData',pageSize,0);
+               						var pg = pagination(pageNo,total,'loadData',10);
+               						 
+               	                	$("#page").html(pg);
+						}else
+						{ 
+							GpsManage.loadData(GpsManage.gps_pageNo);  
+						}
+				}else
+				{ 
+							GpsManage.loadData(GpsManage.gps_pageNo);  
+				}
+			}
+		});
+	},
+	deleteGps:function(gpsId){
+		$("body").tyWindow({"content":"确定要删除?","center":true,"ok":true,"no":true,"okCallback":function(){
+	 	$.ajax({
+					url : "<%=basePath%>gpsWeb/deleteGpsById.do?gpsId="+gpsId+"&sessionId="+sessionId,
+					type : "post", 
+					dataType : "json",
+					success : function(req) {
+						if(req.code==200){
+							GpsManage.loadData(GpsManage.gps_pageNo);  
+						}else{
+					$("body").popjs({"title":"提示","content":req.description});  
+						}
+					}
+			});
+		}});
+	},
+	search:function(){ 
+		GpsManage.packageQuery(1);
+		GpsManage.loadData(1);
+	},
+	addGps:function(){
+		var organId = $("#organId").val();
+		$("#dialog").tyWindow({
+			width : "680px",
+			height : "500px",
+			title : "新增定位设备信息",
+			position : {
+				top : "100px"
+			},
+		content: "<%=basePath%>gpsWeb/gotoGpsAdd.do?organId=" + organId+"&sessionId="+sessionId,
+					iframe : true, 
+					closeCallback :GpsManage.onClose,
+					okCallback:GpsManage.onClose
+				});
+		//$("#dialog").data("kendoWindow").open();
+	},
+	editGps:function(gpsId){
+		var organId = $("#organId").val();
+		$("#dialog").tyWindow({
+			width : "680px",
+			height : "500px",
+			title : "编辑定位设备信息",
+			position : {
+				top : "100px"
+			},
+		content: "<%=basePath%>gpsWeb/gotoGpsEdit.do?gpsId="
+							+ gpsId + "&organId=" + organId+"&sessionId="+sessionId,
+					iframe : true,
+					closeCallback :GpsManage.onClose,
+					okCallback:GpsManage.onClose
+				});
+		//$("#dialog").data("kendoWindow").open();
+	},
+	onClose:function(e){
+		GpsManage.loadData(GpsManage.gps_pageNo);  
+	},
+	importGps:function(){
+		var organId = $("#organId").val();
+		$("#dialog").tyWindow({
+			width : "500px",
+			height : "450px",
+			title : "Gps信息导入",
+			position : {
+				top : "100px"
+			},
+		content: "<%=basePath%>gpsWeb/gotoGpsImport.do?organId=" + organId+"&sessionId="+sessionId,
+					iframe : true,
+					closeCallback : GpsManage.onClose
+				});
+		//$("#dialog").data("kendoWindow").open();
+	},
+	outPortGps:function(){
+		GpsManage.packageQuery();
+		$.ajax({
+					url : "<%=basePath%>excelOutWeb/exportGpsDataToExcle.do?sessionId="+sessionId,
+					type : "post",
+					data : {
+						"gps_Query" : JSON.stringify(bph_gps_query)
+					},
+					dataType : "json",
+					success : function(req) {
+						if (req.code == 200) {
+							var urlStr = "<%=basePath %>"+req.description; 
+							window.location.href = urlStr;
+						}else{
+					$("body").popjs({"title":"提示","content":req.description});  
+						}
+					}
+				});
+	}
+};
+ 
+</script>
+
+<div id="gpsgrid" style="width:150%"></div>
+<div id="page"></div>
+<div id="dialog"></div>
+

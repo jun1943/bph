@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tianyi.bph.dao.system.PatrolAreaDAO">
+  <!-- 巡逻区域 -->
+  <resultMap id="BaseResultMap" type="com.tianyi.bph.domain.system.PatrolArea">
+    <id column="ID" 					jdbcType="DECIMAL" 		property="id" />
+    <result column="BACK_COLOR" 		jdbcType="VARCHAR" 		property="backColor" />
+    <result column="BACK_TRANSPARENCE"	jdbcType="VARCHAR" 		property="backTransparence" />
+    <result column="COORDINATES"		jdbcType="VARCHAR" 		property="coordinates" />
+    <result column="LINE_COLOR" 		jdbcType="VARCHAR" 		property="lineColor" />
+    <result column="LINE_TRANSPARENCE" 	jdbcType="VARCHAR" 		property="lineTransparence" />
+    <result column="NAME" 				jdbcType="VARCHAR"		property="name" />
+    <result column="NOTE" 				jdbcType="VARCHAR" 		property="note" />
+    <result column="ORGAN_ID"			jdbcType="DECIMAL"	 	property="organId" />
+  </resultMap>
+  
+  <sql id="TABLE_NAME">B_PATROL_AREA</sql>
+  
+  <sql id="Base_Column_List">
+    ID, BACK_COLOR, BACK_TRANSPARENCE, COORDINATES, LINE_COLOR, LINE_TRANSPARENCE, NAME, NOTE, ORGAN_ID
+  </sql>
+  
+  <!-- 根据ID查询 -->
+  <select id="selectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from <include refid="TABLE_NAME" /> 
+    where ID = #{id, jdbcType=DECIMAL}
+  </select>
+  
+  <!-- 修改巡逻区域信息 -->
+  <update id="updateByPrimaryKeySelective" parameterType="com.tianyi.bph.domain.system.PatrolArea">
+    update <include refid="TABLE_NAME" />
+    <set>
+      <if test="backColor != null">			BACK_COLOR 			= #{backColor,jdbcType=VARCHAR},		</if>
+      <if test="backTransparence != null">	BACK_TRANSPARENCE 	= #{backTransparence,jdbcType=VARCHAR},	</if>
+      <if test="coordinates != null">		COORDINATES 		= #{coordinates,jdbcType=VARCHAR},		</if>
+      <if test="lineColor != null">			LINE_COLOR 			= #{lineColor,jdbcType=VARCHAR},		</if>
+      <if test="lineTransparence != null">	LINE_TRANSPARENCE 	= #{lineTransparence,jdbcType=VARCHAR},	</if>
+      <if test="name != null">				NAME 				= #{name,jdbcType=VARCHAR},				</if>
+      <if test="note != null">				NOTE 				= #{note,jdbcType=VARCHAR},				</if>
+      <if test="organId != null">			ORGAN_ID 			= #{organId,jdbcType=DECIMAL},			</if>
+    </set>
+    where id = #{id, jdbcType=DECIMAL}
+  </update>
+  
+  <!-- 添加巡逻区域 -->
+  <insert id="insert" parameterType="com.tianyi.bph.domain.system.PatrolArea">
+  	<!-- <selectKey statementType="STATEMENT" order="BEFORE" resultType="Integer" keyProperty="cardPointId" >  
+			SELECT ORGAN_SEQ.NEXTVAL FROM DUAL
+	</selectKey> -->
+	
+	<selectKey resultType="Integer" keyProperty="id" order="AFTER">  
+        SELECT LAST_INSERT_ID()
+    </selectKey>
+    
+    insert into <include refid="TABLE_NAME" /> (	<include refid="Base_Column_List" /> )
+    values (#{id, jdbcType=DECIMAL}, #{backColor,jdbcType=VARCHAR}, #{backTransparence,jdbcType=VARCHAR}, #{coordinates,jdbcType=VARCHAR}, 
+    	#{lineColor,jdbcType=VARCHAR}, #{lineTransparence,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{note,jdbcType=VARCHAR}, #{organId,jdbcType=DECIMAL}
+    )
+  </insert>
+  
+  <!-- 删除巡逻区域 -->
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from <include refid="TABLE_NAME" />
+    where ID = #{id, jdbcType=DECIMAL}
+  </delete>
+  
+ <!-- 条件、分页 -->
+ 	<sql id="find">
+		select 
+			<include refid="Base_Column_List" />
+    	from <include refid="TABLE_NAME" /> 
+		where 1=1 
+		<if test="name != null and name != ''">
+			AND NAME LIKE #{name,jdbcType=VARCHAR}
+		</if>
+	</sql>
+	
+	<!-- 查询总数 -->
+	<select id="findCount"  resultType="Integer">
+		select 
+			count(distinct ID) 
+		from <include refid="TABLE_NAME" /> 
+		where 1=1
+		<if test="name != null and name != ''">
+			AND NAME =#{name,jdbcType=VARCHAR}
+		</if>
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="findByPage" parameterType="com.tianyi.bph.query.system.PatrolAreaQuery"  resultMap="BaseResultMap" >
+		select * from <include refid="TABLE_NAME" /> where 1=1
+		<if test="name != null and name != ''">
+			AND NAME =#{name,jdbcType=VARCHAR}
+		</if>
+		limit #{begin}, #{end}
+	</select>
+	<!--oracle: select * from ( select c.*, rownum ro from <include refid="TABLE_NAME" /> c where rownum &lt; =#{end}) where ro &gt; =#{begin} -->
+	
+	<!-- 条件查询 -->
+	<select id="findByQuery" parameterType="com.tianyi.bph.query.system.PatrolAreaQuery"  resultMap="BaseResultMap" >
+		<include refid="find" />
+	</select>
+	
+	<!-- 重复验证 -->
+	<select id="getUniqueCountByQuery" parameterType="com.tianyi.bph.query.system.PatrolAreaQuery" resultType="Integer">
+		select count(*) from <include refid="TABLE_NAME" />
+		where NAME = #{name,jdbcType=VARCHAR} 
+	</select>
+	
+</mapper>

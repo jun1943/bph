@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.tianyi.bph.dao.duty.DutyReportMapper" >
+
+<resultMap id="BaseResultMap" type="com.tianyi.bph.query.duty.DutyReportVM" >
+	<id column="org_id" property="id" jdbcType="INTEGER" />
+	<result column="org_parent_id" property="parentId" jdbcType="INTEGER" />
+    <result column="org_id" property="orgId" jdbcType="INTEGER" />
+    <result column="org_name" property="orgName" jdbcType="VARCHAR" />
+    <result column="org_short_name" property="orgShortName" jdbcType="VARCHAR" />
+    <result column="org_code" property="orgCode" jdbcType="VARCHAR" />
+    <result column="org_short_name" property="orgShortName" jdbcType="VARCHAR" />
+    <result column="leader_names" property="leaderNames" jdbcType="VARCHAR" />
+    <result column="leader_count" property="leaderCount" jdbcType="INTEGER" />
+    <result column="director_names" property="directorName" jdbcType="VARCHAR" />
+    <result column="director_count" property="directorCount" jdbcType="INTEGER" />
+    <result column="vehicle_count" property="vehicleCount" jdbcType="INTEGER" />
+    <result column="police_count" property="policeCount" jdbcType="INTEGER" />
+    <result column="weapon_count" property="weaponCount" jdbcType="INTEGER" />
+    <result column="gps_count" property="gpsCount" jdbcType="INTEGER" />
+    <result column="community_count" property="communityCount" jdbcType="INTEGER" />
+    <result column="patrolArea_count" property="patrolAreaCount" jdbcType="INTEGER" />
+    <result column="bayonet_count" property="bayonetCount" jdbcType="INTEGER" />
+  </resultMap>
+
+<select id="loadDutyReport" parameterType="java.util.Map" resultMap="BaseResultMap">
+		select
+			org.organ_id				as id, 
+			org.parent_id				as org_parent_id,
+			org.organ_id				as org_id,
+			org.name 					as org_name,
+			org.short_name 				as org_short_name,
+			org.code					as org_code,
+			org.path					as org_path,
+			t.vehicleCount				as vehicle_count,
+			t.policeCount				as police_count,
+			t.weaponCount				as weapon_count,
+			t.gpsCount					as gps_count,
+			t.npname					as leader_names,
+			t.npnameCount				as leader_count,
+			t.dpname                    as director_names,
+			t.dpnameCount				as director_count,
+			t.communityCount			as communityCount,
+			t.patrolAreaCount			as patrolAreaCount,
+			t.bayonetCount				as bayonetCount
+		from t_organ as org
+		left join
+		(
+			select 
+				d.org_id as org_id,
+				count(v.id) 			as vehicleCount,
+				count(p.id) 			as policeCount,
+				count(w.id)				as weaponCount,
+				count(g.id) 			as gpsCount,
+				GROUP_CONCAT(n.npname) 	as npname,
+				count(n.npname)			as npnameCount,
+				GROUP_CONCAT(s.dpname) 	as dpname,
+				count(s.dpname)         as dpnameCount,
+				count(dt1.id) 			as communityCount,
+				count(dt2.id) 			as patrolAreaCount,
+				count(dt3.id) 			as bayonetCount
+			from t_duty as d 
+			left join t_duty_item as di on d.id=di.duty_id
+			left join t_vehicle as v on di.item_id=v.id and di.item_type_id=1
+			left join t_police as p on di.item_id=p.id and di.item_type_id=2
+			left join t_weapon as w on di.item_id=w.id and di.item_type_id=3
+			left join t_gps as g on di.item_id=g.id and di.item_type_id=4
+			left join t_duty_type as dt1 on di.duty_type_id = dt1.id and dt1.asso_task_type=1 and di.item_type_id=2
+			left join t_duty_type as dt2 on di.duty_type_id = dt2.id and dt2.asso_task_type=2 and di.item_type_id=2
+			left join t_duty_type as dt3 on di.duty_type_id = dt3.id and dt3.asso_task_type=3 and di.item_type_id=2
+			left join 
+			(
+				select
+					ndi.id as nid,
+					np.name as npname
+				from t_duty_item as ndi
+				left join t_police as np on ndi.item_id=np.id and ndi.item_type_id=2
+				left join t_duty_type as ndt on ndt.id=ndi.duty_type_id
+				where ndt.name like '%领导%'
+			) as n on n.nid=di.id
+			left join 
+			(
+				select
+					ddi.id as did,
+					dp.name as dpname
+				from t_duty_item as ddi
+				left join t_police as dp on ddi.item_id=dp.id and ddi.item_type_id=2
+				left join t_duty_type as ddt on ddt.id=ddi.duty_type_id
+				where ddt.name like '%主任%'
+			) as s on s.did=di.id
+			where
+				d.ymd= #{ymd,jdbcType=INTEGER}
+				and d.is_template=false
+				and di.begin_time  between #{beginTime,jdbcType=TIMESTAMP}
+				and #{endTime,jdbcType=TIMESTAMP}
+				<if test=" taskProperyIds != null" >
+        			and exists (select 1 from t_duty_type_property_relate as dtpr where dtpr.duty_type_id=di.duty_type_id and dtpr.property_id in
+        			<foreach item="item" index="index" collection="taskProperyIds" open="(" separator="," close=")">
+ 						#{item}  
+					</foreach> )
+      			</if>
+      			<if test=" attireTypeIds != null" >
+      				and exists (select 1 from t_duty_type as wdt where wdt.id=di.duty_type_id and wdt.attire_type in
+      				<foreach item="item" index="index" collection="attireTypeIds" open="(" separator="," close=")">
+ 						#{item}  
+					</foreach>)
+      			</if>
+				<if test=" armamentTypeIds != null" >
+      				and exists (select 1 from t_duty_type as wdt where wdt.id=di.duty_type_id and wdt.armament_type in 
+      				<foreach item="item" index="index" collection="armamentTypeIds" open="(" separator="," close=")">
+ 						#{item}  
+					</foreach> )
+      			</if>
+				<if test=" policeTypeIds != null" >
+      				and exists (select 1 from t_police as pt where pt.id=di.item_id and pt.type_id in 
+      				<foreach item="item" index="index" collection="policeTypeIds" open="(" separator="," close=")">
+ 						#{item}  
+					</foreach> )
+      			</if>
+				<if test=" dutyTypeIds != null" >
+      				and di.duty_type_id in 
+      				<foreach item="item" index="index" collection="dutyTypeIds" open="(" separator="," close=")">
+ 						#{item}  
+					</foreach>
+      			</if>
+			group by d.org_id
+		) as t on org.organ_id=t.org_id
+		where
+			1=1
+			<if test=" orgIds != null" >
+        		and org.organ_id in 
+        		<foreach item="item" index="index" collection="orgIds" open="(" separator="," close=")">
+ 					#{item}  
+				</foreach>  
+			</if>
+		order by org.organ_id
+    </select>
+    
+    </mapper>
