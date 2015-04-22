@@ -35,6 +35,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 <script src="<%=basePath %>JS/extend/pop.js" type='text/javascript'></script>
 <script src="<%=basePath %>JS/extend/ty-window.js" type='text/javascript'></script>
 <script src="<%=basePath %>JS/user/pager.js" type='text/javascript'></script>
+<script src="<%=basePath %>JS/user/dutyutil.js" type='text/javascript'></script>
 <!--[if lte IE 9]>
 <script src="<%=basePath %>JS/extend/html5shiv.js" type='text/javascript'></script>
 <script src="<%=basePath %>JS/extend/respond.js" type='text/javascript'></script>

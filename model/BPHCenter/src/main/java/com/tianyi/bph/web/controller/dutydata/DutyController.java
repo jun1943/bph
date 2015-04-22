@@ -1,8 +1,11 @@
 package com.tianyi.bph.web.controller.dutydata;
 
 import java.util.Calendar;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+
+import net.sf.json.JSONArray;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -11,8 +14,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.tianyi.bph.domain.duty.DutyProperty;
 import com.tianyi.bph.domain.system.Organ;
 import com.tianyi.bph.query.system.UserQuery;
+import com.tianyi.bph.service.duty.DutyService;
 import com.tianyi.bph.service.system.OrganService;
 
 @Controller
@@ -22,6 +27,9 @@ public class DutyController {
 	@Autowired
 	private OrganService organService;
 
+	@Autowired
+	private DutyService dutyService;
+	
 	/**
 	 * web跳转到勤务类型列表
 	 * 
@@ -56,4 +64,17 @@ public class DutyController {
 		return mv;
 	}
 
+	
+	@RequestMapping(value = "/getdutyProperty.do", produces = "application/json;charset=UTF-8")
+	public @ResponseBody
+	String getdutyProperty() throws Exception {
+		try {
+			List<DutyProperty> list = dutyService.selectdutyProperty();
+			JSONArray result = JSONArray.fromObject(list);
+			return result.toString();
+		} catch (Exception ex) {
+			return "";
+		}
+	}
+	
 }
