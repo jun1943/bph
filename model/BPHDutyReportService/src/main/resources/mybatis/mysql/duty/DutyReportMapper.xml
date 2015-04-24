@@ -25,9 +25,9 @@
 
 <select id="loadDutyReport" parameterType="java.util.Map" resultMap="BaseResultMap">
 		select
-			org.id						as id, 
+			org.organ_id				as id, 
 			org.parent_id				as org_parent_id,
-			org.id						as org_id,
+			org.organ_id				as org_id,
 			org.name 					as org_name,
 			org.short_name 				as org_short_name,
 			org.code					as org_code,
@@ -124,16 +124,16 @@
 					</foreach>
       			</if>
 			group by d.org_id
-		) as t on org.id=t.org_id
+		) as t on org.organ_id=t.org_id
 		where
 			1=1
 			<if test=" orgIds != null" >
-        		and org.id in 
+        		and org.organ_id in 
         		<foreach item="item" index="index" collection="orgIds" open="(" separator="," close=")">
  					#{item}  
 				</foreach>  
 			</if>
-		order by org.id
+		order by org.organ_id
     </select>
     
     </mapper>

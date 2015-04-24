@@ -50,7 +50,4 @@ public class DutyTypeVM extends DutyType {
 		this.parentFullPath = parentFullPath;
 	}
 
-	
-	
-	
 }

@@ -25,6 +25,13 @@ public class OrgWithPoliceVM {
 	 */
 	private String code;
 	
+
+	public Boolean getIsOrg() {
+		return dataType==1;
+	}
+	public void setIsOrg(Boolean isOrg) {
+		
+	}
 	public String getId() {
 		return this.id;
 	}
