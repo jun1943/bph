@@ -91,7 +91,7 @@ public interface VehicleService {
 	 * @param param
 	 * @return
 	 */
-	public List<Vehicle> findByNumber(String param);
+	public List<VehicleVM> findByNumber(String param);
 	/**
 	 * 判断车辆资源是否存在关联数据
 	 * @param param
@@ -117,6 +117,6 @@ public interface VehicleService {
 	List<VehicleExtItem> getVehicleDutyInfo(Integer orgId, Integer ymd,Integer isSubOrg);
 	public Vehicle selectByPrimaryKey(Integer vehicleId);
 	public List<GpsBaseVM> selectGpsId(int orgId);
-	public List<Vehicle> findByNumberAndId(Map<String, Object> map);
+	public List<VehicleVM> findByNumberAndId(Map<String, Object> map);
 	
 }

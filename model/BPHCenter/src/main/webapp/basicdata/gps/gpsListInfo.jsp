@@ -7,14 +7,16 @@ var iconUrl;
 var sessionId = $("#token").val();
 $(function() {
 	loadData(1);	
-	$("#gpsNumber").keyup(function(){
+	$("#gpsNumber").keydown(function(){
         if(event.keyCode == 13){
             GpsManage.search();
+            $("#gpsNumber").focus();
         }
     });	
-	$("#gpsName").keyup(function(){
+	$("#gpsName").keydown(function(){
         if(event.keyCode == 13){
             GpsManage.search();
+            $("#gpsName").focus();
         }
     });
 });
@@ -28,8 +30,8 @@ var GpsManage = {
 	gps_pageNo:1,
 	packageQuery:function(pageNo){
 		bph_gps_query.isSubOrg = $("#organLevel").val();
-        bph_gps_query.name = $("#gpsName").val(); 
-        bph_gps_query.number = $("#gpsNumber").val(); 
+        bph_gps_query.name = $.trim($("#gpsName").val()); 
+        bph_gps_query.number = $.trim($("#gpsNumber").val()); 
         bph_gps_query.orgId = $("#organId").val();
         bph_gps_query.orgPath = $("#organPath").val();
         bph_gps_query.pageSize = $("#pageSize").val();
@@ -89,22 +91,16 @@ var GpsManage = {
                                 var userId = e.sender.selectable.userEvents.currentTarget.cells[0].innerHTML; 
                             }
 						});
-									$("#gpsgrid .k-grid-content").mCustomScrollbar( {scrollButtons:{enable:true},advanced:{ updateOnContentResize: true } });
-               						//alert(pageNo);
-               						//alert(total);
-               						//alert("size="+pageSize);
-               						//var pg = pagination(pageNo,total,'loadData',pageSize,0);
-               						var pg = pagination(pageNo,total,'loadData',10);
-               						 
-               	                	$("#page").html(pg);
-						}else
-						{ 
-							GpsManage.loadData(GpsManage.gps_pageNo);  
-						}
-				}else
-				{ 
-							GpsManage.loadData(GpsManage.gps_pageNo);  
-				}
+								var myGrid = $("#gpsgrid").data("kendoGrid");
+           						myGrid.element.on("dblclick","tbody>tr","dblclick",function(e){
+           							var id = $(this).find("td").first().text();
+           							GpsManage.editGps(id);
+           						});
+								$("#gpsgrid .k-grid-content").mCustomScrollbar( {scrollButtons:{enable:true},advanced:{ updateOnContentResize: true } });
+             					var pg = pagination(pageNo,total,'loadData',10);
+              	                $("#page").html(pg);
+						} 
+				} 
 			}
 		});
 	},
@@ -125,14 +121,34 @@ var GpsManage = {
 		}});
 	},
 	search:function(){ 
+	
+		var gpsNumber = $("#gpsNumber").val();
+		if(gpsNumber.length>0)
+		{
+			var myReg = /^[^@\/\'\\\"#$%&\^\*]+$/;
+			if(!myReg.test(gpsNumber)){
+				$("body").popjs({"title":"提示","content":"编号查询条件不能包含非法字符"}); 
+				return;
+			}
+		}
+		
+		var gpsName = $("#gpsName").val();
+		if(gpsName.length>0)
+		{
+			var myReg = /^[^@\/\'\\\"#$%&\^\*]+$/;
+			if(!myReg.test(gpsName)){
+				$("body").popjs({"title":"提示","content":"名称查询条件不能包含非法字符"}); 
+				return;
+			}
+		}
 		GpsManage.packageQuery(1);
 		GpsManage.loadData(1);
 	},
 	addGps:function(){
 		var organId = $("#organId").val();
 		$("#dialog").tyWindow({
-			width : "680px",
-			height : "500px",
+			width : "580px",
+			height : "480px",
 			title : "新增定位设备信息",
 			position : {
 				top : "100px"
@@ -147,8 +163,8 @@ var GpsManage = {
 	editGps:function(gpsId){
 		var organId = $("#organId").val();
 		$("#dialog").tyWindow({
-			width : "680px",
-			height : "500px",
+			width : "580px",
+			height : "480px",
 			title : "编辑定位设备信息",
 			position : {
 				top : "100px"

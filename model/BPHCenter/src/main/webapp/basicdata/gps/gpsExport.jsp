@@ -19,14 +19,43 @@
 
 <%@ include file="../../emulateIE.jsp" %>
 <script  type="text/javascript">
-
+var fileUrl = "";
 var gpsImportManage = {
 		downLoadModel:function(){
 			var urlStr = "<%=basePath %>excelModel/GpsInfo.xls"; 
 			window.location.href = urlStr;
-		} 
+		} ,
+		fileFormSubmit:function(){ 
+			if(fileUrl == undefined ||fileUrl ==""){
+			$("body").popjs({"title":"提示","content":"请选择文件进行上传","callback":function(){ 
+								return; 
+							}});  
+				return; 
+			}
+			$('#gpsimportForm').submit();
+		}
 };
 
+function checkType(e){
+
+
+	 var src=e.target || window.event.srcElement;
+
+	var filepath=src.value;
+	fileUrl = filepath;
+	var files =src.files; 
+	
+	filepath=filepath.substring(filepath.lastIndexOf('.')+1,filepath.length)
+	if(filepath != 'xls'){
+		$("body").popjs({"title":"提示","content":"只能上传97--2003版本格式文件，后缀名为.xls","callback":function(){
+								src.value="";
+								fileUrl = "";
+								return;
+							}});  
+								return; 
+	} 
+
+}
 </script>
 </head>
 <body>
@@ -42,13 +71,14 @@ var gpsImportManage = {
 							<input id="orgId" name="orgId" type="hidden" value="${organ.id}" />
 							<input id="sessionId" name="sessionId" type="hidden" value="${requestScope.sessionId}" />
 							<input id="dataType" name="dataType" value="gpsData" type="hidden"/>
-							<input type="file" name="fileName"  style="width:180px"  text="选择文件上传" /> <a
+							<input type="file" onchange="checkType(event)"  id="fileName"   name="fileName"  style="width:180px"  text="选择文件上传" /> <a
 								href="<%=basePath %>excelModel/GpsInfo.xls" style="font-size:12px;color:#819f0;"
 								onclick="">[点击下载excel模板]</a>
 						</p> <label style="font-size:12px;color:#819f0;">上传文件时，请先下载模板文件填写
 							；</label><br /> <label style="font-size:12px;color:#819f0;">文件对象为：97—03版本的excel文件，后缀格式为xls；</label>
+							<br /> <label style="font-size:12px;color:#819f0;">文件大小为：1Mb以内；</label>
 					 <p>  	
-						<input type="submit" name="submit"  style="width:80px"  onclick="$('#gpsimportForm').submit()" value="开始导入" />
+					 	<span id="submit" class="k-button"  onClick="gpsImportManage.fileFormSubmit();" >开始导入</span>  
 					</p> 
 					 <p style="color: red">${requestScope.uploadError}</p> 
 					 

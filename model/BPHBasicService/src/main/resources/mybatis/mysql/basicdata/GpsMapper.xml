@@ -170,12 +170,22 @@
  				</foreach>
        	
    </delete> 
-  	<select id="findByNumber" parameterType="String" resultType="com.tianyi.bph.domain.basicdata.Gps">  
-       		select * from t_gps where number = #{param}  
+  	<select id="findByNumber" parameterType="String" resultType="com.tianyi.bph.query.basicdata.GpsVM">  
+       		select g.id as id,
+       			   g.number as number,
+       			   o.short_name as orgName 
+       		 from t_gps g 
+       		 left join t_organ o on g.org_id = o.organ_id
+       		  where g.number = #{param}  
     	 </select>
     	 
-    	  <select id="findByNumberAndId" parameterType="java.util.Map" resultType="com.tianyi.bph.domain.basicdata.Gps">  
-       		select * from t_gps where number = #{number} and id  !=  #{id}   
+    	  <select id="findByNumberAndId" parameterType="java.util.Map" resultType="com.tianyi.bph.query.basicdata.GpsVM">  
+       		select g.id as id,
+       			   g.number as number,
+       			   o.short_name as orgName 
+       		 from t_gps g 
+       		 left join t_organ o on g.org_id = o.organ_id
+       		  where g.number = #{number} and g.id  !=  #{id}   
     	 </select>
 <select id="selectGpsType" resultType="com.tianyi.bph.domain.basicdata.GpsType">  
        		 select * from t_gpstype order by id asc

@@ -52,16 +52,11 @@ $(document).ready(function() {
 	</div>
 	<div class="fl ml30 set-hei48"> 
 		 <span class="fl">  车牌号码:<input type="search" class="k-textbox" id="vehicleNumber" name="vehicleNumber" placeholder="等待输入..." /></span> 
-                 	  
                  	   
-		<%-- <input type="hidden" id="organId" name="organId" value="${query.organId}"> 
-		<input type="hidden" id="organPath" name="organPath" value="${organ.path}"> --%>
 		<button id="textButton" class="fr ty-btn-search" onclick="VehicleManage.search()"></button>
-		
-                   <input type="hidden" id="organId" name="organId" value="${query.organId}">
-                   <input type="hidden" id="organPath" name="organPath" value="${organ.path}">
-                   <input type="hidden" id="pageSize" name="organId" value="${query.pageSize}">
-                   <input type="hidden" id="pageStart" name="organPath" value="${query.pageNo}">
+		 
+                   <input type="hidden" id="pageSize" name="pageSize" value="${query.pageSize}">
+                   <input type="hidden" id="pageStart" name="pageStart" value="${query.pageNo}">
 		<div class="temp">
 			<div class="ty-total-decorate"><span id="gridListTotal"></span><i></i></div>
 			<div class="ty-decorate2"></div>

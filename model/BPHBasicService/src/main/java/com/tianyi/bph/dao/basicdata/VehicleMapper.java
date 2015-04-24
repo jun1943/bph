@@ -80,7 +80,7 @@ public interface VehicleMapper {
 	 * @param param
 	 * @return
 	 */
-	List<Vehicle> findByNumber(String param);
+	List<VehicleVM> findByNumber(String param);
 	/**
 	 * 判断是否有车辆关联信息
 	 * @param param
@@ -94,6 +94,6 @@ public interface VehicleMapper {
 	 */
 	List<Vehicle> getVehicleInfo(Map<String, Object> map);
 	List<GpsBaseVM> selectGpsId(int orgId);
-	List<Vehicle> findByNumberAndId(Map<String, Object> map);
+	List<VehicleVM> findByNumberAndId(Map<String, Object> map);
     
 }

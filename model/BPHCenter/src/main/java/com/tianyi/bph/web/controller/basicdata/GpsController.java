@@ -192,6 +192,13 @@ public class GpsController {
 
 			list = gpsService.loadVMList(map);
 
+			if(list.size()==0){
+				if(pageStart>1){
+					pageBegin = pageSize * ((pageStart-1) > 0 ? (pageStart - 2) : 0);
+					map.put("pageStart", pageBegin);
+					list = gpsService.loadVMList(map);
+				}
+			}
 			return PageReturn.MESSAGE(MessageCode.STATUS_SUCESS,
 					MessageCode.SELECT_SUCCESS, total, list);
 		} catch (Exception ex) {
@@ -327,7 +334,7 @@ public class GpsController {
 			@RequestParam(value = "id", required = false) Integer id)
 			throws Exception {
 		try {
-			List<Gps> gps = new ArrayList<Gps>();
+			List<GpsVM> gps = new ArrayList<GpsVM>();
 
 			if (type > 0) {
 				Map<String, Object> map = new HashMap<String, Object>();
@@ -338,7 +345,7 @@ public class GpsController {
 				gps = gpsService.findByNumber(param);
 			}
 			if (gps.size() > 0) {
-				return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL, "Exits",
+				return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL,gps.get(0).getOrgName(),
 						0, null);
 			} else {
 				return ReturnResult.MESSAGE(MessageCode.STATUS_SUCESS,
@@ -346,7 +353,7 @@ public class GpsController {
 			}
 
 		} catch (Exception ex) {
-			return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL, "Exits", 0,
+			return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL, " ", 0,
 					null);
 		}
 	}

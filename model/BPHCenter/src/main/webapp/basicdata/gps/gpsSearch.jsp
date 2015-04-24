@@ -11,13 +11,9 @@
 	<div class="fl set-hei48"> 
 		 <span class="fl">GPS名称:<input type="search" class="k-textbox" id="gpsName" name="gpsName"  placeholder="等待输入..." /></span> 
                  	 <span class="fl"> GPS编号:<input type="search" class="k-textbox" id="gpsNumber" name="gpsNumber"  placeholder="等待输入..." /></span> 
-                 	   
-		<%-- <input type="hidden" id="organId" name="organId" value="${query.organId}"> 
-		<input type="hidden" id="organPath" name="organPath" value="${organ.path}"> --%>
+                 	    
 		<button id="textButton" class="fr ty-btn-search" onclick="GpsManage.search()"></button>
-		
-                   <input type="hidden" id="organId" name="organId" value="${query.organId}"/>
-                   <input type="hidden" id="organPath" name="organPath" value="${organ.path}"/>
+		 
                    <input type="hidden" id="pageSize" name="pageSize" value="${query.pageSize}"/>
                    <input type="hidden" id="pageStart" name="pageStart" value="${query.pageNo}"/>
 		<div class="temp">

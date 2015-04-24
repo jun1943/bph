@@ -156,7 +156,7 @@
 		org.path 			as 	orgPath
   	from 
   		t_duty_weapon_group as g
-  		left join t_organ as org on g.org_id=org.id
+  		left join t_organ as org on g.org_id=org.organ_id
   	where
 		g.org_id=#{orgId,jdbcType=INTEGER}
   	
@@ -182,7 +182,7 @@ select distinct	g.id,
 		org.path 			as 	orgPath
  		from t_duty_weapon_group g 
 			left join t_duty_weapon_group_org  pgo on g.id = pgo.weapon_group_id 
-			left join t_organ org on g.org_id = org.id
+			left join t_organ org on g.org_id = org.organ_id
   	where
 		pgo.org_id=#{orgId,jdbcType=INTEGER}
   	 

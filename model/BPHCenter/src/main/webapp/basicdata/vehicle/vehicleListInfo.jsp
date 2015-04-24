@@ -5,9 +5,10 @@ var bph_vehicle_query ={};
 var sessionId = $("#token").val();
 $(function() {
 	loadData(1);
-	$("#vehicleNumber").keyup(function(){
+	$("#vehicleNumber").keydown(function(){
         if(event.keyCode == 13){
             VehicleManage.search();
+            $("#vehicleNumber").focus();
         }
     });
 });
@@ -20,7 +21,7 @@ var VehicleManage = {
 	vehicle_pageNo:1,
 	packageQuery : function(pageNo) {
 			bph_vehicle_query.isSubOrg = $("#organLevel").val();
-			bph_vehicle_query.number = $("#vehicleNumber").val();
+			bph_vehicle_query.number = $.trim($("#vehicleNumber").val());
 			bph_vehicle_query.orgId = $("#organId").val();
 			bph_vehicle_query.orgPath = $("#organPath").val();
 			bph_vehicle_query.pageSize = $("#pageSize").val();
@@ -90,22 +91,16 @@ var VehicleManage = {
                                 var userId = e.sender.selectable.userEvents.currentTarget.cells[0].innerHTML; 
                             }
 						});
+							var myGrid = $("#vehiclegrid").data("kendoGrid");
+            				myGrid.element.on("dblclick","tbody>tr","dblclick",function(e){
+             					var id = $(this).find("td").first().text();
+             					VehicleManage.editVehicle(id);
+             				});
 							$("#vehiclegrid .k-grid-content").mCustomScrollbar( {scrollButtons:{enable:true},advanced:{ updateOnContentResize: true } });
-               						//alert(pageNo);
-               						//alert(total);
-               						//alert("size="+pageSize);
-               						//var pg = pagination(pageNo,total,'loadData',pageSize,0);
-               						var pg = pagination(pageNo,total,'loadData',10);
-               					 
-               	                	$("#page").html(pg);
-						}else
-						{ 
-							VehicleManage.loadData(VehicleManage.vehicle_pageNo);  
-						}
-					}else
-					{ 
-							VehicleManage.loadData(VehicleManage.vehicle_pageNo);  
-					}
+             				var pg = pagination(pageNo,total,'loadData',10);
+               	            $("#page").html(pg);
+						} 
+					} 
 				}
 			});
 	}, 
@@ -126,6 +121,15 @@ var VehicleManage = {
 		}});	
 	},
 	search:function(){ 
+		var vehiclenumber = $("#vehicleNumber").val();
+		if(vehiclenumber.length>0)
+		{
+			var myReg = /^[^@\/\'\\\"#$%&\^\*]+$/;
+			if(!myReg.test(vehiclenumber)){
+				$("body").popjs({"title":"提示","content":"查询条件不能包含非法字符"}); 
+				return;
+			}
+		}
 		VehicleManage.packageQuery(1);
 		VehicleManage.loadData(1);
 	},

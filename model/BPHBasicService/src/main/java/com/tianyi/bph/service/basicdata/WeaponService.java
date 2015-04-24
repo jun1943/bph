@@ -105,7 +105,7 @@ public interface WeaponService {
 	 * @param param
 	 * @return
 	 */
-	List<Weapon> findByNumber(String param);
+	List<WeaponVM> findByNumber(String param);
 	/**
 	 * 判断是否有武器关联数据
 	 * @param string
@@ -128,6 +128,6 @@ public interface WeaponService {
 	 * @return
 	 */
 	List<ExtItem<Weapon>> getWeaponDutyInfo(Integer orgId, Integer ymd,Integer isSubOrg);
-	List<Weapon> findByNumberAndId(Map<String, Object> map);
+	List<WeaponVM> findByNumberAndId(Map<String, Object> map);
 	
 }

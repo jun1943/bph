@@ -231,11 +231,23 @@
 		left join t_gpstype gt on g.type_id = gt.id
 		where g.org_id = #{orgId,jdbcType=INTEGER} order by g.id asc
 	</select>
-   		<select id="findByNumber" parameterType="String" resultType="com.tianyi.bph.domain.basicdata.Vehicle">  
-       		select * from t_vehicle where number = #{param}  
+   		<select id="findByNumber" parameterType="String" resultType="com.tianyi.bph.query.basicdata.VehicleVM">  
+       		select 
+       			v.id as id,
+       			v.number as number,
+       			o.short_name as orgName 
+			from t_vehicle v 
+       		left join t_organ o on v.org_id = o.organ_id
+       		 where v.number = #{param}  
     	 </select>
-    	    		<select id="findByNumberAndId" parameterType="java.util.Map" resultType="com.tianyi.bph.domain.basicdata.Vehicle">  
-       		select * from t_vehicle where number = #{number}  and id !=#{id,jdbcType=INTEGER}
+    	    		<select id="findByNumberAndId" parameterType="java.util.Map" resultType="com.tianyi.bph.query.basicdata.VehicleVM">  
+       		select 
+       			v.id as id,
+       			v.number as number,
+       			o.short_name as orgName 
+			from t_vehicle v 
+       		left join t_organ o on v.org_id = o.organ_id
+       		 where v.number = #{number}  and v.id !=#{id,jdbcType=INTEGER}
     	 </select>
     	 
       	 <select id="selectVehicleType" resultType="com.tianyi.bph.domain.basicdata.VehicleType">  

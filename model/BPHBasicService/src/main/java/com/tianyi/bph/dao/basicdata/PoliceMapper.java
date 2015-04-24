@@ -46,7 +46,7 @@ public interface PoliceMapper {
     /**
      * 根据警号查询警员对象
      */
-    List<Police> findBycode(String code); 
+    List<PoliceVM> findBycode(String code); 
 	/**
 	 * 根据警员名称查询警员对象
 	 */
@@ -110,7 +110,7 @@ public interface PoliceMapper {
 	/**
 	 * 根据身份证号查询警员对象
 	 */
-	List<Police> findByidCard(String param);
+	List<PoliceVM> findByidCard(String param);
 	/**
 	 * 警员资源查询，根据所选分组进行筛选
 	 */
@@ -133,7 +133,7 @@ public interface PoliceMapper {
 	 * @param param
 	 * @return
 	 */
-	List<Police> findByintercomPerson(String param);
+	List<PoliceVM> findByintercomPerson(String param);
 	/**
 	 * 根据组织机构id，查询所有警员列表数据
 	 * @param orgId
@@ -155,8 +155,8 @@ public interface PoliceMapper {
 	 */
 	List<Police> getPoliceInfo(Map<String, Object> map);
 	
-	List<Police> findByidCardAndId(Map<String, Object> map);
-	List<Police> findBycodeAndId(Map<String, Object> map);
-	List<Police> findByintercomPersonAndId(Map<String, Object> map);
+	List<PoliceVM> findByidCardAndId(Map<String, Object> map);
+	List<PoliceVM> findBycodeAndId(Map<String, Object> map);
+	List<PoliceVM> findByintercomPersonAndId(Map<String, Object> map);
 	 
 }

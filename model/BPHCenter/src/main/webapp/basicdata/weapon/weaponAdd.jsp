@@ -42,6 +42,7 @@ $(function() {
  
 var bph_weaponAdd_pkg={};
 var isExist = false;
+var bph_Exist_OrgName ="";
 var WeaponAddManage= { 
 		isComplete:false,
 		saveWeaponWithOut:function(){ 
@@ -78,22 +79,30 @@ var WeaponAddManage= {
 			var pnumber = $.trim($("#weaponNumber").val()); 
 			if(pnumber.length>0){
 				if (pnumber.length > 20) { 
-							$("body").popjs({"title":"提示","content":"武器编号长度出错，限制长度为0--20！"});  
+							$("body").popjs({"title":"提示","content":"武器编号长度出错，限制长度为0--20！","callback":function(){
+								$("#weaponNumber").focus();
+							}});    
 					return;
 				}
 				WeaponAddManage.isExistWeapon(pnumber,0, 0);
 				if (!isExist) { 
-							$("body").popjs({"title":"提示","content":"武器编号重复，请检查"});
-					return;
+							$("body").popjs({"title":"提示","content":"该武器编号在"+bph_Exist_OrgName+"机构下已经存在，请确认之后添加","callback":function(){
+								$("#weaponNumber").focus();
+							}});    
+					return; 
 				}
 			}else{ 
-							$("body").popjs({"title":"提示","content":"请录入武器编号"});
+							$("body").popjs({"title":"提示","content":"请录入武器编号","callback":function(){
+								$("#weaponNumber").focus();
+							}});    
 				return;
 			}
 			bph_weaponAdd_pkg.number= pnumber;
 			var wstandard= $.trim($("#weaponStandard").val());
 			if (wstandard.length > 20) { 
-							$("body").popjs({"title":"提示","content":"子弹数目长度过长，限制长度为20！"});
+							$("body").popjs({"title":"提示","content":"子弹数目长度过长，限制长度为20！","callback":function(){
+								$("#weaponStandard").focus();
+							}});    
 				return;
 			}
 			bph_weaponAdd_pkg.standard = wstandard; 
@@ -134,6 +143,8 @@ var WeaponAddManage= {
 				success : function(req) {
 					if (req.code==200) {
 						isExist = true;
+					}else{
+						bph_Exist_OrgName = req.description;
 					}
 				}
 			});
@@ -148,22 +159,22 @@ var WeaponAddManage= {
 
 <body>
 	<div id="vertical">
-		<div id="horizontal" style="height: 450px; width: 590px;">
+		<div id="horizontal">
 			<div class="pane-content">
 				<!-- 左开始 -->
 				<div class="demo-section k-header"> 
 					<ul>
-						<li><label for="weaponType">武器类型:</label><input id="weaponType"
+						<li style="padding:5px;"><span class="ty-input-warn">*</span><label for="weaponType" class="fl mr5">武器类型:</label><input id="weaponType"
 							placeholder="请选择车辆类型..." /><input type="hidden"
 							id="weaponId"><input type="hidden"
 							id="orgId" value="${organ.id}" /></li>
-						<li><label for="weaponNumber">武器编号:</label><input
+						<li style="padding:5px;"><span class="ty-input-warn">*</span><label for="weaponNumber" class="fl mr5">武器编号:</label><input
 							type="text" class="k-textbox" name="weaponNumber"
 							id="weaponNumber" /></li>
-						<li><label for="weaponStandard">子弹数目:</label><input type="text"
+						<li style="padding:5px;"><label for="weaponStandard" class="fl mr5">子弹数目:</label><input type="text"
 							class="k-textbox" name="weaponStandard" id="weaponStandard" /></li>
 					</ul>
-					<p>
+					<p style="padding:5px;">
 						<!--<span class="k-button"  onclick="WeaponAddManage.saveWeaponNotOut()">保存并继续</span>-->
 						<span class="k-button"  onclick="WeaponAddManage.saveWeaponWithOut()">保存</span>
 					</p>

@@ -78,6 +78,7 @@ var sessionId = $("#token").val();
 	var gpsIconData="";
 	var bph_gpsAdd_pkg={};
 	var isExist = false; 
+	var bph_Exist_OrgName = "";
 	var GpsAddManage= { 
 			onSelectIcon:function(e){
 				var dataItem = this.dataItem(e.item.index()); 
@@ -119,27 +120,37 @@ var sessionId = $("#token").val();
 				var pnumber = $.trim($("#gpsNumber").val()); 
 				if(pnumber.length>0){
 					if (pnumber.length > 20) {
-						$("body").popjs({"title":"提示","content":"定位设备编号长度出错，限制长度为0--20！"}); 
+						$("body").popjs({"title":"提示","content":"定位设备编号长度出错，限制长度为0--20！","callback":function(){
+								$("#gpsNumber").focus();
+							}});  
 						return;
 					}
 					GpsAddManage.isExistGps(pnumber,0,0);
 					if (!isExist) {
-						$("body").popjs({"title":"提示","content":"定位设备编号重复，请检查"});  
+						$("body").popjs({"title":"提示","content":"该设备编号在"+bph_Exist_OrgName+"机构下已经存在，请确认之后添加","callback":function(){
+								$("#gpsNumber").focus();
+							}});   
 						return;
 					}
 				}else{ 
-					$("body").popjs({"title":"提示","content":"请录入定位设备编号！"});  
+					$("body").popjs({"title":"提示","content":"请录入定位设备编号！","callback":function(){
+								$("#gpsNumber").focus();
+							}});  
 					return;
 				}
 				bph_gpsAdd_pkg.number= pnumber;
 				var gname= $.trim($("#gpsName").val());
 				if(gname.length>0){
 					if (gname.length > 20) {
-					$("body").popjs({"title":"提示","content":"定位设备名称长度过长，限制长度为20！"});  
+					$("body").popjs({"title":"提示","content":"定位设备名称长度过长，限制长度为20！","callback":function(){
+								$("#gpsName").focus();
+							}});  
 						return;
 					}
 				}else{ 
-					$("body").popjs({"title":"提示","content":"请录入定位设备名称！"});  
+					$("body").popjs({"title":"提示","content":"请录入定位设备名称！","callback":function(){
+								$("#gpsName").focus();
+							}});  
 					return;
 				}
 				bph_gpsAdd_pkg.gpsName = gname; 
@@ -182,6 +193,8 @@ var sessionId = $("#token").val();
 					success : function(req) {
 						if (req.code==200) {
 							isExist = true;
+						}else{
+							bph_Exist_OrgName = req.description;
 						}
 					}
 				});
@@ -196,7 +209,7 @@ var sessionId = $("#token").val();
 
 <body>
 	<div id="vertical">
-		<div id="horizontal" style="height: 450px; width: 590px;">
+		<div id="horizontal">
 			<div class="pane-content">
 				<!-- 左开始 -->
 				<div class="demo-section k-header">
@@ -204,17 +217,17 @@ var sessionId = $("#token").val();
 					 	<tr>
 					 		<td style="width:400px">
 					 			<ul  style="float:left; width:300px">
-									<li><label for="gpsType">GPS类型:</label><input id="gpsType"
+									<li style="padding:5px;"><span class="ty-input-warn">*</span><label for="gpsType" class="fl mr5">GPS类型:</label><input id="gpsType"
 										placeholder="请选择类别..." /><input type="hidden"
 										id="gpsId"><input type="hidden"
 										id="orgId" value="${organ.id}" /></li>
-									<li><label for="gpsName">GPS名称:</label><input type="text"
+									<li style="padding:5px;"><span class="ty-input-warn">*</span><label for="gpsName" class="fl mr5">GPS名称:</label><input type="text"
 										class="k-textbox" name="gpsName" id="gpsName"
 										required="required" /></li>
-									<li><label for="gpsNumber">GPS编号:</label><input
+									<li style="padding:5px;"><span class="ty-input-warn">*</span><label for="gpsNumber" class="fl mr5">GPS编号:</label><input
 										type="text" class="k-textbox" name="gpsNumber"
 										id="gpsNumber" /></li>
-									<li><label for="gpsIcons">GPS图标:</label><input
+									<li style="padding:5px;"><label for="gpsIcons" class="fl mr5">GPS图标:</label><input
 										id="gpsIcons" placeholder="请选择对应图标..."  /></li>
 								</ul> 
 					 		</td>
@@ -224,7 +237,7 @@ var sessionId = $("#token").val();
 					 	</tr>
 					 </table>
 					
-					<p>
+					<p style="padding:5px;">
 						<!--<span class="k-button"  onclick="GpsAddManage.saveGpsNotOut()">保存并继续</span>-->
 						<span class="k-button"  onclick="GpsAddManage.saveGpsWithOut()">保存</span>
 					</p>

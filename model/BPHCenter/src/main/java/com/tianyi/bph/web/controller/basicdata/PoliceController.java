@@ -127,6 +127,14 @@ public class PoliceController {
 
 			list = policeService.loadVMList(map);
 
+			if(list.size()==0){
+				if(pageStart>1){
+					pageBegin = pageSize * ((pageStart-1) > 0 ? (pageStart - 2) : 0);
+					map.put("pageStart", pageBegin);
+					list = policeService.loadVMList(map);
+				}
+			}
+			
 			return PageReturn.MESSAGE(MessageCode.STATUS_SUCESS,
 					MessageCode.SELECT_SUCCESS, total, list);
 		} catch (Exception ex) {
@@ -333,7 +341,7 @@ public class PoliceController {
 			@RequestParam(value = "id", required = false) Integer id)
 			throws Exception {
 		try {
-			List<Police> police = new ArrayList<Police>();
+			List<PoliceVM> police = new ArrayList<PoliceVM>();
 
 			if (paramType.equals("idCard")) {
 				if (optType > 0) {
@@ -346,7 +354,7 @@ public class PoliceController {
 				}
 				if (police.size() > 0) {
 					return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL,
-							"Exits", 0, null);
+							police.get(0).getOrgName(), 0, null);
 				} else {
 					return ReturnResult.MESSAGE(MessageCode.STATUS_SUCESS,
 							"UnExits", 0, null);
@@ -362,7 +370,7 @@ public class PoliceController {
 				}
 				if (police.size() > 0) {
 					return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL,
-							"Exits", 0, null);
+							police.get(0).getOrgName(), 0, null);
 				} else {
 					return ReturnResult.MESSAGE(MessageCode.STATUS_SUCESS,
 							"UnExits", 0, null);
@@ -379,7 +387,7 @@ public class PoliceController {
 				}
 				if (police.size() > 0) {
 					return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL,
-							"Exits", 0, null);
+							police.get(0).getOrgName(), 0, null);
 				} else {
 					return ReturnResult.MESSAGE(MessageCode.STATUS_SUCESS,
 							"UnExits", 0, null);
@@ -390,7 +398,7 @@ public class PoliceController {
 						"UnExits", 0, null);
 			}
 		} catch (Exception ex) {
-			return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL, "Exits", 0,
+			return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL, " ", 0,
 					null);
 		}
 	}

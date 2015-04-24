@@ -210,7 +210,7 @@ public class VehicleServiceImpl implements VehicleService {
 	 * 
 	 * @see com.tianyi.drs.basedata.service.VehicleService#findByNumber(String)
 	 */
-	public List<Vehicle> findByNumber(String param) {
+	public List<VehicleVM> findByNumber(String param) {
 		// TODO Auto-generated method stub
 		return vehicleMapper.findByNumber(param);
 	}
@@ -471,7 +471,7 @@ public class VehicleServiceImpl implements VehicleService {
 	}
 
 	@Override
-	public List<Vehicle> findByNumberAndId(Map<String, Object> map) {
+	public List<VehicleVM> findByNumberAndId(Map<String, Object> map) {
 		// TODO Auto-generated method stub
 		return vehicleMapper.findByNumberAndId(map);
 	}

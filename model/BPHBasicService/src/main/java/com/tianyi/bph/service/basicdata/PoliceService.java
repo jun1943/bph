@@ -60,7 +60,7 @@ public interface PoliceService {
      * @param code
      * @return
      */
-    public List<Police> findBycode(String code);
+    public List<PoliceVM> findBycode(String code);
     /**
      * 根据姓名查询警员对象
      * @param name
@@ -136,7 +136,7 @@ public interface PoliceService {
 	  * @param param
 	  * @return
 	  */
-	 public List<Police> findByidCard(String param);
+	 public List<PoliceVM> findByidCard(String param);
 	 /**
 	  * 查询分组警员对象列表
 	  * @param map
@@ -165,7 +165,7 @@ public interface PoliceService {
 	 * @param param
 	 * @return
 	 */
-	 public List<Police> findByintercomPerson(String param);
+	 public List<PoliceVM> findByintercomPerson(String param);
 	/**
 	 * 根据组织机构，查询所有数据
 	 * @param orgId
@@ -198,9 +198,9 @@ public interface PoliceService {
 	 * @return
 	 */
 	 public List<PoliceExtItem> getPoliceDutyInfo(Integer orgId, Integer ymd,Integer isSubOrg);
-	 public List<Police> findByidCardAndId(Map<String, Object> map);
-	 public List<Police> findBycodeAndId(Map<String, Object> map);
-	 public List<Police> findByintercomPersonAndId(Map<String, Object> map);
+	 public List<PoliceVM> findByidCardAndId(Map<String, Object> map);
+	 public List<PoliceVM> findBycodeAndId(Map<String, Object> map);
+	 public List<PoliceVM> findByintercomPersonAndId(Map<String, Object> map);
 	
 	
 	 

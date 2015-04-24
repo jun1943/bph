@@ -156,7 +156,7 @@ public class WeaponServiceImpl implements WeaponService {
 		// TODO Auto-generated method stub
 		weaponMapper.deleteByIds(map);
 	}
-	public List<Weapon> findByNumber(String param) {
+	public List<WeaponVM> findByNumber(String param) {
 		// TODO Auto-generated method stub
 		return weaponMapper.findByNumber(param);
 	}
@@ -289,7 +289,7 @@ public class WeaponServiceImpl implements WeaponService {
 		return w;
 	}
 	@Override
-	public List<Weapon> findByNumberAndId(Map<String, Object> map) {
+	public List<WeaponVM> findByNumberAndId(Map<String, Object> map) {
 		// TODO Auto-generated method stub
 		return weaponMapper.findByNumberAndId(map);
 	} 

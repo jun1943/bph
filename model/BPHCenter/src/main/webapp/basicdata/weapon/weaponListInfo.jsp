@@ -6,9 +6,10 @@ var sessionId = $("#token").val();
 $(function() {
 	loadData(1); 
 	
-	$("#weaponNumber").keyup(function(){
+	$("#weaponNumber").keydown(function(){
         if(event.keyCode == 13){
             WeaponManage.search();
+            $("#weaponNumber").focus();
         }
     });
 });
@@ -21,7 +22,7 @@ var WeaponManage= {
 	weapon_pageNo:1,
 	packageQuery:function(pageNo){
 			bph_weapon_query.isSubOrg = $("#organLevel").val();
-			bph_weapon_query.number = $("#weaponNumber").val();
+			bph_weapon_query.number = $.trim($("#weaponNumber").val());
 			bph_weapon_query.orgId = $("#organId").val();
 			bph_weapon_query.orgPath = $("#organPath").val();
 			bph_weapon_query.pageSize = $("#pageSize").val();
@@ -78,22 +79,16 @@ var WeaponManage= {
                                
                             }
 						});
-									$("#weapongrid .k-grid-content").mCustomScrollbar( {scrollButtons:{enable:true},advanced:{ updateOnContentResize: true } });
-               						//alert(pageNo);
-               						//alert(total);
-               						//alert("size="+pageSize);
-               						//var pg = pagination(pageNo,total,'loadData',pageSize,0);
-               						var pg = pagination(pageNo,total,'loadData',10);
-               						 
-               	                	$("#page").html(pg);
-						}else
-						{ 
-							WeaponManage.loadData(WeaponManage.weapon_pageNo);  
-						}
-					}else
-					{ 
-						WeaponManage.loadData(WeaponManage.weapon_pageNo);  
-					}
+							var myGrid = $("#weapongrid").data("kendoGrid");
+             				myGrid.element.on("dblclick","tbody>tr","dblclick",function(e){
+             					var id = $(this).find("td").first().text();
+             					WeaponManage.editWeapon(id);
+             				});
+							$("#weapongrid .k-grid-content").mCustomScrollbar( {scrollButtons:{enable:true},advanced:{ updateOnContentResize: true } });
+               				var pg = pagination(pageNo,total,'loadData',10);
+               	            $("#page").html(pg);
+						} 
+					} 
 				}
 			});
 	}, 
@@ -114,14 +109,23 @@ var WeaponManage= {
 		}});	
 	},
 	search:function(){ 
+		var weaponNumber = $("#weaponNumber").val();
+		if(weaponNumber.length>0)
+		{
+			var myReg = /^[^@\/\'\\\"#$%&\^\*]+$/;
+			if(!myReg.test(weaponNumber)){
+				$("body").popjs({"title":"提示","content":"查询条件不能包含非法字符"}); 
+				return;
+			}
+		}
 		WeaponManage.packageQuery(1);
 		WeaponManage.loadData(1);
 	},
 	addWeapon:function(){
 		var organId = $("#organId").val();
 		$("#dialog").tyWindow({
-			width : "680px",
-			height : "500px",
+			width : "640px",
+			height : "540px",
 			title : "新增武器信息",
 			position : {
 				top : "100px"
@@ -136,8 +140,8 @@ var WeaponManage= {
 	editWeapon:function(weaponId){
 		var organId = $("#organId").val();
 		$("#dialog").tyWindow({
-			width : "680px",
-			height : "500px",
+			width : "640px",
+			height : "540px",
 			title : "编辑武器信息",
 			position : {
 				top : "100px"

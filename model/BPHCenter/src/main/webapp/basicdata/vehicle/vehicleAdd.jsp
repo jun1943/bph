@@ -74,6 +74,7 @@ $(function() {
 
 var bph_vehicleAdd_pkg={}; 
 var isExist = false;
+var bph_Exist_OrgName = "";
 var vehicleAddManage= {
 		bph_iscomplete : false,
 		
@@ -114,16 +115,31 @@ var vehicleAddManage= {
 			}
 			var pNumber = $.trim($("#vehicleNumber").val());
 			if (pNumber == ""||pNumber==undefined) {
-							$("body").popjs({"title":"提示","content":"请输入车牌号码"});  
+							$("body").popjs({"title":"提示","content":"请输入车牌号码","callback":function(){
+								$("#vehicleNumber").focus();
+							}});  
+			
 				return;
 			}
-			if (pNumber.length > 20) { 
-							$("body").popjs({"title":"提示","content":"车牌号码长度过长，限制长度为20！"}); 
+			if(pNumber.length>0)
+			{
+				var myReg = /^[^@\/\'\\\"#$%&\^\*]+$/;
+				if(!myReg.test(pNumber)){
+					$("body").popjs({"title":"提示","content":"车牌号码不能包含特殊字符"}); 
+					return;
+				}
+			}
+			if (pNumber.length > 10) { 
+				$("body").popjs({"title":"提示","content":"车牌号码长度过长，限制长度为10！","callback":function(){
+					$("#vehicleNumber").focus();
+				}});  
 				return;
 			}
 			vehicleAddManage.isExistVehicle(pNumber,0,0);
 			if(!isExist){ 
-							$("body").popjs({"title":"提示","content":"车牌号码已存在！"}); 
+							$("body").popjs({"title":"提示","content":"该车牌号在"+bph_Exist_OrgName+"机构下已存在，请确认后添加！","callback":function(){
+								$("#vehicleNumber").focus();
+							}});  
 				return;
 			}
 			bph_vehicleAdd_pkg.number = pNumber; 
@@ -131,7 +147,9 @@ var vehicleAddManage= {
 			var brand = $.trim($("#vehicleBrand").val());
 		
 			if (brand.length > 20) { 
-							$("body").popjs({"title":"提示","content":"车辆品牌长度出错，限制长度为20！"}); 
+							$("body").popjs({"title":"提示","content":"车辆品牌长度出错，限制长度为20！","callback":function(){
+								$("#vehicleBrand").focus();
+							}});  
 				return;
 			}
 			
@@ -139,13 +157,17 @@ var vehicleAddManage= {
 			
 			 var siteQty= $.trim($("#vehicleSiteQty").val());
 			if (siteQty.length > 20) { 
-							$("body").popjs({"title":"提示","content":"车辆座位数长度过长，限制长度为20！"}); 
+							$("body").popjs({"title":"提示","content":"车辆座位数长度过长，限制长度为20！","callback":function(){
+								$("#vehicleSiteQty").focus();
+							}});  
 				return;
 			}
 			bph_vehicleAdd_pkg.siteQty = siteQty;
 			var purpose = $.trim($("#vehiclePurpose").val());
 			if (purpose.length > 20) {
-							$("body").popjs({"title":"提示","content":"车辆用途长度过长，限制长度为20！"});  
+							$("body").popjs({"title":"提示","content":"车辆用途长度过长，限制长度为20！","callback":function(){
+								$("#vehiclePurpose").focus();
+							}});  
 			}
 			bph_vehicleAdd_pkg.purpose=purpose;
 			
@@ -157,7 +179,9 @@ var vehicleAddManage= {
 			 
 			var intercomPerson = $("#vehicleIntercomPerson").val(); 
 			if(intercomPerson.length>30){ 
-							$("body").popjs({"title":"提示","content":"对讲机个呼号长度过长，限制长度为0-30"});  
+							$("body").popjs({"title":"提示","content":"对讲机个呼号长度过长，限制长度为0-30","callback":function(){
+								$("#vehicleIntercomPerson").focus();
+							}});    
 				return;
 			}
 			bph_vehicleAdd_pkg.intercomPerson = intercomPerson;  
@@ -197,6 +221,8 @@ var vehicleAddManage= {
 				success : function(req) {
 					if (req.code==200) {
 						isExist = true;
+					}else{
+						bph_Exist_OrgName = req.description;
 					}
 				}
 			});
@@ -218,9 +244,9 @@ var vehicleAddManage= {
 				<!-- 左开始 -->
 				<div class="demo-section k-header"> 
 					<ul>
-						<li class="ty-input"><label class="ty-input-label" for="vehicleType">车辆类型:</label><input id="vehicleType"
+						<li class="ty-input"><span class="ty-input-warn">*</span><label class="ty-input-label" for="vehicleType">车辆类型:</label><input id="vehicleType"
 							placeholder="请选择车辆类型..." /></li>
-						<li class="ty-input"><label class="ty-input-label" for="vehicleNumber">车牌号码:</label><input
+						<li class="ty-input"><span class="ty-input-warn">*</span><label class="ty-input-label" for="vehicleNumber">车牌号码:</label><input
 							type="text" class="k-textbox" name="vehicleNumber"
 							id="vehicleNumber" /></li>
 						<li class="ty-input"><label class="ty-input-label" for="vehicleBrand">车辆品牌:</label><input type="text"

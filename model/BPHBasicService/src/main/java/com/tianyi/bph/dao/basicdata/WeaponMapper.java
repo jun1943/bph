@@ -79,7 +79,7 @@ public interface WeaponMapper {
 	 * @param param
 	 * @return
 	 */
-	List<Weapon> findByNumber(String param);
+	List<WeaponVM> findByNumber(String param);
 	/**
 	 * 判断是否武器存在关联数据
 	 * @param param
@@ -92,5 +92,5 @@ public interface WeaponMapper {
 	 * @return
 	 */
 	List<WeaponItemVM> getWeaponInfo(Map<String, Object> map);
-	List<Weapon> findByNumberAndId(Map<String, Object> map);
+	List<WeaponVM> findByNumberAndId(Map<String, Object> map);
 }

@@ -285,31 +285,79 @@
 	</update>
 
 	<select id="findBycode" parameterType="String"
-		resultType="com.tianyi.bph.domain.basicdata.Police">
-		select * from t_police where number = #{param}
+		resultType="com.tianyi.bph.query.basicdata.PoliceVM">
+		select 
+			p.id as id,
+			p.name as name,
+			o.short_name as orgName,
+			p.number as number,
+			p.idcardno as idcardno 
+		 from t_police p  
+		left join t_organ o on p.org_id = o.organ_id 
+		 where p.number = #{param}
 	</select>
 	<select id="findByidCard" parameterType="String"
-		resultType="com.tianyi.bph.domain.basicdata.Police">
-		select * from t_police where idcardNo = #{param}
+		resultType="com.tianyi.bph.query.basicdata.PoliceVM">
+		select 
+			p.id as id,
+			p.name as name,
+			o.short_name as orgName,
+			p.number as number,
+			p.idcardno as idcardno 
+		 from t_police p  
+		left join t_organ o on p.org_id = o.organ_id 
+		 where p.idcardNo = #{param}
 	</select> 
 	<select id="findByidCardAndId" parameterType="java.util.Map"
-		resultType="com.tianyi.bph.domain.basicdata.Police">
-		select * from t_police where idcardNo = #{param} and id =#{id,jdbcType=INTEGER}
+		resultType="com.tianyi.bph.query.basicdata.PoliceVM">
+		select 
+			p.id as id,
+			p.name as name,
+			o.short_name as orgName,
+			p.number as number,
+			p.idcardno as idcardno 
+		 from t_police p  
+		left join t_organ o on p.org_id = o.organ_id 
+		 where p.idcardNo = #{param} and p.id !=#{id,jdbcType=INTEGER}
 	</select>
 	<select id="findBycodeAndId" parameterType="java.util.Map"
-		resultType="com.tianyi.bph.domain.basicdata.Police">
-		select * from t_police where number = #{param} and id =#{id,jdbcType=INTEGER}
+		resultType="com.tianyi.bph.query.basicdata.PoliceVM">
+		select 
+			p.id as id,
+			p.name as name,
+			o.short_name as orgName,
+			p.number as number,
+			p.idcardno as idcardno 
+		 from t_police p  
+		left join t_organ o on p.org_id = o.organ_id 
+		 where p.number = #{param} and p.id !=#{id,jdbcType=INTEGER}
 	</select>
 	<select id="findByintercomPersonAndId" parameterType="java.util.Map"
-		resultType="com.tianyi.bph.domain.basicdata.Police">
-		select * from t_police where intercom_person = #{param} and id =#{id,jdbcType=INTEGER}
+		resultType="com.tianyi.bph.query.basicdata.PoliceVM">
+		select 
+			p.id as id,
+			p.name as name,
+			o.short_name as orgName,
+			p.number as number,
+			p.idcardno as idcardno 
+		 from t_police p  
+		left join t_organ o on p.org_id = o.organ_id 
+		 where p.intercom_person = #{param} and p.id !=#{id,jdbcType=INTEGER}
 	</select>
 	
 	
 	
 	<select id="findByintercomPerson" parameterType="String"
-		resultType="com.tianyi.bph.domain.basicdata.Police">
-		select * from t_police where intercom_person = #{param}
+		resultType="com.tianyi.bph.query.basicdata.PoliceVM">
+		select 
+			p.id as id,
+			p.name as name,
+			o.short_name as orgName,
+			p.number as number,
+			p.idcardno as idcardno 
+		from t_police p  
+		left join t_organ o on p.org_id = o.organ_id 
+		 where p.intercom_person = #{param}
 	</select>
 
 	<select id="findByIdAndDtyId" parameterType="String"

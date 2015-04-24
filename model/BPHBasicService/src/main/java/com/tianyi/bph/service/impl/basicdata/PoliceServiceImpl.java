@@ -125,7 +125,7 @@ public class PoliceServiceImpl implements PoliceService {
 	 * 
 	 * @see com.tianyi.drs.basedata.service.PoliceService#
 	 */
-	public List<Police> findBycode(String code) {
+	public List<PoliceVM> findBycode(String code) {
 		// TODO Auto-generated method stub
 		return policeMapper.findBycode(code);
 	}
@@ -267,7 +267,7 @@ public class PoliceServiceImpl implements PoliceService {
 	 * @see com.tianyi.drs.basedata.service.PoliceService#findByidCard(String
 	 *      param)
 	 */
-	public List<Police> findByidCard(String param) {
+	public List<PoliceVM> findByidCard(String param) {
 		// TODO Auto-generated method stub
 		return policeMapper.findByidCard(param);
 	}
@@ -324,7 +324,7 @@ public class PoliceServiceImpl implements PoliceService {
 	 * 
 	 * @see com.tianyi.drs.basedata.service.PoliceService#findByintercomPerson(String)
 	 */
-	public List<Police> findByintercomPerson(String param) {
+	public List<PoliceVM> findByintercomPerson(String param) {
 		// TODO Auto-generated method stub
 		return policeMapper.findByintercomPerson(param);
 	}
@@ -581,19 +581,19 @@ public class PoliceServiceImpl implements PoliceService {
 	}
 
 	@Override
-	public List<Police> findByidCardAndId(Map<String, Object> map) {
+	public List<PoliceVM> findByidCardAndId(Map<String, Object> map) {
 		// TODO Auto-generated method stub
 		return policeMapper.findByidCardAndId(map);
 	}
 
 	@Override
-	public List<Police> findBycodeAndId(Map<String, Object> map) {
+	public List<PoliceVM> findBycodeAndId(Map<String, Object> map) {
 		// TODO Auto-generated method stub
 		return policeMapper.findBycodeAndId(map);
 	}
 
 	@Override
-	public List<Police> findByintercomPersonAndId(Map<String, Object> map) {
+	public List<PoliceVM> findByintercomPersonAndId(Map<String, Object> map) {
 		// TODO Auto-generated method stub
 		return policeMapper.findByintercomPersonAndId(map);
 	}

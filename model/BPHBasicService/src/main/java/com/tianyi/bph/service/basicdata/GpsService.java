@@ -81,7 +81,7 @@ public interface GpsService {
 	 * @param param
 	 * @return
 	 */
-	public List<Gps> findByNumber(String param);
+	public List<GpsVM> findByNumber(String param);
 	/**
 	 * 判断是否存在定位设备关联数据
 	 * @param param
@@ -107,5 +107,5 @@ public interface GpsService {
 	List<ExtItem<Gps>> getGpsDutyInfo(Integer orgId, Integer ymd,Integer isSubOrg);
 	public Gps selectByPrimaryKey(Integer gpsId);
 	public List<Icons> selectIconsList();
-	public List<Gps> findByNumberAndId(Map<String, Object> map);
+	public List<GpsVM> findByNumberAndId(Map<String, Object> map);
 }

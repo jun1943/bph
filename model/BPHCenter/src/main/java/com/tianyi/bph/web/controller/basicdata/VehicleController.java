@@ -192,6 +192,13 @@ public class VehicleController {
 
 			list = vehicleService.loadVMList(map);
 
+			if(list.size()==0){
+				if(pageStart>1){
+					pageBegin = pageSize * ((pageStart-1) > 0 ? (pageStart - 2) : 0);
+					map.put("pageStart", pageBegin);
+					list =vehicleService.loadVMList(map);
+				}
+			}
 			return PageReturn.MESSAGE(MessageCode.STATUS_SUCESS,
 					MessageCode.SELECT_SUCCESS, total, list);
 		} catch (Exception ex) {
@@ -316,7 +323,7 @@ public class VehicleController {
 			@RequestParam(value = "id", required = false) Integer id)
 			throws Exception {
 		try {
-			List<Vehicle> vehicle = new ArrayList<Vehicle>();  
+			List<VehicleVM> vehicle = new ArrayList<VehicleVM>();  
 			
 			if (type > 0) {
 				Map<String, Object> map = new HashMap<String, Object>();
@@ -328,7 +335,7 @@ public class VehicleController {
 			}
 			
 			if (vehicle.size() > 0) {
-				return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL, "Exits",
+				return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL,vehicle.get(0).getOrgName() ,
 						0, null);
 			} else {
 				return ReturnResult.MESSAGE(MessageCode.STATUS_SUCESS, "UnExits",
@@ -336,7 +343,7 @@ public class VehicleController {
 			}
 
 		} catch (Exception ex) {
-			return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL, "Exits", 0,
+			return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL, " ", 0,
 					null);
 		}
 	}

@@ -22,7 +22,7 @@ var PoliceManage = {
  	police_pageNo:1,
 	packageQuery : function(pageNo) {
 		bph_police_query.isSubOrg = $("#organLevel").val();
-		bph_police_query.name = $("#policeName").val();
+		bph_police_query.name = $.trim($("#policeName").val());
 		bph_police_query.orgId = $("#organId").val();
 		bph_police_query.orgPath = $("#organPath").val(); 
 		bph_police_query.pageSize = $("#pageSize").val();
@@ -116,23 +116,18 @@ var PoliceManage = {
 													change : function(e) {
 														var userId = e.sender.selectable.userEvents.currentTarget.cells[0].innerHTML;
 													}
-												});
+												}); 
+												var myGrid = $("#policegrid").data("kendoGrid");
+				           						myGrid.element.on("dblclick","tbody>tr","dblclick",function(e){
+				           							var id = $(this).find("td").first().text();
+				           							PoliceManage.editUser(id);
+				           						}); 
 												$("#policegrid .k-grid-content").mCustomScrollbar( {scrollButtons:{enable:true},advanced:{ updateOnContentResize: true } });
-               									//alert(pageNo);
-               									//alert(total);
-               									//alert("size="+pageSize);
-               									//var pg = pagination(pageNo,total,'loadData',pageSize,0);
                									var pg = pagination(pageNo,total,'loadData',10);
                						 
                	                				$("#page").html(pg);
-						}else
-						{ 
-							PoliceManage.loadData(PoliceManage.police_pageNo);  
-						}
-					}else
-					{ 
-							PoliceManage.loadData(PoliceManage.police_pageNo);  
-					}
+						} 
+					} 
 				}
 			});
 	},

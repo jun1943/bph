@@ -73,6 +73,7 @@ $(function() {
 });
 var bph_policeEdit_pkg={};
 var isExist = false;
+var bph_Exist_OrgName = "";
 var policeEditManage= { 
 		onSelectGps:function(e){
 			 var dataItem = this.dataItem(e.item.index()); 
@@ -116,6 +117,13 @@ var policeEditManage= {
 							}});    
 				return;
 			}
+			var myReg = /^[^@\/\'\\\"#$%&\^\*]+$/;
+			if(!myReg.test(pName)){
+					$("body").popjs({"title":"提示","content":"警员姓名不能包含特殊字符","callback":function(){
+							$("#policename").focus();
+						}});  
+					return;
+			}
 			if (pName.length > 20) {
 				$("body").popjs({"title":"提示","content":"警员姓名长度过长，限制长度为20！","callback":function(){
 								$("#policename").focus();
@@ -148,10 +156,21 @@ var policeEditManage= {
 							}});    
 					return;
 				}
+				var endIdCard = idcardno.substring(idcardno.length, idcardno.length-1);
+				//为数字
+				if (isNaN(endIdCard)){
+					if(endIdCard != "X" && endIdCard != "x"){
+						$("body").popjs({"title":"提示","content":"警员身份证号码格式出错 ,最后一位只能是数字或者字母X！","callback":function(){
+								$("#policeidcardno").focus(); 
+							}});    
+						return;
+					}
+				} 
+				
 				policeEditManage.isExistPolice(idcardno, "idCard",pId,1);
 				if (!isExist) {
 					isExist = false; 
-				$("body").popjs({"title":"提示","content":"警员身份证号码重复，请检查","callback":function(){
+				$("body").popjs({"title":"提示","content":"该身份证号在"+bph_Exist_OrgName+"机构下已存在，请确认后添加","callback":function(){
 								$("#policeidcardno").focus(); 
 							}});      
 					return;
@@ -161,6 +180,14 @@ var policeEditManage= {
 			var pnumber = $.trim($("#policecode").val());
 			
 			if(pnumber.length>0){
+			
+				var myReg = /^[^@\/\'\\\"#$%&\^\*]+$/;
+				if(!myReg.test(pnumber)){
+						$("body").popjs({"title":"提示","content":"警员警号不能包含特殊字符","callback":function(){
+								$("#policecode").focus();
+							}});  
+						return;
+				}
 				if (pnumber.length > 20 || pnumber.length < 6) {
 				$("body").popjs({"title":"提示","content":"警员警号长度出错，限制长度为6--20！","callback":function(){
 								$("#policecode").focus();  
@@ -169,7 +196,7 @@ var policeEditManage= {
 				}
 				policeEditManage.isExistPolice(pnumber, "number",pId,1);
 				if (!isExist) { 
-				$("body").popjs({"title":"提示","content":"警员警号重复，请检查","callback":function(){
+				$("body").popjs({"title":"提示","content":"该警号在"+bph_Exist_OrgName+"机构下已存在，请确认后添加","callback":function(){
 								$("#policecode").focus();  
 							}});    
 					return;
@@ -183,12 +210,29 @@ var policeEditManage= {
 							}});      
 				return;
 			}
+			if (ptitle.length > 0){
+				if(!myReg.test(ptitle)){
+						$("body").popjs({"title":"提示","content":"警员职位不能包含特殊字符","callback":function(){
+								$("#policetitle").focus();
+							}});  
+						return;
+				}
+			}
 			bph_policeEdit_pkg.title = ptitle;
 			var phone = $.trim($("#policephone").val());
-			if (phone.length > 0 && phone.length > 20) { 
-				$("body").popjs({"title":"提示","content":"警员电话号码长度过长，限制长度为20！","callback":function(){
+			if (phone.length > 0) {
+				if(phone.length != 11){ 
+					$("body").popjs({"title":"提示","content":"警员电话号码格式错误，只能是11位的数字！","callback":function(){
 								$("#policephone").focus();    
-							}});         
+							}});    
+					return;  
+				}
+				if(pattern.test(phone)){
+					$("body").popjs({"title":"提示","content":"警员电话号码格式错误，只能为数字！","callback":function(){
+								$("#policephone").focus();    
+							}});    
+					return;  
+				}
 			}
 			bph_policeEdit_pkg.mobile=phone;
 			var mobileShorts = $.trim($("#policeshortno").val());
@@ -198,13 +242,28 @@ var policeEditManage= {
 							}});         
 				return;
 			}
+			if (mobileShorts.length > 0){
+				if(!myReg.test(mobileShorts)){
+						$("body").popjs({"title":"提示","content":"警员公安短号不能包含特殊字符","callback":function(){
+								$("#policeshortno").focus();
+							}});  
+						return;
+				}
+			}
 			bph_policeEdit_pkg.mobileShort = mobileShorts;
 			bph_policeEdit_pkg.intercomGroup = $("#policegroupno").val();
 			var intercomPerson = $("#policepersonno").val();
 			if(intercomPerson.length>0){
+			
+				if(!myReg.test(intercomPerson)){
+						$("body").popjs({"title":"提示","content":"警员个呼号不能包含特殊字符","callback":function(){
+								$("#policepersonno").focus();
+							}});  
+						return;
+				}
 				policeEditManage.isExistPolice(intercomPerson, "intercomPerson",pId,1);
 				if (!isExist) { 
-				$("body").popjs({"title":"提示","content":"个呼号为  " + intercomPerson + " 的警员已存在，请检查！","callback":function(){
+				$("body").popjs({"title":"提示","content":"该对讲机个呼号在  "+bph_Exist_OrgName+"机构下已存在，请确认后添加","callback":function(){
 								$("#policepersonno").focus();    
 							}});   
 					return;
@@ -235,8 +294,10 @@ var policeEditManage= {
 					"id"     :   pid
 				},
 				success : function(req) {
-					if (req.code=200) {
+					if (req.code==200) {
 						isExist = true;
+					}else{
+						bph_Exist_OrgName = req.description;
 					}
 				}
 			});
@@ -252,11 +313,11 @@ var policeEditManage= {
 				<!-- 左开始 -->
 				<div class="demo-section k-header"> 
 					<ul>
-						<li class="ty-input"><label class="ty-input-label" for="policetype">警员类型:</label><input id="policetype"
+						<li class="ty-input"><span class="ty-input-warn">*</span><label class="ty-input-label" for="policetype">警员类型:</label><input id="policetype"
 							placeholder="请选择警员类别..." value="${police.typeId}"  /><input type="hidden"
 							id="policeId"  value="${police.id}" ><input type="hidden"
 							id="orgId" value="${organ.id}" /></li>
-						<li class="ty-input"><label class="ty-input-label" for="policename">警员姓名:</label><input type="text"
+						<li class="ty-input"><span class="ty-input-warn">*</span><label class="ty-input-label" for="policename">警员姓名:</label><input type="text"
 							class="k-textbox" name="policename"  value="${police.name}" id="policename"
 							required="required" /></li>
 						<li class="ty-input"><label class="ty-input-label" for="policeidcardno">身份证号:</label><input

@@ -116,7 +116,7 @@ public class GpsServiceImpl implements GpsService{
 	/** (non-Javadoc)
 	 * @see com.tianyi.drs.basedata.service.GpsService#findByNumber(String)
 	 */
-	public List<Gps> findByNumber(String param) {
+	public List<GpsVM> findByNumber(String param) {
 		// TODO Auto-generated method stub
 		return gpsMapper.findByNumber(param);
 	}
@@ -249,7 +249,7 @@ public class GpsServiceImpl implements GpsService{
 		return gpsMapper.selectIconsList();
 	}
 	@Override
-	public List<Gps> findByNumberAndId(Map<String, Object> map) {
+	public List<GpsVM> findByNumberAndId(Map<String, Object> map) {
 		// TODO Auto-generated method stub
 		return gpsMapper.findByNumberAndId(map);
 	}

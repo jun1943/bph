@@ -153,10 +153,11 @@
   	  <select id="findByIdAndDtyId" parameterType="String" resultType="com.tianyi.bph.domain.basicdata.DutyItem">  
        		select * from t_duty_item where item_type_id = 3 and item_id =  #{param}   
     	 </select>
-    	  <select id="findByNumberAndId" parameterType="java.util.Map" resultType="com.tianyi.bph.domain.basicdata.Weapon">  
-       		select * from t_weapon where number = #{number} and id  !=  #{id}   
-    	 </select>
-  
+    	  <select id="findByNumberAndId" parameterType="java.util.Map" resultType="com.tianyi.bph.query.basicdata.WeaponVM">  
+       		select w.id as id,w.number as number ,o.short_name as orgName  
+       		
+       		from t_weapon w left join t_organ o on w.org_id = o.organ_id  where w.number = #{number} and w.id  !=  #{id}   
+    	 </select> 
   
    <delete id="deleteByIds"  parameterType="java.util.Map" >  
        delete from t_weapon where id in 
@@ -171,7 +172,9 @@
        		 select * from t_weapon order by number asc
     	 </select> 
     	 <select id="findByNumber" parameterType="String" resultType="com.tianyi.bph.domain.basicdata.Weapon">  
-       		select * from t_weapon where number = #{param}  
+       		select w.id as id,w.number as number ,o.short_name as orgName  
+       		
+       		from t_weapon w left join t_organ o on w.org_id = o.organ_id  where w.number = #{param}  
     	 </select>
    
     

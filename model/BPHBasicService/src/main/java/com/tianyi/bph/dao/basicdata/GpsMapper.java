@@ -72,7 +72,7 @@ public interface GpsMapper {
 	 * @param param
 	 * @return
 	 */
-	List<Gps> findByNumber(String param);
+	List<GpsVM> findByNumber(String param);
 	
 	/**
 	 * 判斷是否存在定位设备关联数据
@@ -87,7 +87,7 @@ public interface GpsMapper {
 	 */
 	List<Gps> getGPSInfo(Map<String, Object> map);
 	List<Icons> selectIconsList();
-	List<Gps> findByNumberAndId(Map<String, Object> map); 
+	List<GpsVM> findByNumberAndId(Map<String, Object> map); 
 }
 
 
