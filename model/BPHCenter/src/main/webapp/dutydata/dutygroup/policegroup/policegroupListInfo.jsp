@@ -15,15 +15,17 @@ var m_policeGroup_Query = {};
 
 var PolicegroupManage = { 
 	pageNo:1,
+	packageGroupData:function(){
+		m_policeGroup_Query.orgId = $("#organId").val();
+		m_policeGroup_Query.orgPath = $("#organPath").val();
+	},
 	loadGroupData : function(pageNo) {
 		$.ajax({
 		type: "post",
 		url: "",
 		dataType: "json",
 		data: {
-			"policeGroup_Query": JSON.stringify(m_policeGroup_Query),
-			page: 0,
-			rows: 500 //最大500条（必须是最大值）
+			"policeGroup_Query": JSON.stringify(m_policeGroup_Query) 
 		},
 		success: function(req) {
 			if (req.code == 200) { 

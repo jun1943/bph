@@ -56,9 +56,7 @@ $(document).ready(function() {
 		</div>
 	</div>
 	<div class="fl set-hei48">
-		<div class="ty-decorate1"></div>
-		<button id="undo" class="ty-btn-add ty-btn-offset" onclick="PoliceManage.addPolice()"></button>
-                    
+		<div class="ty-decorate1"></div> 
                    <span id="btncreateGroup" class="k-button"  onclick="PolicegroupManage.createGroup()">创建分组</span>
                    <span id="btneditGroup" class="k-button"  onclick="PolicegroupManage.editGroup()">修改分组</span> 
                    <span id="btndeleteGroup" class="k-button"  onclick="PolicegroupManage.deleteGroup)">删除分组</span>

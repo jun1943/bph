@@ -11,19 +11,33 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.tianyi.bph.domain.duty.PoliceGroup;
 import com.tianyi.bph.domain.system.Organ;
+import com.tianyi.bph.query.duty.PoliceGroupVM;
 import com.tianyi.bph.query.system.UserQuery;
+import com.tianyi.bph.service.duty.GpsGroupService;
+import com.tianyi.bph.service.duty.PoliceGroupService;
+import com.tianyi.bph.service.duty.VehicleGroupService;
+import com.tianyi.bph.service.duty.WeaponGroupService;
 import com.tianyi.bph.service.system.OrganService;
 
 
 
 @Controller
 @RequestMapping("/dutyTypeRouteWeb")
-public class DutyTypeRouteController {
+public class DutyGroupRouteController {
 
 
 	@Autowired
 	private OrganService organService;
+	@Autowired
+	protected PoliceGroupService policeGroupService;
+	@Autowired
+	protected VehicleGroupService vehicleGroupService;
+	@Autowired
+	protected WeaponGroupService weaponGroupService;
+	@Autowired
+	protected GpsGroupService gpsGroupService; 
 	/**
 	 * web跳转到勤务类型列表
 	 * 
@@ -43,14 +57,10 @@ public class DutyTypeRouteController {
 		Organ organ = new Organ();
 		if (organId != null) {
 			organ = organService.getOrganByPrimaryKey(organId);
-		}
-
-		Calendar c = Calendar.getInstance();
-		int years = c.get(Calendar.YEAR);
-		int month = c.get(Calendar.MONTH) + 1;
+		} 
 		query.setOrganId(organId);
-		query.setPageNo(years);
-		query.setPageSize(month);
+		query.setPageNo(1);
+		query.setPageSize(10);
 		mv.addObject("organ", organ);
 		mv.addObject("query", query);
 		mv.addObject("num", "200");
@@ -61,23 +71,14 @@ public class DutyTypeRouteController {
 	@ResponseBody
 	public ModelAndView gotoPoliceGroupAdd(
 			@RequestParam(value = "organId", required = true, defaultValue = "1") Integer organId,
-			HttpServletRequest request) {
-		UserQuery query = new UserQuery();
+			HttpServletRequest request) { 
 		ModelAndView mv = new ModelAndView(
 				"/dutydata/dutygroup/policegroup/policegroupAddGroup.jsp");
 		Organ organ = new Organ();
 		if (organId != null) {
 			organ = organService.getOrganByPrimaryKey(organId);
-		}
-
-		Calendar c = Calendar.getInstance();
-		int years = c.get(Calendar.YEAR);
-		int month = c.get(Calendar.MONTH) + 1;
-		query.setOrganId(organId);
-		query.setPageNo(years);
-		query.setPageSize(month);
-		mv.addObject("organ", organ);
-		mv.addObject("query", query);
+		}  
+		mv.addObject("organ", organ); 
 		mv.addObject("num", "200");
 		return mv;
 	}
@@ -88,28 +89,21 @@ public class DutyTypeRouteController {
 	public ModelAndView gotoPoliceGroupEdit(
 			@RequestParam(value = "organId", required = true, defaultValue = "1") Integer organId,
 			@RequestParam(value = "groupId", required = true, defaultValue = "1") Integer groupId,
-			HttpServletRequest request) {
-		UserQuery query = new UserQuery();
+			HttpServletRequest request) { 
 		ModelAndView mv = new ModelAndView(
 				"/dutydata/dutygroup/policegroup/policegroupEditGroup.jsp");
 		Organ organ = new Organ();
 		if (organId != null) {
 			organ = organService.getOrganByPrimaryKey(organId);
-		}
-
-		Calendar c = Calendar.getInstance();
-		int years = c.get(Calendar.YEAR);
-		int month = c.get(Calendar.MONTH) + 1;
-		query.setOrganId(organId);
-		query.setPageNo(years);
-		query.setPageSize(month);
-		mv.addObject("organ", organ);
-		mv.addObject("query", query);
+		} 
+		PoliceGroup pg = policeGroupService.loadById(groupId);
+		mv.addObject("organ", organ); 
+		mv.addObject("policeGroup", pg); 
 		mv.addObject("num", "200");
 		return mv;
 	}
 	
-
+	
 	@RequestMapping({ "/gotoPoliceGroupAddMember.do", "/gotoPoliceGroupAddMember.action" })
 	@ResponseBody
 	public ModelAndView gotoPoliceGroupAddMember(

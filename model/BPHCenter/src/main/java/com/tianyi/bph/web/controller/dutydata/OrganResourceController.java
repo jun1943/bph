@@ -24,7 +24,7 @@ import com.tianyi.bph.web.controller.ListResult;
 
 @Controller
 @RequestMapping("/organWeb")
-public class OrganController {
+public class OrganResourceController {
 
 	@Autowired
 	protected OrgService orgService;
