@@ -26,6 +26,8 @@ public class OrgWithPoliceVM {
 	private String code;
 	
 
+	private int ReportsTo;
+
 	public Boolean getIsOrg() {
 		return dataType==1;
 	}
@@ -74,6 +76,12 @@ public class OrgWithPoliceVM {
 	}
 	public void setCode(String code) {
 		this.code = code;
+	}
+	public int getReportsTo() {
+		return ReportsTo;
+	}
+	public void setReportsTo(int reportsTo) {
+		ReportsTo = reportsTo;
 	}
 	
 }
