@@ -158,5 +158,7 @@ public interface PoliceMapper {
 	List<PoliceVM> findByidCardAndId(Map<String, Object> map);
 	List<PoliceVM> findBycodeAndId(Map<String, Object> map);
 	List<PoliceVM> findByintercomPersonAndId(Map<String, Object> map);
+	
+	 
 	 
 }
