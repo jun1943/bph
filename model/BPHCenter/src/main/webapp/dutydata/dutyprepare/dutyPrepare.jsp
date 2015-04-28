@@ -44,6 +44,7 @@
 							<div class="span8 box">
 								<!----表格---->
 								<%@ include file="dutyPrepareInfo.jsp"%>
+								
 							</div>
 							<!----表格结束---->
 						</div>
@@ -54,5 +55,7 @@
 			</div>
 		</section>
 	</div>
+	<!-- 引用 js  -->
+	<script type="text/javascript" charset="utf-8" src="<%=basePath%>dutydata/dutyprepare/js/dutyPrepare.js"></script>
   </body>
 </html>
