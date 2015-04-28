@@ -474,7 +474,7 @@
 		</if>
 
 	</select>
-
+ 
 
 	<select id="loadVMList" parameterType="java.util.Map" resultMap="BaseModelMap">
 		select
@@ -498,7 +498,7 @@
 
 		<if test="name !=null">
 			and p.name like CONCAT('%','${name}','%' )
-		</if>
+		</if>  
 		<if test="ids !=null">
 			and pt.id in
 
