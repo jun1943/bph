@@ -1153,34 +1153,62 @@ var DutyItemManage={
 			dutyRow.itemId = itemId;
 			// dutyRow.itemInnerTypeId = innerTypeId;
 			dutyRow.itemInnerTypeName = innerTypeName;
-			dutyRow.displayName = this.genDisplayName(typeId, innerTypeName, name);
+			dutyRow.displayName = this.genDisplayName(dutyRow); //typeId, innerTypeName, name
 			dutyRow.itemTypeName = this.genItemTypeName(typeId);
 		},
-		genDisplayName:function(itemTypeId, iteminnerTypeName, name){
+		genDisplayName:function(row){
+			//itemTypeId, iteminnerTypeName, name
 			var rs = '';
-			switch (itemTypeId) {
+			switch (row.itemTypeId) {
 			case 1:
-				rs = iteminnerTypeName + ":" + name;
+				rs = row.iteminnerTypeName + ":" + row.name;
 				break;
 			case 2:
-				rs = name;
+				rs = row.name;
 				break;
 			case 3:
-				rs = iteminnerTypeName + ":" + name;
+				rs = row.iteminnerTypeName + ":" + row.name;
 				break;
 			case 4:
-				rs = iteminnerTypeName + ":" + name;
+				rs = row.iteminnerTypeName + ":" + row.name;
 				break;
 			case 100:
-				rs = name;
+				rs = row.name;
 				break;
 			case 101:
-				rs = name;
+				var bts =row.beginTime2.getHours() + ":" +row.beginTime2.getMinutes();
+				var ets=row.endTime2.getHours() + ":" +row.endTime2.getMinutes();
+				rs = row.name +" [" + bts +"到" + (row.isOverDay?"第二天":"") + ets +"] ";
+				
 				break;
 			case 999:
-				rs = name;
+				var x=new Date();
+				x.getHours();
+				rs = row.name;
 				break;
 			}
+			var sts=DutyItemManage.getRowStatistics(row);
+			return rs + sts;
+		},
+		getRowStatistics:function(row){
+			var rs="";
+			if( row.policeCount !=null && row.policeCount >0){
+				rs += "  警员:"+row.policeCount;
+			}
+			if( row.velicleCount !=null && row.velicleCount >0){
+				rs += "  车辆:"+row.velicleCount;
+			}
+			if( row.weaponCount !=null && row.weaponCount >0){
+				rs += "  武器:"+row.weaponCount;
+			}
+			if( row.gpsCount !=null && row.gpsCount >0){
+				rs += "  定位:"+row.gpsCount;
+			}
+			
+			if(rs !=""){
+				rs= "  < " +rs + " >";
+			}
+			
 			return rs;
 		},
 		genItemTypeName:function (itemTypeId) {
@@ -1413,6 +1441,7 @@ var DutyItemManage={
 					
 					var bt=YMD.createNew(m_ymd.ymd).getDate();
 					bt.setHours(8,0,0,0);
+					
 					var et=YMD.createNew(m_ymd.ymd).getDate();
 					et.setHours(22,0,0,0);
 					
@@ -1428,7 +1457,6 @@ var DutyItemManage={
 					m_shift.targetRow = row;
 					m_shift.editType = "new";
 				} else {
-					//$.messager.alert('提示', "只能勤务类型下面定义班次!", "warning");
 					$("body").popjs({"title":"提示","content":"只能勤务类型下面定义班次!"}); 
 				}
 			}
@@ -1440,10 +1468,8 @@ var DutyItemManage={
 			var tv = $("#dutyItemTV").data("kendoTreeView");
 			var row=tv.dataItem(tv.select());
 			if (row == null) {
-				//$.messager.alert('提示', "请选择班次!", "warning");
 				$("body").popjs({"title":"提示","content":"请选择班次!"}); 
 			} else if (row.itemTypeId != 101) {
-				//$.messager.alert('提示', "请选择班次所在行!", "warning");
 				$("body").popjs({"title":"提示","content":"请选择班次所在行!"}); 
 			} else {
 				$('#txtShiftName').val(row.name);
@@ -1644,11 +1670,9 @@ var DutyItemManage={
 			var tv=$("#dutyItemTV").data("kendoTreeView");
 					
 			if (!verifyTime(bt, et)) {
-				//$.messager.alert('提示', "结束时间不能小于开始时间", "warning");
 				$("body").popjs({"title":"提示","content":"结束时间不能小于开始时间"}); 
 				return;
 			} else if (name == null || name.length == 0) {
-				//$.messager.alert('提示', "请输入班次名称!", "warning");
 				$("body").popjs({"title":"提示","content":"请输入班次名称!"}); 
 			} else {
 				if (m_shift.editType == 'new') {
@@ -1656,23 +1680,18 @@ var DutyItemManage={
 					row.beginTime2 = bt;
 					row.endTime2 = et;
 
-					DutyItemManage.genDutyRow(0, name, 101, 0, '班次', row);
-					
+					DutyItemManage.genDutyRow(0, name, 101, 0, '班次', row);					
 					tv.append(row,  tv.findByUid(m_shift.targetRow.uid));
-					//DutyItemManage.reCalcDuty();					
 				} else {
 					m_shift.targetRow.name = name;
 					m_shift.targetRow.displayName = name;
 					m_shift.targetRow.itemInnerTypeName = name;
 					m_shift.targetRow.beginTime2 = bt;
 					m_shift.targetRow.endTime2 = et;
-					
-					
 				}
 				DutyItemManage.reCalcDuty();
 				var winShift= $("#shiftWindow").data("kendoWindow");
 				winShift.close();
-				//$('#shiftWindows').window('close');
 			}
 			function verifyTime(b, e) {
 				if (b.dateDiff('n', e) < 0) {
@@ -1712,8 +1731,17 @@ var DutyItemManage={
 		},
 		onDeleteNode:function(uid){
 			var tv = $("#dutyItemTV").data("kendoTreeView");
-
-			var re=tv.findByUid(uid);
+			var re=null;
+			
+			if(uid==undefined){
+				re=tv.select();
+				if(re ==null){
+					$("body").popjs({"title":"提示","content":"请选择要删除节点"}); 
+					return;
+				}
+			}else{
+				re=tv.findByUid(uid);
+			}
 			var row=tv.dataItem(re);
 			
 			if(row.items !==null && row.items.length>0){
@@ -1727,12 +1755,99 @@ var DutyItemManage={
 				DutyItemManage.reCalcDuty();
 			}
 		},
+		rebuildItems:function(items){
+			var items2=[];
+			
+			$.each(items, function(i, v) {
+				var item =rebuildItem(v,null);
+				items2.push(item);
+			});
+			
+			return items2;
+			
+			function rebuildItem(v,p){
+				var v2={};
+				v2.id=v.id;
+				v2.xid =v.xid;
+				v2.name = v.name;
+				v2.itemTypeId = v.itemTypeId;
+				v2.itemId =v.itemId;
+				v2.itemInnerTypeId = v.itemInnerTypeId;
+				v2.itemInnerTypeName =v.itemInnerTypeName;
+				
+				v2.itemTypeName =v.displayName;
+				v2.beginTime2=v.beginTime2;
+				v2.endTime2=v.endTime2;
+				
+				v2.beginTime=v.beginTime;
+				v2.endTime=v.endTime;
+				
+				v2.maxPolice = v.maxPolice;
+				v2.taskType = v.taskType;
+				v2.targets = v.targets;
+
+				v2.getParent = function() {
+					return p;
+				};
+				
+				v2.xid =DutyItemManage.genXId(v2.itemTypeId); //为什么要重新设置xid? 
+
+				if (v2.itemTypeId == 101) {
+					DutyItemManage.initDate(v2);
+					if (v2.beginTime2.dateDiffOfDay(v2.endTime2) == 1) {
+						v2.isOverDay=true;
+					} else {
+						v2.isOverDay=false;
+					}
+				}
+
+				//itemiconCls = createIconStyle(item, item.itemTypeId, item.iconUrl);
+				
+				/* 初始化数量等于0 */
+				v2.velicleCount = 0;
+				v2.policeCount = 0;
+				v2.weaponCount = 0;
+				v2.gpsCount = 0;
+				
+				switch (v2.itemTypeId) {
+				case 1:
+					v2.velicleCount = 1;
+					break;
+				case 2:
+					v2.policeCount = 1;
+					break;
+				case 3:
+					v2.weaponCount = 1;
+					break;
+				case 4:
+					v2.gpsCount = 1;
+					break;
+				}
+
+				if(v.items != null && v.items.length>0){
+					v2.items=[];
+					$.each(v.items, function(i, val) {
+						var nv=rebuildItem(val,v2);
+						v2.velicleCount += nv.velicleCount;
+						v2.policeCount += nv.policeCount;
+						v2.weaponCount += nv.weaponCount;
+						v2.gpsCount += nv.gpsCount;
+						v2.items.push(nv);
+						v2.expanded =true;
+					});
+				}
+				
+				v2.displayName = DutyItemManage.genDisplayName(v2);
+				return v2;
+			}
+			
+		},
 		/**
 		 * 克隆一个items,
 		 * SB kendo ui
 		 * @param items
 		 */
-		rebuildItems:function(items,parent){
+		rebuildItems2:function(v,p){
 			var items2=[];
 			
 			$.each(items, function(i, v) {
@@ -1744,7 +1859,7 @@ var DutyItemManage={
 				v2.itemId =v.itemId;
 				v2.itemInnerTypeId = v.itemInnerTypeId;
 				v2.itemInnerTypeName =v.itemInnerTypeName;
-				v2.displayName = v.displayName;
+				
 				v2.itemTypeName =v.displayName;
 				v2.beginTime2=v.beginTime2;
 				v2.endTime2=v.endTime2;
@@ -1760,19 +1875,27 @@ var DutyItemManage={
 					return parent;
 				};
 				
+				
+				
+				v2.xid =DutyItemManage.genXId(v2.itemTypeId); //为什么要重新设置xid? 
+
+				if (v2.itemTypeId == 101) {
+					DutyItemManage.initDate(v2);
+					if (v2.beginTime2.dateDiffOfDay(v2.endTime2) == 1) {
+						v2.isOverDay=true;
+					} else {
+						v2.isOverDay=false;
+					}
+				}
+
+				//itemiconCls = createIconStyle(item, item.itemTypeId, item.iconUrl);
+				
 				/* 初始化数量等于0 */
 				v2.velicleCount = 0;
 				v2.policeCount = 0;
 				v2.weaponCount = 0;
 				v2.gpsCount = 0;
-				v2.xid =DutyItemManage.genXId(v2.itemTypeId); //为什么要重新设置xid? 
-
-				if (v2.itemTypeId == 101) {
-					DutyItemManage.initDate(v2);
-				}
-
-				//itemiconCls = createIconStyle(item, item.itemTypeId, item.iconUrl);
-
+				
 				switch (v2.itemTypeId) {
 				case 1:
 					v2.velicleCount = 1;
@@ -1794,12 +1917,13 @@ var DutyItemManage={
 				}
 				
 				if(parent !=undefined && parent != null){
-					parent.velicleCount += v.velicleCount;
-					parent.policeCount += v.policeCount;
-					parent.weaponCount += v.weaponCount;
-					parent.gpsCount += v.gpsCount;
+					parent.velicleCount += v2.velicleCount;
+					parent.policeCount += v2.policeCount;
+					parent.weaponCount += v2.weaponCount;
+					parent.gpsCount += v2.gpsCount;
 				}
-
+				//displayName 的生成必选放在最后! 
+				v2.displayName = DutyItemManage.genDisplayName(v2);
 				items2.push(v2);
 			});
 			return items2;

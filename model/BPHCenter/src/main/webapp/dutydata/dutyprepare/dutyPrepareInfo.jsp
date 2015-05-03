@@ -42,10 +42,9 @@
 </script>
 
 <script id="dutyItem-template" type="text/x-kendo-template">
-    <span> #: item.displayName #</span>
+    <span> #: item.displayName     #</span>
 	<button type="button" class="ty-delete-btn"  onclick=DutyItemManage.onDeleteNode('#: item.uid #')></button>
 </script>
-
 
 <div id="dutyResource" style="width:40%; float:left">
 	<div class="demo-section k-header"> 
@@ -109,7 +108,7 @@
             <span  class="k-button" onclick="DutyItemManage.addUserNode()">添加编组</span>
 			<span class="k-button" onclick="DutyItemManage.setUserNode()">设置编组</span>
 			<span  class="k-button" onclick="DutyItemManage.setTask()">关联任务</span> 
-			<span  class="k-button" onclick="DutyItemManage.savePoliceWithOut()">删除节点</span> 
+			<span  class="k-button" onclick="DutyItemManage.onDeleteNode()">删除节点</span> 
 		</div>
 		<div id="dutyItemTVBox"> 
         	<div id="dutyItemTV"></div>
