@@ -3,6 +3,7 @@ package com.tianyi.bph.service.duty;
 import java.util.List;
 
 import com.tianyi.bph.domain.duty.Org;
+import com.tianyi.bph.domain.system.Organ;
 import com.tianyi.bph.query.duty.TaskTargetVM;
  
 
@@ -18,5 +19,5 @@ public interface DutyTaskService {
 	 * @param org
 	 * @return
 	 */
-	List<TaskTargetVM>  loadTaskTargetVMList(Integer taskType,Org org);
+	List<TaskTargetVM>  loadTaskTargetVMList(Integer taskType,Organ org);
 }

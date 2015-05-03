@@ -52,13 +52,13 @@ $(document).ready(function() {
 	<div class="fl set-hei48">
 		<div class="ty-decorate1"></div> 
 					<input type="hidden" id="organCode" name="organCode" value="${organ.code}">
-                   <span id="btnaddParentNode" class="k-button"  onclick="DutyPraperManage.selectDutyType()">勤务类型选择</span>
-                   <span id="btnaddChildNode" class="k-button"  onclick="DutyPraperManage.selectDutyTemplete()">报备模板选择</span> 
-                   <span id="btndeleteNode" class="k-button"  onclick="DutyPraperManage.copyOfDuty()">报备复制</span> 
-                   <span id="btnunLockNode" class="k-button"  onclick="DutyPraperManage.clearDuty()">清空报备</span> 
-                   <span id="btnlockNode" class="k-button"  onclick="DutyPraperManage.saveDutyAsTemplete()">保存模板</span> 
-                   <span id="btnlockNode" class="k-button"  onclick="DutyPraperManage.saveDuty()">保存</span> 
-                   <span id="btnlockNode" class="k-button"  onclick="DutyPraperManage.exportDuty()">导出</span> 
+                   <span id="btnaddParentNode" class="k-button"  onclick="DutyPrepareManage.showDutyTypeWindow()">勤务类型选择</span>
+                   <span id="btnaddChildNode" class="k-button"  onclick="DutyPrepareManage.selectDutyTemplete()">报备模板选择</span> 
+                   <span id="btndeleteNode" class="k-button"  onclick="DutyPrepareManage.onShowCalendarWindow()">报备复制</span> 
+                   <span id="btnunLockNode" class="k-button"  onclick="DutyPrepareManage.clearDuty()">清空报备</span> 
+                   <span id="btnlockNode" class="k-button"  onclick="DutyPrepareManage.onShowTemplateWindow()">保存模板</span> 
+                   <span id="btnlockNode" class="k-button"  onclick="DutyPrepareManage.onSaveDuty()">保存</span> 
+                   <span id="btnlockNode" class="k-button"  onclick="DutyPrepareManage.onExportDuty()">导出</span> 
 	</div>
 	<div class="fr set-hei48">
 		<div class="ty-screen-mode" id="tyScreenMode">

@@ -104,7 +104,7 @@
   			id 			as id,
   			name 	as	name  
   		from 
-  			community
+  			b_community
   		where
   			1=1
   			<if test="orgId != null" >
@@ -119,8 +119,8 @@
   			pp.name 	as name,
   			pa.name	  	as pa_name
   		from 
-  			patrol_point as pp
-  		left join patrol_area as pa on pp.patrol_area_id=pa.id
+  			b_patrol_point as pp
+  		left join b_patrol_area as pa on pp.patrol_area_id=pa.id
   		where
   			1=1
   			<if test="orgId != null" >
@@ -134,11 +134,11 @@
   		id 			as id,
   		name 	as	name  
   		from 
-  		bayonet_info
+  		b_bayonet_info
   		where
   			1=1
-  			<if test="orgCode != null" >
-        		and orgCode = #{orgCode,jdbcType=VARCHAR}
+  			<if test="orgId != null" >
+        		and organ_id = #{orgId,jdbcType=INTEGER}
       		</if>
   </select>
   

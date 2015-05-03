@@ -104,9 +104,9 @@ public class DutyServiceImpl implements DutyService {
 			for (DutyItemVM ivm : ls) {
 				if (ivm.getParentId() != null && ivm.getParentId() != 0) {
 					DutyItemVM pivm = map.get(ivm.getParentId());
-					if (pivm.getChildren() == null)
-						pivm.setChildren(new ArrayList<DutyItemVM>());
-					map.get(ivm.getParentId()).getChildren().add(ivm);
+					if (pivm.getItems() == null)
+						pivm.setItems(new ArrayList<DutyItemVM>());
+					map.get(ivm.getParentId()).getItems().add(ivm);
 				} else {
 					dvm.getItems().add(ivm);
 				}
@@ -170,21 +170,21 @@ public class DutyServiceImpl implements DutyService {
 		}
 
 		if (pivm == null) {
-			ivm.setLevel(1);
+			ivm.setPathLevel(1);
 			ivm.setParentId(null);
 		} else {
-			ivm.setLevel(pivm.getLevel() + 1);
+			ivm.setPathLevel(pivm.getPathLevel() + 1);
 			ivm.setParentId(pivm.getId());
 		}
 
-		if (ivm.getChildren() != null && ivm.getChildren().size() > 0) {
+		if (ivm.getItems() != null && ivm.getItems().size() > 0) {
 			ivm.setIsLeaf(false);
 		} else {
 			ivm.setIsLeaf(true);
 		}
 
 		dutyItemsMapper.insert(ivm);
-		ivm.setFullIdPath(ivm.getLevel() == 1 ? ivm.getId().toString() : pivm
+		ivm.setFullIdPath(ivm.getPathLevel() == 1 ? ivm.getId().toString() : pivm
 				.getFullIdPath() + "." + ivm.getId());
 		dutyItemsMapper.updateByPrimaryKey(ivm);
 
@@ -199,9 +199,9 @@ public class DutyServiceImpl implements DutyService {
 			}
 		}
 
-		if (ivm.getChildren() != null) {
+		if (ivm.getItems() != null) {
 
-			for (DutyItemVM civm : ivm.getChildren()) {
+			for (DutyItemVM civm : ivm.getItems()) {
 				saveItem(civm, ivm, vm);
 			}
 		}

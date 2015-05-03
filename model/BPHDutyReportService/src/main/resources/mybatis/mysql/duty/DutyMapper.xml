@@ -213,7 +213,7 @@
     <result column="item_name" property="name" jdbcType="VARCHAR" />
     <result column="item_display_name" property="displayName" jdbcType="VARCHAR" />
     <result column="item_parent_id" property="parentId" jdbcType="INTEGER" />
-    <result column="item_level" property="level" jdbcType="INTEGER" />
+    <result column="item_level" property="pathLevel" jdbcType="INTEGER" />
     <result column="item_is_leaf" property="isLeaf" jdbcType="BIT" />
     <result column="item_full_id_path" property="fullIdPath" jdbcType="VARCHAR" />
     <result column="item_icon_url" property="iconUrl" jdbcType="VARCHAR" />
@@ -274,7 +274,7 @@
   	from 
   		t_duty as d
   	left join t_duty_item 					as di 		on d.id=di.duty_id
-  	left join t_organ 							as org 		on d.org_id=org.id
+  	left join t_organ 						as org 		on d.org_id=org.organ_id
   	left join t_duty_type 					as dt 		on di.duty_type_id= dt.id
   	left join t_duty_item_type			as dit 		on di.item_type_id=dit.type_id
   	left join t_vehicle						as vel		on di.item_type_id=1 and di.item_id=vel.id
@@ -285,7 +285,7 @@
   	left join	t_weapontype				as	wept		on wep.type_id =wept.id
   	left join t_gps							as gps		on di.item_type_id=4 and di.item_id=gps.id
   	left join t_gpstype						as gpst		on gps.type_id =gpst.id
-  	left join t_duty_police_target		as	dpt		on	di.id=dpt.duty_item_id and di.item_type_id=2
+  	left join t_duty_police_target		as	dpt		on di.id=dpt.duty_item_id and di.item_type_id=2
   	where
   		1=1
   		<if test="id != null" >

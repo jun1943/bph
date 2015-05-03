@@ -49,18 +49,7 @@ public class DutyController {
 
 	@Autowired
 	private DutyTaskService dutyTaskService; 
-	/**
-	 * 鎶ュ妯℃澘鐨勫姞杞借幏鍙栬祴鍊兼姤澶囨暟鎹俊鎭�
-	 * 
-	 * @param orgId
-	 *            缁勭粐鏈烘瀯id
-	 * @param ymd
-	 *            鏃ユ湡
-	 * @param id
-	 *            浼犲叆鐨刬d鍊硷紝鑻d涓嶇瓑浜庣┖锛屽垯鏄�杩囨ā鏉块�鎷╂潵鍔犺浇鎶ュ鏁版嵁锛岃嫢id涓虹┖锛屽垯閫氳繃鎶ュ澶嶅埗鍔犺浇鎶ュ鏁版嵁
-	 * @param request
-	 * @return
-	 */
+
 	@RequestMapping(value = "loadDutyByOrgIdAndYMD.do")
 	public @ResponseBody
 	ReturnResult loadDutyByOrgIdAndYMD(
@@ -85,14 +74,7 @@ public class DutyController {
 	}
 	
 
-	/**
-	 * 鍔犺浇褰撳墠缁勭粐鏈烘瀯涓嬪凡淇濆瓨鐨勬ā鏉�
-	 * 
-	 * @param orgId
-	 *            缁勭粐鏈烘瀯id
-	 * @param request
-	 * @return
-	 */
+
 	@RequestMapping(value = "loadTemplateByOrgId.do")
 	public @ResponseBody
 	ReturnResult loadTemplateByOrgId(
@@ -110,14 +92,7 @@ public class DutyController {
 		}
 	}
  
-	/**
-	 * 淇濆瓨鎶ュ鏄庣粏鏁版嵁
-	 * 
-	 * @param dvm
-	 *            鍓嶅彴鏋勫缓瀵硅薄
-	 * @param request
-	 * @return
-	 */
+
 	@RequestMapping(value = "save.do")
 	public @ResponseBody
 	ReturnResult save(@RequestParam(value = "duty", required = false) String dvm,
@@ -135,7 +110,7 @@ public class DutyController {
 			Map<String, Class<?>> classMap = new HashMap<String, Class<?>>();
 	
 			classMap.put("items", DutyItemVM.class);
-			classMap.put("children", DutyItemVM.class);
+			//classMap.put("children", DutyItemVM.class);
 			classMap.put("targets", PoliceTarget.class);
 	
 			DutyVM d = (DutyVM) JSONObject.toBean(jobj, DutyVM.class, classMap);
@@ -173,28 +148,19 @@ public class DutyController {
 	}
 	
 
-	/**
-	 * 鍔犺浇褰撳墠鍕ゅ姟绫诲瀷鐨勫叧鑱斾换鍔″睘鎬�
-	 * 
-	 * @param orgId
-	 * @param orgCode
-	 * @param taskType
-	 * @param request
-	 * @return
-	 */
 	@RequestMapping(value = "loadTaskTargetByOrg.do")
 	public @ResponseBody
 	ReturnResult loadTaskTargetByOrg(
 			@RequestParam(value = "orgId", required = false) Integer orgId,
-			@RequestParam(value = "orgCode", required = false) String orgCode,
 			@RequestParam(value = "taskType", required = false) Integer taskType,
 			HttpServletRequest request) { 
 		try{
-			Org org = new Org(); 
-			org.setId(orgId);
-			org.setCode(orgCode); 
-			List<TaskTargetVM> ls = dutyTaskService.loadTaskTargetVMList(taskType,
-					org); 
+
+			Organ org=null;
+			
+			org=organService.getOrganByPrimaryKey(orgId);
+			
+			List<TaskTargetVM> ls = dutyTaskService.loadTaskTargetVMList(taskType,	org); 
 			return ReturnResult.MESSAGE(MessageCode.STATUS_SUCESS,
 					MessageCode.SELECT_SUCCESS, ls.size(), ls);
 		}catch(Exception ex){

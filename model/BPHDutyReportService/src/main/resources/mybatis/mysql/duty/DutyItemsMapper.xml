@@ -12,7 +12,7 @@
     <result column="item_name" property="itemName" jdbcType="VARCHAR" />
     <result column="name" property="name" jdbcType="VARCHAR" />
     <result column="parent_id" property="parentId" jdbcType="INTEGER" />
-    <result column="level" property="level" jdbcType="INTEGER" />
+    <result column="level" property="pathLevel" jdbcType="INTEGER" />
     <result column="is_leaf" property="isLeaf" jdbcType="BIT" />
     <result column="full_id_path" property="fullIdPath" jdbcType="VARCHAR" />
     <result column="icon_url" property="iconUrl" jdbcType="VARCHAR" />
@@ -47,7 +47,7 @@
     values (#{id,jdbcType=INTEGER}, #{dutyId,jdbcType=INTEGER}, #{dutyTypeId,jdbcType=INTEGER}, 
       #{beginTime,jdbcType=TIMESTAMP}, #{endTime,jdbcType=TIMESTAMP}, #{itemTypeId,jdbcType=INTEGER}, 
       #{itemId,jdbcType=INTEGER}, #{itemName,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, 
-      #{parentId,jdbcType=INTEGER}, #{level,jdbcType=INTEGER}, #{isLeaf,jdbcType=BIT}, 
+      #{parentId,jdbcType=INTEGER}, #{pathLevel,jdbcType=INTEGER}, #{isLeaf,jdbcType=BIT}, 
       #{fullIdPath,jdbcType=VARCHAR},#{iconUrl,jdbcType=VARCHAR}, #{syncState,jdbcType=BIT}, #{platformId,jdbcType=INTEGER}, 
       #{description,jdbcType=VARCHAR})
   </insert>
@@ -84,7 +84,7 @@
       <if test="parentId != null" >
         parent_id,
       </if>
-      <if test="level != null" >
+      <if test="pathLevel != null" >
         level,
       </if>
       <if test="isLeaf != null" >
@@ -137,8 +137,8 @@
       <if test="parentId != null" >
         #{parentId,jdbcType=INTEGER},
       </if>
-      <if test="level != null" >
-        #{level,jdbcType=INTEGER},
+      <if test="pathLevel != null" >
+        #{pathLevel,jdbcType=INTEGER},
       </if>
       <if test="isLeaf != null" >
         #{isLeaf,jdbcType=BIT},
@@ -187,8 +187,8 @@
       <if test="parentId != null" >
         parent_id = #{parentId,jdbcType=INTEGER},
       </if>
-      <if test="level != null" >
-        level = #{level,jdbcType=INTEGER},
+      <if test="pathLevel != null" >
+        level = #{pathLevel,jdbcType=INTEGER},
       </if>
       <if test="isLeaf != null" >
         is_leaf = #{isLeaf,jdbcType=BIT},
@@ -222,7 +222,7 @@
       item_name = #{itemName,jdbcType=VARCHAR},
       name = #{name,jdbcType=VARCHAR},
       parent_id = #{parentId,jdbcType=INTEGER},
-      level = #{level,jdbcType=INTEGER},
+      level = #{pathLevel,jdbcType=INTEGER},
       is_leaf = #{isLeaf,jdbcType=BIT},
       full_id_path = #{fullIdPath,jdbcType=VARCHAR},
       icon_url = #{iconUrl,jdbcType=VARCHAR},

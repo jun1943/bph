@@ -41,7 +41,7 @@
 
 						<div class="row-fluid">
 							<!----信息显示区---->
-							<div class="span8 box">
+							<div class="span12 box">
 								<!----表格---->
 								<%@ include file="dutyPrepareInfo.jsp"%>
 								
@@ -56,6 +56,7 @@
 		</section>
 	</div>
 	<!-- 引用 js  -->
+	<script type="text/javascript" charset="utf-8" src="<%=basePath%>dutydata/common.js"></script>
 	<script type="text/javascript" charset="utf-8" src="<%=basePath%>dutydata/dutyprepare/js/dutyPrepare.js"></script>
   </body>
 </html>

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.tianyi.bph.dao.duty.DutyTaskMapper;
 import com.tianyi.bph.domain.duty.Org;
+import com.tianyi.bph.domain.system.Organ;
 import com.tianyi.bph.query.duty.TaskTargetVM;
 import com.tianyi.bph.service.duty.DutyTaskService;
  
@@ -31,7 +32,7 @@ public class DutyTaskServiceImpl implements DutyTaskService{
 	 * 社区：社区名称
 	 * 卡点：卡点名称
 	 */
-	public List<TaskTargetVM> loadTaskTargetVMList(Integer taskType, Org org) {
+	public List<TaskTargetVM> loadTaskTargetVMList(Integer taskType, Organ org) {
 		Map<String,Object>map=new HashMap<String, Object>();
 		map.put("orgId", org.getId());
 		map.put("orgCode", org.getCode());

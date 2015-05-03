@@ -50,7 +50,7 @@ public class DutyItems {
     /**
 	 * 节点层级
 	 */
-    private Integer level;
+    private Integer pathLevel;
     /**
 	 * 是否子节点
 	 */
@@ -156,12 +156,12 @@ public class DutyItems {
         this.parentId = parentId;
     }
 
-    public Integer getLevel() {
-        return level;
+    public Integer getPathLevel() {
+        return pathLevel;
     }
 
-    public void setLevel(Integer level) {
-        this.level = level;
+    public void setPathLevel(Integer pathLevel) {
+        this.pathLevel = pathLevel;
     }
 
     public Boolean getIsLeaf() {

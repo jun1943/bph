@@ -1,108 +1,328 @@
 var sessionId = $("#token").val();
-var ymd = 20150103;
-var bph_dutyPrepare_OrgId = $("#organId").val();
+var ymd = '20150103';
+var m_ymd=null;
+var m_xid_max = 0; // duty的treegrid的id,必须确保唯一性
+var m_changestates = "2";
+//var bph_dutyPrepare_OrgId = $("#organId").val();
+var m_dutyprepare_Org={};
+
+var m_policesourceData=null;
+var m_vehicleSourceData=null;
+var m_weaponSourceData=null;
+var m_gpsSourceData =null;
+var m_shift={};
+var m_userNode={};
+var m_target={};
+var m_duty={};
+var m_changestates = "2";
 
 function loadData(pageNo){ 
 	
 } 
 
 $(function() {
-	 DutyPraperManage.initCtl();
+	m_ymd = YMD.createNew((ymd));
+	
+	m_dutyprepare_Org.id=$("#organId").val();
+	m_dutyprepare_Org.path=$("#organPath").val();
+	
+	DutyPrepareManage.initControl();
 	 $("#calendar").kendoCalendar({
-         change: DutyPraperManage.onSelectDateToCopy
+         change: DutyBaseManage.onSelectDateToCopy
      });
-	 
 });
+//管理窗体及对话框。
+var DutyPrepareManage={
+		initControl:function(){
+			DutyBaseManage.initResourceTabStrip();
+			DutyItemManage.initCtl();
+			this.initDutyTypeWindow();
+			this.initTemplateWindow();
+			this.initCalendarWindow();
+		},
+		initDutyTypeWindow:function(){
+			$("#DutyTypetreeList").kendoTreeList({
+				columns : [{
+					field : "name",
+					expandable: true,
+					title : "名称",
+					width : 150
+					//,template: $("#dutyType-checkbox-template").html()
+				} , {
+					title : "人数上限",
+					field : "maxPolice",
+					align : 'left',
+					width : 80
+				}],
+				scrollable: true,
+				selectable: "row",
+				height:300
+			});
+			$("#DutyTypetreeList").delegate("tbody>tr", "dblclick", this.onSelectDutyType);
+			
+		},
+		initTemplateWindow:function(){
+			$("#templateWindow").kendoWindow({
+                width: "450px",
+                title:"保存备勤模板"
+            });
+		},
+		initCalendarWindow:function(){
+			$("#calendarWindow").kendoWindow({
+                width: "450px",
+                title:"复制报备信息"
+            });
+			
+			$("#cc").kendoCalendar({
+				value: new Date(),
+				change:function(){
+					 var date = this.value();
+					 var y = date.getFullYear();
+					var m = date.getMonth() + 1;
+					var d = date.getDate();
+					var s = y.toString() + (m < 10 ? '0' + m : m)
+								+ (d < 10 ? '0' + d : d);
+					var pars = {
+							orgId : m_dutyprepare_Org.id,
+							ymd : s
+						};
+					DutyPrepareManage.loadDuty(pars,2);
+					var winCal=$("#calendarWindow").data("kendoWindow");
+					winCal.close();
+					//loadDuty(pars, 2);
+				}
+			});
+			
+		},
+		showDutyTypeWindow : function(){
+		 	$.ajax({
+				url : "/BPHCenter/dutyTypeWeb/getDutyTypelist.do",
+				type : "POST",
+				dataType : "json",
+				async : false,
+				success : function(req) {
+					if(req.code == 200){
+						if(req.data != null){
+							//[{id:1,name:'a1',parentId:null},{id:2,name:"a2",parentId:1}]
+							$.each(req.data, function(index, value) {
+								if(value.parentId==0)
+									value.parentId=null;
+								});
+							var ds = new kendo.data.TreeListDataSource({
+								data:req.data,
+								schema: {
+		                            model: {
+		                                id: "id",
+		                                expanded: true
+		                            }
+		                        }
+							});
+							var dutyTypeTreeList=$("#DutyTypetreeList").data("kendoTreeList");
+							
+							dutyTypeTreeList.setDataSource(ds);
+						} 
+					}
+				}
+			});
+			var win =$('#windowDutyType');
+			win.kendoWindow({
+	                        width: "450px",
+	                        title: "备勤类型"
+	                    });
+			win.data("kendoWindow").open();
+		},
+		onSelectDutyType:function(e,b){
+			var dutyTypeTreeList=$("#DutyTypetreeList").data("kendoTreeList");
+			var tr=dutyTypeTreeList.select();
+			var row= dutyTypeTreeList.dataItem(tr);
+			if(!row.isLeaf){
+				$("body").popjs({"title":"提示","content":"请选择最末级节点"}); 
+			}else{
+				DutyItemManage.addDutyTypeRow(row);
+			}
+		},
+		onSaveDuty:function(){
+			DutyPrepareManage.saveDuty(false,null);
+		},
+		onShowTemplateWindow:function(){
+			var winTmp=$("#templateWindow").data("kendoWindow");
+			winTmp.open();
+		},
+		onShowCalendarWindow:function(){
+			var winCal=$("#calendarWindow").data("kendoWindow");
+			winCal.open();
+		},
+		onSaveTemplate:function(){
+			var name = $('#txtTemplateName').val();
 
-var DutyPraperManage = {
-	initCtl:function(){
-		this.initDutyTypeWindow();
-		this.initResourceTabStrip();
-		this.initDutyItemList();
-	},
-	initDutyTypeWindow:function(){
-		$("#DutyTypetreeList").kendoTreeList({
-			columns : [{
-			field : "id",
-			title : "id",
-			hidden: true
-		} ,{
-			field : "name",
-			expandable: true,
-			title : "名称",
-			width : 150
-		} , {
-			title : "人数上限",
-			field : "maxPolice",
-			align : 'left',
-			width : 80
-		}],
-		selectable: "row",
-		height:300
-		});
-		$("#DutyTypetreeList").delegate("tbody>tr", "dblclick", this.dutyTypeTreeListDblClick);
-		
-	},
-	dutyTypeTreeListDblClick:function(){
-		
-	},
+			var myReg = /^[^|"'<>]*$/;
+			if (!myReg.test($.trim(name))) {
+				//$.messager.alert("错误提示", "模板名称含有非法字符！", "error");
+				$("body").popjs({"title":"提示","content":"模板名称含有非法字符"}); 
+				$('#txtTemplateName').focus();
+				return;
+			}
+			if (name.length > 20) {
+				//$.messager.alert("错误提示", "模板名称长度过长，限制长度1-20！", "error");
+				$("body").popjs({"title":"提示","content":"模板名称长度过长，限制长度1-20！"}); 
+				$('#txtTemplateName').focus();
+				return;
+			}
+			if (name == null || name.lenght == 0 || name == "" || name == undefined) {
+				//$.messager.alert('提示', "请输入模板名称!", "warning");
+				$("body").popjs({"title":"提示","content":"请输入模板名称"}); 
+				return;
+			} else {
+				DutyPrepareManage.saveDuty(true, name);
+				var winTmp=$("#templateWindow").data("kendoWindow");
+				winTmp.close();
+				//$('#templateWindows').window('close');
+			}
+		},
+		loadDuty:function(pars, type){
+			$.ajax({
+				url : "/BPHCenter/dutyWeb/loadDutyByOrgIdAndYMD.do",
+				type : "POST",
+				dataType : "json",
+				data : pars,
+				async : false,
+				success : function(req) {
+					if (req.code==200) {// 成功填充数据
+						var duty = req.data;
+						m_targetPoint = req.data;
+						if (duty == null) {
+							duty = {};
+							duty.id = 0;
+							duty.ymd = m_ymd.ymd;
+							duty.orgId = m_dutyprepare_Org.id;
+							duty.items = [];
+						}
+						switch (type) {
+						case 1:
+							DutyItemManage.clearId(duty);
+							duty.isTemplate = false;
+							break;
+						case 2:
+							DutyItemManage.clearId(duty);
+							break;
+						}
+						
+						DutyItemManage.reCalcDuty(duty.items);
+						
+						m_duty = duty;
+						//$('#tdDuty').treegrid('loadData', duty.items);
+					} else {
+						alert("获取报备明细数据信息失败");
+					}
+				}
+			});
+		},
+		saveDuty:function(isTemplate, name){
+			var duty = {};
+			duty.id = m_duty.id;
+			duty.orgId = m_dutyprepare_Org.id;
+			duty.name = name;
+			duty.isTemplate = isTemplate;
+			if (isTemplate) {
+				duty.id = 0; // 模板新建
+			}
+
+			var tv=$("#dutyItemTV").data("kendoTreeView");
+			
+			duty.items = tv.dataSource.data();
+
+			DutyItemManage.dutyRegul(duty);
+
+			$.ajax({
+				url:"/BPHCenter/dutyWeb/save.do",
+				type : "POST",
+				dataType : "json",
+				data : {
+					'duty' : JSON.stringify(duty)
+				},
+				async : false,
+				success : function(req) {
+					if (req.code == 200) {// 成功填充数据
+						m_duty.id = req.data;
+
+						//$("#divMember").unmask();
+						$("body").popjs({"title":"提示","content":"保存成功!"}); 
+					} else {
+						//$("#divMember").unmask();
+						//$.messager.alert('提示', "保存失败!", "info");
+						$("body").popjs({"title":"提示","content":"保存失败!"}); 
+					}
+				},
+				error : function(a) {
+					//$.messager.alert('提示', "保存失败!", "info");
+					//$("#divMember").unmask();
+				}
+			});
+
+			DutyItemManage.reCalcDuty();
+			m_changestates = "2";
+		},
+		clearDuty:function() {
+			
+			$("body").tyWindow({"content":"确定要清空所有报备信息?","center":true,"ok":true,"no":true,
+				"okCallback":function(){ 
+					var tv = $("#dutyItemTV").data("kendoTreeView");
+					var items=tv.dataSource.data();
+					items.length=0;
+					DutyItemManage.reCalcDuty(items);
+			}});	
+		},
+};
+//管理基础资料
+var DutyBaseManage = {
+	
 	initResourceTabStrip:function(){
 		$("#tabstrip-sprites").kendoTabStrip({
         	   animation: { open: { effects: "fadeIn"} },
                dataTextField: "text",
                dataSpriteCssClass: "spriteCssClass",
-               dataContentField: "content",
-               dataSource: [{
-                       text: "警员",
-                       spriteCssClass: "brazilFlag",
-                       content: "<div id='policeSourceTreeList'></div>"
-                   },{
-                       text: "警车",
-                       spriteCssClass: "indiaFlag",
-                       content: "<div id='vehicleSourceTreeList'></div>"
-                   },{
-                       text: "武器",
-                       spriteCssClass: "netherlandsFlag",
-                       content: "<div id='weaponSourceTreeList'></div>"
-                   },{
-                       text: "定位设备",
-                       spriteCssClass: "netherlandsFlag",
-                       content: "<div id='gpsSourceTreeList'></div>"
-                   }]
+               dataContentField: "content"
            }).data("kendoTabStrip").select(0);
                 
-           DutyPraperManage.initPoliceResource();
-           DutyPraperManage.initVehicleResource();
-           DutyPraperManage.initWeaponResource();
-           DutyPraperManage.initGpsResource();
+           DutyBaseManage.initPoliceResource();
+           DutyBaseManage.initVehicleResource();
+           DutyBaseManage.initWeaponResource();
+           DutyBaseManage.initGpsResource();
            
 	},
 	bph_police_query:{},
 	packagePolQuery:function(){
-		DutyPraperManage.bph_police_query.orgId = $("#organId").val();
-		DutyPraperManage.bph_police_query.orgCode = $("#organCode").val();
-		DutyPraperManage.bph_police_query.orgPath = $("#organPath").val();
-		DutyPraperManage.bph_police_query.name = "";//$("#policeresName").val();
-		DutyPraperManage.bph_police_query.typeId = "";
-		DutyPraperManage.bph_police_query.groupId = "";  
+		DutyBaseManage.bph_police_query.orgId = $("#organId").val();
+		DutyBaseManage.bph_police_query.orgCode = $("#organCode").val();
+		DutyBaseManage.bph_police_query.orgPath = $("#organPath").val();
+		DutyBaseManage.bph_police_query.name = "";//$("#policeresName").val();
+		DutyBaseManage.bph_police_query.typeId = "";
+		DutyBaseManage.bph_police_query.groupId = "";  
 	},
 	initPoliceResource:function(){
-		DutyPraperManage.packagePolQuery();
+		DutyBaseManage.packagePolQuery();
 		
-		$("#policeSourceTreeList").kendoTreeList({
-			toolbar: kendo.template($("#polContemplate").html()),
-				columns : [{
-					field : "id",
-					title : "id",
-					hidden: true
-				} ,{
-					field : "name", 
-					title : "名称" 
-				} , {
-					title : "所属机构",
-					field : "orgName"
-					} ],
-                selectable: "multiple row"
+		$("#policeSourceTV").kendoTreeView({
+			//toolbar: kendo.template($("#polContemplate").html()),
+			dragAndDrop: true,
+			drop:function(e){
+				var point=e.dropPosition;
+				var sRow=$("#policeSourceTV").data("kendoTreeView").dataItem(e.sourceNode);
+				var tRow=$("#dutyItemTV").data("kendoTreeView").dataItem(e.destinationNode );
+				
+				if(tRow==null || sRow == null){
+					e.setValid(false);
+				}
+				
+				if(DutyItemManage.checkDrop(tRow,sRow,point)){
+					DutyItemManage.doDrop(tRow, sRow, point);
+				}else{
+					e.setValid(false);
+				}
+			},
+			dragend:DutyItemManage.doDragEnd,
+			template: kendo.template($("#policeSource-template").html()),
+			dataTextField:["name","number"]
 			});
 		
 		$.ajax({
@@ -110,12 +330,13 @@ var DutyPraperManage = {
 			type : "POST",
 			dataType : "json",
 			data : {
-						"police_Query" : JSON.stringify(DutyPraperManage.bph_police_query)
+						"police_Query" : JSON.stringify(DutyBaseManage.bph_police_query)
 					},
 			success : function(req) {
 				if(req.code == 200){
 					if(req.data != null){
-						$("#policeSourceTreeList").data("kendoTreeList").setDataSource(req.data);
+						m_policesourceData = req.data;
+						$("#policeSourceTV").data("kendoTreeView").setDataSource(req.data);
 					} 
 				}
 			}
@@ -128,13 +349,13 @@ var DutyPraperManage = {
 			url : "/BPHCenter/dutyResourceWeb/getPoliceGrouplist.do?sessionId="+sessionId,
 					type : "post",
 					data : {
-						"orgId" : bph_dutyPrepare_OrgId
+						"orgId" : m_dutyprepare_Org.id
 					},
 					dataType : "json",
 					success:function(req){
 						if(req.code==200){
 							if(req.data!=null){
-								DutyPraperManage.polGroupResData = req.data;
+								DutyBaseManage.polGroupResData = req.data;
 							}
 						}else{
 							$("body").popjs({"title":"提示","content":"获取警员分组查询条件失败"}); 
@@ -148,7 +369,7 @@ var DutyPraperManage = {
 					success:function(req){
 						if(req.code==200){
 							if(req.data!=null){
-								DutyPraperManage.polTypeResData = req.data;
+								DutyBaseManage.polTypeResData = req.data;
 							}
 						}else{
 							$("body").popjs({"title":"提示","content":"获取警员类型查询条件失败"}); 
@@ -157,7 +378,7 @@ var DutyPraperManage = {
 		});
 				 $("#polGroupgrid").kendoGrid({
                          dataSource: {
-                            data: DutyPraperManage.polGroupResData
+                            data: DutyBaseManage.polGroupResData
                         }, 
 						sortable : true,
                         selectable: "multiple row", 
@@ -172,7 +393,7 @@ var DutyPraperManage = {
                     });
                      $("#polTypegrid").kendoGrid({
                          dataSource: {
-                            data: DutyPraperManage.polTypeResData
+                            data: DutyBaseManage.polTypeResData
                         }, 
 						sortable : true,
                         selectable: "multiple row", 
@@ -197,63 +418,62 @@ var DutyPraperManage = {
                     }  
 	},
 	searchPoliceRescource:function(){ 
-		DutyPraperManage.bph_police_query.orgId = $("#organId").val();
-		DutyPraperManage.bph_police_query.orgCode = $("#organCode").val();
-		DutyPraperManage.bph_police_query.orgPath = $("#organPath").val();
-		DutyPraperManage.bph_police_query.name = $("#policeresName").val();
-		
-		
-		
-		DutyPraperManage.bph_police_query.typeId = "";
-		DutyPraperManage.bph_police_query.groupId = ""; 
+		DutyBaseManage.bph_police_query.orgId = $("#organId").val();
+		DutyBaseManage.bph_police_query.orgCode = $("#organCode").val();
+		DutyBaseManage.bph_police_query.orgPath = $("#organPath").val();
+		DutyBaseManage.bph_police_query.name = $("#policeresName").val();
+
+		DutyBaseManage.bph_police_query.typeId = "";
+		DutyBaseManage.bph_police_query.groupId = ""; 
 	},
 	bph_vehicle_query:{},
 	packageVelQuery:function(){
-		DutyPraperManage.bph_vehicle_query.orgId = $("#organId").val();
-		DutyPraperManage.bph_vehicle_query.orgCode = $("#organCode").val();
-		DutyPraperManage.bph_vehicle_query.orgPath = $("#organPath").val();
-		DutyPraperManage.bph_vehicle_query.number = "";//$("#vehicleresName").val();
-		DutyPraperManage.bph_vehicle_query.typeId = "";
-		DutyPraperManage.bph_vehicle_query.groupId = ""; 
+		DutyBaseManage.bph_vehicle_query.orgId = $("#organId").val();
+		DutyBaseManage.bph_vehicle_query.orgCode = $("#organCode").val();
+		DutyBaseManage.bph_vehicle_query.orgPath = $("#organPath").val();
+		DutyBaseManage.bph_vehicle_query.number = "";//$("#vehicleresName").val();
+		DutyBaseManage.bph_vehicle_query.typeId = "";
+		DutyBaseManage.bph_vehicle_query.groupId = ""; 
 	 
 	},
 	initVehicleResource:function(){
-		DutyPraperManage.packageVelQuery();
+		DutyBaseManage.packageVelQuery();
+		
+		$("#vehicleSourceTV").kendoTreeView({
+			//toolbar: kendo.template($("#polContemplate").html()),
+			dragAndDrop: true,
+			drop:function(e){
+				var point=e.dropPosition;
+				var sRow=$("#vehicleSourceTV").data("kendoTreeView").dataItem(e.sourceNode);
+				var tRow=$("#dutyItemTV").data("kendoTreeView").dataItem(e.destinationNode );
+				
+				if(tRow==null || sRow == null){
+					e.setValid(false);
+				}
+				
+				if(DutyItemManage.checkDrop(tRow,sRow,point)){
+					DutyItemManage.doDrop(tRow, sRow, point);
+				}else{
+					e.setValid(false);
+				}
+			},
+			dragend:DutyItemManage.doDragEnd,
+			template: kendo.template($("#vehicleSource-template").html()),
+			dataTextField:["name","number"]
+			});
+		
 		$.ajax({
 			url : "/BPHCenter/dutyResourceWeb/getVehicleSource.do?sessionId="+sessionId,
 			type : "POST",
 			dataType : "json",
 			data : {
-						"vehicle_Query" : JSON.stringify(DutyPraperManage.bph_vehicle_query)
+						"vehicle_Query" : JSON.stringify(DutyBaseManage.bph_vehicle_query)
 					},
 			success : function(req) {
 				if(req.code == 200){
 					if(req.data != null){
-						for(var i = 0; i<req.data.length;i++)
-						{
-							var obj = req.data[i]; 
-							obj.parentId = null; 
-						}
-						var dtdatatemp = JSON.stringify(req.data);
-                $("#vehicleSourceTreeList").kendoTreeList({
-						 dataSource: {
-             				data:req.data
-             			},
-						 
-						  toolbar: kendo.template($("#vehContemplate").html()),
-							columns : [{
-								field : "id",
-								title : "id",
-								hidden: true
-							} , {
-								field : "number", 
-								title : "车牌号码" 
-							} , {
-								title : "所属机构",
-								field : "orgName"
-							} ],
-                        selectable: "multiple row"
-						});
+						m_vehicleSourceData = req.data;
+						$("#vehicleSourceTV").data("kendoTreeView").setDataSource(req.data);
 					} 
 				}
 			}
@@ -266,13 +486,13 @@ var DutyPraperManage = {
 			url : "/BPHCenter/dutyResourceWeb/getVehicleGrouplist.do?sessionId="+sessionId,
 					type : "post",
 					data : {
-						"orgId" : bph_dutyPrepare_OrgId
+						"orgId" : m_dutyprepare_Org.id
 					},
 					dataType : "json",
 					success:function(req){
 						if(req.code==200){
 							if(req.data!=null){
-								DutyPraperManage.vehGroupResData = req.data;
+								DutyBaseManage.vehGroupResData = req.data;
 							}
 						}else{
 							$("body").popjs({"title":"提示","content":"获取警员分组查询条件失败"}); 
@@ -286,7 +506,7 @@ var DutyPraperManage = {
 					success:function(req){
 						if(req.code==200){
 							if(req.data!=null){
-								DutyPraperManage.vehTypeResData = req.data;
+								DutyBaseManage.vehTypeResData = req.data;
 							}
 						}else{
 							$("body").popjs({"title":"提示","content":"获取警员类型查询条件失败"}); 
@@ -295,7 +515,7 @@ var DutyPraperManage = {
 		}); 
 		 			 $("#vehGroupgrid").kendoGrid({
                  		 dataSource: {
-                            data: DutyPraperManage.vehGroupResData
+                            data: DutyBaseManage.vehGroupResData
                         }, 
 						sortable : true,
                         selectable: "multiple row", 
@@ -310,7 +530,7 @@ var DutyPraperManage = {
                     });
                      $("#vehTypegrid").kendoGrid({
                         dataSource: {
-                            data: DutyPraperManage.vehTypeResData
+                            data: DutyBaseManage.vehTypeResData
                         }, 
 						sortable : true,
                         selectable: "multiple row",
@@ -335,63 +555,61 @@ var DutyPraperManage = {
                     }  
 	},
 	searchVehicleRescource:function(){
-		DutyPraperManage.bph_vehicle_query.orgId = $("#organId").val();
-		DutyPraperManage.bph_vehicle_query.orgCode = $("#organCode").val();
-		DutyPraperManage.bph_vehicle_query.orgPath = $("#organPath").val();
-		DutyPraperManage.bph_vehicle_query.number = $("#vehicleresName").val();
-		DutyPraperManage.bph_vehicle_query.typeId = "";
-		DutyPraperManage.bph_vehicle_query.groupId = ""; 
+		DutyBaseManage.bph_vehicle_query.orgId = $("#organId").val();
+		DutyBaseManage.bph_vehicle_query.orgCode = $("#organCode").val();
+		DutyBaseManage.bph_vehicle_query.orgPath = $("#organPath").val();
+		DutyBaseManage.bph_vehicle_query.number = $("#vehicleresName").val();
+		DutyBaseManage.bph_vehicle_query.typeId = "";
+		DutyBaseManage.bph_vehicle_query.groupId = ""; 
 	},
 	bph_weapon_query:{},
 	packageWepQuery:function(){
-		DutyPraperManage.bph_weapon_query.orgId = $("#organId").val();
-		DutyPraperManage.bph_weapon_query.orgCode = $("#organCode").val();
-		DutyPraperManage.bph_weapon_query.orgPath = $("#organPath").val();
-		DutyPraperManage.bph_weapon_query.number = "";//$("#weaponresName").val();
-		DutyPraperManage.bph_weapon_query.typeId = "";
-		DutyPraperManage.bph_weapon_query.groupId = "";  
+		DutyBaseManage.bph_weapon_query.orgId = $("#organId").val();
+		DutyBaseManage.bph_weapon_query.orgCode = $("#organCode").val();
+		DutyBaseManage.bph_weapon_query.orgPath = $("#organPath").val();
+		DutyBaseManage.bph_weapon_query.number = "";//$("#weaponresName").val();
+		DutyBaseManage.bph_weapon_query.typeId = "";
+		DutyBaseManage.bph_weapon_query.groupId = "";  
 	},
 	initWeaponResource:function(){
-		DutyPraperManage.packageWepQuery();
+		DutyBaseManage.packageWepQuery();
+		
+		$("#weaponSourceTV").kendoTreeView({
+			//toolbar: kendo.template($("#polContemplate").html()),
+			dragAndDrop: true,
+			drop:function(e){
+				var point=e.dropPosition;
+				var sRow=$("#weaponSourceTV").data("kendoTreeView").dataItem(e.sourceNode);
+				var tRow=$("#dutyItemTV").data("kendoTreeView").dataItem(e.destinationNode );
+				
+				if(tRow==null || sRow == null){
+					e.setValid(false);
+				}
+				
+				if(DutyItemManage.checkDrop(tRow,sRow,point)){
+					DutyItemManage.doDrop(tRow, sRow, point);
+				}else{
+					e.setValid(false);
+				}
+			},
+			dragend:DutyItemManage.doDragEnd,
+			template: kendo.template($("#weaponSource-template").html()),
+			dataTextField:["typeName","number"]
+		});
+		
 		$.ajax({
 			url : "/BPHCenter/dutyResourceWeb/getWeaponSource.do?sessionId="+sessionId,
 			type : "POST",
 			dataType : "json",
 			dataType : "json",
 			data : {
-						"weapon_Query" : JSON.stringify(DutyPraperManage.bph_weapon_query)
+						"weapon_Query" : JSON.stringify(DutyBaseManage.bph_weapon_query)
 					},
 			success : function(req) {
 				if(req.code == 200){
 					if(req.data != null){
-						for(var i = 0; i<req.data.length;i++)
-						{
-							var obj = req.data[i]; 
-							obj.parentId = null; 
-						}
-						var dtdatatemp = JSON.stringify(req.data);
-                $("#weaponSourceTreeList").kendoTreeList({
-						 dataSource: {
-             				data:req.data
-             			},
-						 
-						  toolbar: kendo.template($("#wepContemplate").html()),
-							columns : [{
-								field : "id",
-								title : "id",
-								hidden: true
-							} ,{
-								field : "typeName", 
-								title : "武器类型" 
-							} , {
-								title : '武器编号',
-								field : 'number' 
-							}, {
-								title : '所属机构',
-								field : 'orgName' 
-							} ],
-                        selectable: "multiple row"
-						});
+						m_weaponSourceData = req.data;
+						$("#weaponSourceTV").data("kendoTreeView").setDataSource(req.data);
 					} 
 				}
 			}
@@ -404,13 +622,13 @@ var DutyPraperManage = {
 			url : "/BPHCenter/dutyResourceWeb/getWeaponGrouplist.do?sessionId="+sessionId,
 					type : "post",
 					data : {
-						"orgId" : bph_dutyPrepare_OrgId
+						"orgId" : m_dutyprepare_Org.id
 					},
 					dataType : "json",
 					success:function(req){
 						if(req.code==200){
 							if(req.data!=null){
-								DutyPraperManage.wepGroupResData = req.data;
+								DutyBaseManage.wepGroupResData = req.data;
 							}
 						}else{
 							$("body").popjs({"title":"提示","content":"获取警员分组查询条件失败"}); 
@@ -424,16 +642,16 @@ var DutyPraperManage = {
 					success:function(req){
 						if(req.code==200){
 							if(req.data!=null){
-								DutyPraperManage.wepTypeResData = req.data;
+								DutyBaseManage.wepTypeResData = req.data;
 							}
 						}else{
-							$("body").popjs({"title":"提示","content":"获取警员类型查询条件失败"}); 
+							$("body").popjs({"title":"提示","content":"获取武器类型查询条件失败"}); 
 						}
 					} 
 		}); 
 		 $("#wepGroupgrid").kendoGrid({ 
                         dataSource: {
-                            data: DutyPraperManage.wepGroupResData
+                            data: DutyBaseManage.wepGroupResData
                         }, 
 						sortable : true,
                         selectable: "multiple row",
@@ -448,7 +666,7 @@ var DutyPraperManage = {
                     });
                      $("#wepTypegrid").kendoGrid({
                           dataSource: {
-                            data: DutyPraperManage.wepTypeResData
+                            data: DutyBaseManage.wepTypeResData
                         }, 
 						sortable : true,
                         selectable: "multiple row",
@@ -473,66 +691,66 @@ var DutyPraperManage = {
                     }  
 	},
 	searchWeaponRescource:function(){
-		DutyPraperManage.bph_weapon_query.orgId = $("#organId").val();
-		DutyPraperManage.bph_weapon_query.orgCode = $("#organCode").val();
-		DutyPraperManage.bph_weapon_query.orgPath = $("#organPath").val();
-		DutyPraperManage.bph_weapon_query.number = $("#weaponresName").val();
-		DutyPraperManage.bph_weapon_query.typeId = "";
-		DutyPraperManage.bph_weapon_query.groupId = "";  
+		DutyBaseManage.bph_weapon_query.orgId = $("#organId").val();
+		DutyBaseManage.bph_weapon_query.orgCode = $("#organCode").val();
+		DutyBaseManage.bph_weapon_query.orgPath = $("#organPath").val();
+		DutyBaseManage.bph_weapon_query.number = $("#weaponresName").val();
+		DutyBaseManage.bph_weapon_query.typeId = "";
+		DutyBaseManage.bph_weapon_query.groupId = "";  
 	},
 	bph_gps_query:{},
 	packageGpsQuery:function(){
-		DutyPraperManage.bph_gps_query.orgId = $("#organId").val();
-		DutyPraperManage.bph_gps_query.orgCode = $("#organCode").val();
-		DutyPraperManage.bph_gps_query.orgPath = $("#organPath").val();
-		DutyPraperManage.bph_gps_query.gpsname = "";//$("#gpsresName").val();
-		DutyPraperManage.bph_gps_query.typeId = "";
-		DutyPraperManage.bph_gps_query.groupId = "";  
+		DutyBaseManage.bph_gps_query.orgId = $("#organId").val();
+		DutyBaseManage.bph_gps_query.orgCode = $("#organCode").val();
+		DutyBaseManage.bph_gps_query.orgPath = $("#organPath").val();
+		DutyBaseManage.bph_gps_query.gpsname = "";//$("#gpsresName").val();
+		DutyBaseManage.bph_gps_query.typeId = "";
+		DutyBaseManage.bph_gps_query.groupId = "";  
 	},
+	/*
+	 * 初始化定位设备数据
+	 */
 	initGpsResource:function(){
-		DutyPraperManage.packageGpsQuery();
+		DutyBaseManage.packageGpsQuery();
+		
+		$("#gpsSourceTV").kendoTreeView({
+			//toolbar: kendo.template($("#polContemplate").html()),
+			dragAndDrop: true,
+			drop:function(e){
+				var point=e.dropPosition;
+				var sRow=$("#gpsSourceTV").data("kendoTreeView").dataItem(e.sourceNode);
+				var tRow=$("#dutyItemTV").data("kendoTreeView").dataItem(e.destinationNode );
+				
+				if(tRow==null || sRow == null){
+					e.setValid(false);
+				}
+				
+				if(DutyItemManage.checkDrop(tRow,sRow,point)){
+					DutyItemManage.doDrop(tRow, sRow, point);
+				}else{
+					e.setValid(false);
+				}
+			},
+			dragend:DutyItemManage.doDragEnd,
+			template: kendo.template($("#gpsSource-template").html()),
+			dataTextField:["typeName","number"]
+		});
+		
 		$.ajax({
 			url : "/BPHCenter/dutyResourceWeb/getGpsSource.do?sessionId="+sessionId,
 			type : "POST",
 			dataType : "json",
 			data : {
-						"gps_Query" : JSON.stringify(DutyPraperManage.bph_gps_query)
+						"gps_Query" : JSON.stringify(DutyBaseManage.bph_gps_query)
 					},
 			success : function(req) {
-				if(req.code == 200){
-					if(req.data != null){
-						for(var i = 0; i<req.data.length;i++)
-						{
-							var obj = req.data[i]; 
-							obj.parentId = null; 
-						}
-						var dtdatatemp = JSON.stringify(req.data);
-                $("#gpsSourceTreeList").kendoTreeList({
-						 dataSource: {
-             				data:req.data
-             			},
-						 
-						  toolbar: kendo.template($("#gpsContemplate").html()),
-							columns : [{
-								field : "id",
-								title : "id",
-								hidden: true
-							} ,{
-								field : "typeName", 
-								title : "类型" 
-							} ,{
-								title : '显示名称',
-								field : 'gpsName' 
-							} , {
-								title : '设备编号',
-								field : 'number' 
-							},{
-								title : "所属单位",
-								field : "orgName"
-							} ],
-                        selectable: "multiple row"
-						});
-					} 
+				if(req.code==200){
+					if(req.data!=null){
+						m_gpsSourceData = req.data;
+						$("#gpsSourceTV").data("kendoTreeView").setDataSource(req.data);
+					}
+				}else{
+					$("body").popjs({"title":"提示","content":"获取定位设备失败"}); 
 				}
 			}
 		}); 
@@ -544,13 +762,13 @@ var DutyPraperManage = {
 			url : "/BPHCenter/dutyResourceWeb/getGpsGrouplist.do?sessionId="+sessionId,
 					type : "post",
 					data : {
-						"orgId" : bph_dutyPrepare_OrgId
+						"orgId" : m_dutyprepare_Org.id
 					},
 					dataType : "json",
 					success:function(req){
 						if(req.code==200){
 							if(req.data!=null){
-								DutyPraperManage.gpsGroupResData = req.data;
+								DutyBaseManage.gpsGroupResData = req.data;
 							}
 						}else{
 							$("body").popjs({"title":"提示","content":"获取警员分组查询条件失败"}); 
@@ -564,7 +782,7 @@ var DutyPraperManage = {
 					success:function(req){
 						if(req.code==200){
 							if(req.data!=null){
-								DutyPraperManage.gpsTypeResData = req.data;
+								DutyBaseManage.gpsTypeResData = req.data;
 							}
 						}else{
 							$("body").popjs({"title":"提示","content":"获取警员类型查询条件失败"}); 
@@ -573,7 +791,7 @@ var DutyPraperManage = {
 		}); 
 		  $("#gpsGroupgrid").kendoGrid({
                         dataSource: {
-                            data: DutyPraperManage.gpsGroupResData
+                            data: DutyBaseManage.gpsGroupResData
                         }, 
 						sortable : true,
                         selectable: "multiple row",
@@ -588,7 +806,7 @@ var DutyPraperManage = {
                     });
                      $("#gpsTypegrid").kendoGrid({
                         dataSource: {
-                            data: DutyPraperManage.gpsTypeResData
+                            data: DutyBaseManage.gpsTypeResData
                         }, 
 						sortable : true,
                         selectable: "multiple row",
@@ -613,123 +831,12 @@ var DutyPraperManage = {
                     }
 	},
 	searchGpsRescource:function(){ 
-		DutyPraperManage.bph_gps_query.orgId = $("#organId").val();
-		DutyPraperManage.bph_gps_query.orgCode = $("#organCode").val();
-		DutyPraperManage.bph_gps_query.orgPath = $("#organPath").val();
-		DutyPraperManage.bph_gps_query.gpsname = $("#gpsresName").val();
-		DutyPraperManage.bph_gps_query.typeId = "";
-		DutyPraperManage.bph_gps_query.groupId = "";  
-	},
-	initDutyItemList:function(){
-		$("#dutyItemList").kendoTreeList({
-			 toolbar: kendo.template($("#dutyItemtemplate").html()),
-			columns : [{
-				title : 'xid',
-				field : 'xid',
-				width : 0,
-				hidden : true
-			},{
-				field : "id",
-				title : "id",
-				hidden: true
-			} ,{
-				title : '人数限制',
-				field : 'maxpolice',
-				hidden : true
-			} ,{
-				title : '名称',
-				field : 'displayName' 
-			} , {
-				title : '类型',
-				field : 'itemInnerTypeName' 
-			} ,  {
-				title : '时间区间', 
-				template: '<label>DutyPraperManage.formatShiftTime(#: beginTime #)</label>'
-			} ,  {
-				title : '类型',
-				field : 'velicleCount' 
-			} ,  {
-				title : '警员',
-				field : 'policeCount'
-			} ,  {
-				title : '武器',
-				field : 'weaponCount'
-			} ,  {
-				title : '定位',
-				field : 'gpsCount'
-			} ,  {
-				title : '操作',
-				template : "<button type='button' class='ty-delete-btn' id='#: id #' title='删除' onclick='DutyPraperManage.deleteThisNode(#: xid #,#: name #,#: itemTypeId #)'>删除</button> ",
-				width : 120
-			} ],
-			selectable: "row" 
-		});
-		
-//		$.ajax({
-//			url : "/BPHCenter/dutyWeb/getDutylist.do?sessionId="+sessionId,
-//			type : "POST",
-//			dataType : "json",
-//			success : function(req) {
-//				if(req.code == 200){
-//					if(req.data != null){
-//						for(var i = 0; i<req.data.length;i++)
-//						{
-//							var obj = req.data[i];
-//							if(obj.parentId ==0)
-//							{
-//								obj.parentId = null;
-//							} 
-//						}
-//						var dtdatatemp = JSON.stringify(req.data);
-                
-	},
-	deleteThisNode:function(objId,objname,objtypeId){
-		
-	},
-	selectDutyType : function(){
-		
-	 	$.ajax({
-			url : "/BPHCenter/dutyTypeWeb/getDutyTypelist.do",
-			type : "POST",
-			dataType : "json",
-			async : false,
-			success : function(req) {
-				if(req.code == 200){
-					if(req.data != null){
-						//[{id:1,name:'a1',parentId:null},{id:2,name:"a2",parentId:1}]
-						$.each(req.data, function(index, value) {
-							if(value.parentId==0)
-								value.parentId=null;
-							});
-						var ds = new kendo.data.TreeListDataSource({
-							data:req.data,
-							schema: {
-	                            model: {
-	                                id: "id",
-	                                expanded: true
-	                            }
-	                        }
-						});
-						var dutyTypeTreeList=$("#DutyTypetreeList").data("kendoTreeList");
-						
-						dutyTypeTreeList.setDataSource(ds);
-					} 
-				}
-			}
-		});
-		
-
-				
-		
-		
-		var win =$('#windowDutyType');
-		win.kendoWindow({
-                        width: "450px",
-                        title: "123"
-                    });
-		win.data("kendoWindow").open();
-
-
+		DutyBaseManage.bph_gps_query.orgId = $("#organId").val();
+		DutyBaseManage.bph_gps_query.orgCode = $("#organCode").val();
+		DutyBaseManage.bph_gps_query.orgPath = $("#organPath").val();
+		DutyBaseManage.bph_gps_query.gpsname = $("#gpsresName").val();
+		DutyBaseManage.bph_gps_query.typeId = "";
+		DutyBaseManage.bph_gps_query.groupId = "";  
 	},
 	getProperty:function(data){
 		if (data == null || data.length == 0)
@@ -820,19 +927,1015 @@ var DutyPraperManage = {
 		var s  = kendo.toString(this.value(), 'd');
 		alert(s);
 	},
-	clearDuty:function(){
-		$("body").tyWindow({"content":"确定要清空所有报备信息?","center":true,"ok":true,"no":true,"okCallback":function(){ 
-				alert("清空所有报备信息");
-			}
-		});	
-	},
-	saveDutyAsTemplete:function(){
-		
-	},
-	saveDuty:function(){
-	
-	},
 	exportDuty:function(){
 	
+	},
+	showDialog:function(title,msg){
+		var dlgEl=$("#dialog");
+		dlgEl.kendoWindow({
+			'width': "300px",
+            'title': title,
+            'actions': [
+                "Close"
+            ]
+		});
+		var dialog=dlgEl.data("kendoWindow");
+		dialog.content(msg);
+		dialog.open();
 	}
 };
+// 备情功能比较复杂，所以单独建立一个对象管理器.
+var DutyItemManage={
+		
+		initCtl:function(){
+			this.initShiftWindow();
+			this.initdutyItemTV();
+			this.initUserNodeWindow();
+			this.initTaskWindow();
+		},
+		initShiftWindow:function(){
+			 $("#tpkBeginTime").kendoTimePicker();
+			 $("#tpkEndTime").kendoTimePicker();
+			 
+			 $("#shiftWindow").kendoWindow({
+                 width: "450px"
+             });
+		},
+		initUserNodeWindow:function(){
+			$("#userNodeWindow").kendoWindow({
+                width: "450px"
+            });
+		},
+		initTaskWindow:function(){
+			$("#taskGrid").kendoGrid(	{
+				height : 550,
+				sortable : true,
+				selectable : "multiple", 
+				columns : [{
+						title : 'Id',
+						field : 'id',
+						width : 10
+					},{
+						title : "名称",
+						field:"areaName"
+					},{
+						title:"点位名称",
+						field : "name"
+					},{
+						title : "经过次数",
+						field : "count"
+					},{
+						title : "停留时间(分钟)",
+						field : "stayTime"
+					},{
+						title : "操作",
+						template:""
+					} ]
+			}); 
+		},
+		initdutyItemTV:function(){
+			m_duty.id = 0;
+			$("#dutyItemTV").kendoTreeView({
+				template:kendo.template($("#dutyItem-template").html()),
+				dragAndDrop: true,
+				drop: function(e) {
+					//e.setValid(false);
+				},
+				dataTextField:["displayName"]
+			});	     
+
+		},
+		doDrop:function(tRow,sRow,point){
+
+			if (sRow.xid == undefined) {
+				/* 从资源拖动过来 */
+				/* itemId,name,typeId,innerTypeId,innerTypeName,dutyRow */
+				var name = sRow.itemTypeId == 2 ? sRow.name : sRow.number;
+				// sRow.iconUrl = tRow.iconUrl == undefined ? null : tRow.iconUrl;
+
+				switch (sRow.itemTypeId) {
+				case 1:
+					name = sRow.number;
+					break;
+				case 2:
+					name = sRow.name;
+					break;
+				case 3:
+					name = sRow.number;
+					break;
+				case 4:
+					name = sRow.number;
+					break;
+				}
+
+				DutyItemManage.genDutyRow(sRow.id, name, sRow.itemTypeId, sRow.typeId, sRow.typeName,sRow);
+									
+				if (sRow.itemTypeId == 1) {
+					//$('#source_vehicle').treegrid('loadData', m_vehiclesourceData);
+				} else if (sRow.itemTypeId == 2) {
+					if (m_policesourceData != null && m_policesourceData.length > 0) {
+						$.each(m_policesourceData, function(index, value) {
+							var iconUrl = value.iconUrl;// .substring(1,
+							// value.length);
+							//itemiconCls = createIconStyle(value, 2, iconUrl);
+						});
+					}
+					//$('#source_police').treegrid('loadData', m_policesourceData);
+				} else if (sRow.itemTypeId == 3) {
+					//$('#source_weapon').treegrid('loadData', m_weaponsourceData);
+				} else if (sRow.itemTypeId == 4) {
+					//$('#source_gpsdevice').treegrid('loadData', m_gpssourceData);
+				}
+			}
+			
+		},
+		doDragEnd:function(e){
+			DutyItemManage.reCalcDuty();
+		},
+		checkDrop:function(tRow,sRow,point){
+			
+			if(tRow==null || sRow == null){
+				return false;
+			}
+			var pTypeId = null;
+
+			if (point == "over") {
+				pTypeId = tRow.itemTypeId;
+			} else {
+				var p = tRow.getParent();
+				pTypeId = p == null ? 0 : p.itemTypeId;
+			}
+
+			var isSuccess = dutyItemRelate.check(pTypeId, sRow.itemTypeId);
+
+			if (!isSuccess) {
+				//$.messager.alert("操作提示", "资源载入类型不符合规则，请按规则添加资源", "error");
+				$("body").popjs({"title":"操作提示","content":"资源载入类型不符合规则，请按规则添加资源"}); 
+				return false;
+			} else {
+				var shiftRowT = null;
+				var shiftRowS = null;
+				var dutyTypeRow = DutyItemManage.findDutyTypeRow(tRow);
+				
+				var exists = false;
+				var isMaxPolice = false;
+
+				if (sRow.xid != undefined) {
+					shiftRowT = DutyItemManage.findShiftRow(tRow);
+					shiftRowS = DutyItemManage.findShiftRow(sRow);
+					isMaxPolice = DutyItemManage.checkMaxPolice(dutyTypeRow, shiftRowT, sRow);
+					if (shiftRowT.xid != shiftRowS.xid) {
+						exists = DutyItemManage.existsResource(shiftRowT, sRow);
+
+					}
+				} else {
+					shiftRowT = DutyItemManage.findShiftRow(tRow);
+					isMaxPolice = DutyItemManage.checkMaxPolice(dutyTypeRow, shiftRowT, sRow);
+					exists =DutyItemManage.existsResource(shiftRowT, sRow);
+				}
+				if (exists) {
+					var name = sRow.itemTypeId == 2 ? sRow.name : sRow.number;
+					//$.messager.alert('提示', name + ' 在班次 ' + shiftRowT.name + '中已经存在!',	"warning");
+					$("body").popjs({"title":"操作提示","content":name + ' 在班次 ' + shiftRowT.name + '中已经存在!'}); 
+				}
+
+				if (isMaxPolice) {
+					//$.messager.alert('提示', '勤务类型: ' + dutyTypeRow.name + ' 警员数量上限是:'+ dutyTypeRow.maxPolice, "warning");
+					$("body").popjs({"title":"操作提示","content": '勤务类型: ' + dutyTypeRow.name + ' 警员数量上限是:'+ dutyTypeRow.maxPolice}); 
+				}
+
+				return !exists && !isMaxPolice;
+			}
+		},
+		addDutyTypeRow :function(value){
+			var duty = {};
+			duty.maxPolice = value.maxPolice;
+			duty.taskType = value.assoTaskType;
+			duty.targets = [];
+			var shift = {};
+			this.genDutyRow(value.id, value.name, 100, value.typeId, value.name, duty);
+			shift.getParent = function() {
+				return duty;
+			};
+			shift.beginTime2 = new Date(m_ymd.getYear(), m_ymd.getMonth() - 1, m_ymd
+					.getDay(), 9, 30);
+			shift.endTime2 = new Date(m_ymd.getYear(), m_ymd.getMonth() - 1, m_ymd
+					.getDay(), 16, 30);
+			this.genDutyRow(null, "班次", 101, null, "班次", shift);
+			
+			var dutyItems=[];
+			
+			dutyItems.push(duty);
+			duty.items=[];
+			duty.items.push(shift);
+			//TreeListDataSource HierarchicalDataSource
+			var ds = new kendo.data.HierarchicalDataSource({
+			    data:dutyItems,
+			    schema: {
+			        model: {
+			          children: "items"
+			        }
+			      }
+			});
+
+			var tv = $("#dutyItemTV").data("kendoTreeView");
+			tv.setDataSource(ds);
+			tv.expand(".k-item");
+
+		},
+		genDutyRow:function(itemId, name, typeId, innerTypeId, innerTypeName, dutyRow) {
+			if (dutyRow.id == undefined || dutyRow.id == null)
+				dutyRow.id = 0;
+			
+			dutyRow.xid = this.genXId(typeId);
+			dutyRow.name = name;
+			dutyRow.itemTypeId = typeId;
+			dutyRow.itemId = itemId;
+			// dutyRow.itemInnerTypeId = innerTypeId;
+			dutyRow.itemInnerTypeName = innerTypeName;
+			dutyRow.displayName = this.genDisplayName(typeId, innerTypeName, name);
+			dutyRow.itemTypeName = this.genItemTypeName(typeId);
+		},
+		genDisplayName:function(itemTypeId, iteminnerTypeName, name){
+			var rs = '';
+			switch (itemTypeId) {
+			case 1:
+				rs = iteminnerTypeName + ":" + name;
+				break;
+			case 2:
+				rs = name;
+				break;
+			case 3:
+				rs = iteminnerTypeName + ":" + name;
+				break;
+			case 4:
+				rs = iteminnerTypeName + ":" + name;
+				break;
+			case 100:
+				rs = name;
+				break;
+			case 101:
+				rs = name;
+				break;
+			case 999:
+				rs = name;
+				break;
+			}
+			return rs;
+		},
+		genItemTypeName:function (itemTypeId) {
+			switch (itemTypeId) {
+			case 1:
+				return "车辆";
+			case 2:
+				return "警员";
+			case 3:
+				return "武器";
+			case 4:
+				return "定位设备";
+			case 100:
+				return "备勤类型";
+			case 101:
+				return "班次";
+			case 999:
+				return "自定义";
+			}
+		},
+		genXId:function (itemTypeId, itemId) {
+			m_xid_max++;
+			return itemTypeId + "_AI_" + m_xid_max;
+		},
+		findDutyTypeRow:function(tRow) {
+			if (tRow.itemTypeId == 100)
+				return tRow;
+			else
+				return DutyItemManage.findDutyTypeRow(tRow.getParent());
+		},
+		findShiftRow:function(tRow) {
+			if (tRow.itemTypeId == 101)
+				return tRow;
+			else
+				return DutyItemManage.findShiftRow(tRow.getParent());
+		},
+		checkMaxPolice:function(dutyTypeRow, shiftRow, row) {
+			if (row.itemTypeId == 2 && dutyTypeRow.maxPolice > 0
+					&& shiftRow.policeCount >= dutyTypeRow.maxPolice) {
+				return true;
+			} else {
+				return false;
+			}
+		},
+		/**
+		 * 判断资源是否在班次中重复
+		 * 
+		 * @param p
+		 * @param row
+		 * @returns {Boolean}
+		 */
+		existsResource:function(p, row) {
+			var exists = false;
+			if (row.xid == undefined && p.itemTypeId == row.itemTypeId
+					&& p.itemId == row.id) {
+				return true;
+			} else if (row.xid != undefined && p.itemTypeId == row.itemTypeId
+					&& p.itemId == row.itemId) {
+				return true;
+			} else if (p.items != null && p.items.length > 0) {
+				$.each(p.items, function(index, value) {
+					exists = DutyItemManage.existsResource(value, row);
+					if (exists) {
+						return false;
+					}
+				});
+			}
+			return exists;
+		},
+		/* 从新计算并加载数据 */
+		reCalcDuty:function(data) {
+			/* 从新计算并加载数据 */
+			var item_new =null;
+			var item_old =null;
+			
+			if(data==undefined)
+			{
+				var tv = $("#dutyItemTV").data("kendoTreeView");
+				item_old=tv.dataSource.data();
+				
+			}else{
+				item_old = data;
+			}
+			
+			item_new=DutyItemManage.rebuildItems(item_old);
+			
+			DutyItemManage.reloadItems(item_new);
+			
+			m_changestates = "0";
+		},
+		reloadItems:function(items){
+			var ds = new kendo.data.HierarchicalDataSource({
+			    data:items,
+			    schema: {
+			        model: {
+			          children: "items"
+			        }
+			      }
+			});
+			
+			$("#dutyItemTV").remove();
+			$("#dutyItemTVBox").append("<div id='dutyItemTV'></div>");
+			
+			var tv  = $("#dutyItemTV").kendoTreeView({
+				template:kendo.template($("#dutyItem-template").html()),
+				dataSource:ds,
+				dragAndDrop: true,
+				drop: function(e) {
+					//e.setValid(false);
+				},
+				dataTextField:["displayName"]
+			}).data("kendoTreeView");
+			tv.expand(".k-item");
+		},
+		structureItemTree:function(items) {
+			$.each(items, function(i, val) {
+				DutyItemManage.structureItem(val, null);
+			});
+		},
+		structureItem:function(item, parent) {
+			item.getParent = function() {
+				return parent;
+			};
+			/* 初始化数量等于0 */
+			item.velicleCount = 0;
+			item.policeCount = 0;
+			item.weaponCount = 0;
+			item.gpsCount = 0;
+			item.xid =DutyItemManage.genXId(item.itemTypeId);
+
+			if (item.itemTypeId == 101) {
+				DutyItemManage.initDate(item);
+			}
+
+			//itemiconCls = createIconStyle(item, item.itemTypeId, item.iconUrl);
+
+			switch (item.itemTypeId) {
+			case 1:
+				item.velicleCount = 1;
+				break;
+			case 2:
+				item.policeCount = 1;
+				break;
+			case 3:
+				item.weaponCount = 1;
+				break;
+			case 4:
+				item.gpsCount = 1;
+				break;
+			}
+			if (item.items != undefined && item.items != null
+					&& item.items.length > 0) {
+				$.each(item.items, function(i, val) {
+					DutyItemManage.structureItem(val, item);/* 获取下级的汇总 */
+					item.velicleCount += val.velicleCount;
+					item.policeCount += val.policeCount;
+					item.weaponCount += val.weaponCount;
+					item.gpsCount += val.gpsCount;
+				});
+			}
+		},
+		dutyRegul:function(duty){
+			if (duty.items != null) {
+				$.each(duty.items, function(i, row) {
+					DutyItemManage.itemRegul(row);
+				});
+			}
+		},
+		itemRegul:function(item){
+			if (item.itemTypeId == 101) {
+				item.beginTime = item.beginTime2.toSimpleString();
+				item.endTime = item.endTime2.toSimpleString();
+			}
+			item.beginTime2 = undefined;
+			item.endTime2 = undefined;
+			if (item.items != null) {
+				$.each(item.items, function(i, row) {
+					DutyItemManage.itemRegul(row);
+				});
+			}
+		},
+		/**
+		 * 初始化日期
+		 * 
+		 * @param ymd
+		 * @param item
+		 */
+		initDate:function(item) {
+
+			if (item.beginTime2 == undefined || item.endTime2 == undefined) {
+				var b = gCreateDate(item.beginTime);
+				var e = gCreateDate(item.endTime);
+
+				var diffDay = b.dateDiffOfDay(e);
+
+				if (diffDay > 1) {
+					alert('date diff day is error !');
+				}
+
+				b.setFullYear(m_ymd.getYear(), m_ymd.getMonth() - 1, m_ymd.getDay());
+				e.setFullYear(m_ymd.getYear(), m_ymd.getMonth() - 1, m_ymd.getDay());
+				e.add('d', diffDay);
+
+				item.beginTime2 = b;
+				item.endTime2 = e;
+			}
+		},
+		createDate:function(dateStr){
+			return new Date(Date.parse(dateStr.replace(/-/g, "/")));
+		},
+		/**
+		 * 备勤菜单
+		 */
+		/*
+		 * 添加班次
+		 */
+		addShift:function(){
+			var tv = $("#dutyItemTV").data("kendoTreeView");
+			var row=tv.dataItem(tv.select());
+			
+			if (row == null) {
+				//$.messager.alert('提示', "请选择备勤类型", "warning");
+				$("body").popjs({"title":"提示","content":"请选择备勤类型"}); 
+			} else {
+				if (dutyItemRelate.check(row.itemTypeId, 101)) {
+					$('#txtShiftName').val('');
+
+					var tpkBeginTime = $("#tpkBeginTime").data("kendoTimePicker");
+					var tpkEndTime = $("#tpkEndTime").data("kendoTimePicker");
+					
+					var bt=YMD.createNew(m_ymd.ymd).getDate();
+					bt.setHours(8,0,0,0);
+					var et=YMD.createNew(m_ymd.ymd).getDate();
+					et.setHours(22,0,0,0);
+					
+					tpkBeginTime.value(bt);
+					tpkEndTime.value(et);
+					
+					$('#chkDayType').val(false);
+					
+					var winShift= $("#shiftWindow").data("kendoWindow");
+					winShift.title("添加班次");
+					winShift.open();
+
+					m_shift.targetRow = row;
+					m_shift.editType = "new";
+				} else {
+					//$.messager.alert('提示', "只能勤务类型下面定义班次!", "warning");
+					$("body").popjs({"title":"提示","content":"只能勤务类型下面定义班次!"}); 
+				}
+			}
+		},
+		/**
+		 * 设置班次
+		 */
+		setShift:function(){
+			var tv = $("#dutyItemTV").data("kendoTreeView");
+			var row=tv.dataItem(tv.select());
+			if (row == null) {
+				//$.messager.alert('提示', "请选择班次!", "warning");
+				$("body").popjs({"title":"提示","content":"请选择班次!"}); 
+			} else if (row.itemTypeId != 101) {
+				//$.messager.alert('提示', "请选择班次所在行!", "warning");
+				$("body").popjs({"title":"提示","content":"请选择班次所在行!"}); 
+			} else {
+				$('#txtShiftName').val(row.name);
+				
+				$('#tpkBeginTime').data("kendoTimePicker").value(row.beginTime2);
+				$('#tpkEndTime').data("kendoTimePicker").value(row.endTime2);
+
+				if (row.beginTime2.dateDiffOfDay(row.endTime2) == 1) {
+					$('#chkDayType').prop('checked', true);
+				} else {
+					$('#chkDayType').prop('checked', false);
+				}
+				m_shift.targetRow = row;
+				m_shift.editType = "edit";
+				
+				var winShift= $("#shiftWindow").data("kendoWindow");
+				winShift.title("编辑班次");
+				winShift.open();
+			}
+		},
+		addUserNode:function() {
+			//var row = $("#tdDuty").treegrid("getSelected");
+			var tv = $("#dutyItemTV").data("kendoTreeView");
+			var row=tv.dataItem(tv.select());
+			if (row == null) {
+				//$.messager.alert('提示', "请选择父节点", "warning");
+				$("body").popjs({"title":"提示","content":"请选择父节点"}); 
+			} else {
+				if (dutyItemRelate.check(row.itemTypeId, 999)) {
+					$('#txtUserNodeName').val('');
+					m_userNode.targetRow = row;
+					m_userNode.editType = "new";
+					//$('#userNodeWindow').window('open');
+					var winUserNode= $("#userNodeWindow").data("kendoWindow");
+					winUserNode.open();
+				} else {
+					$.messager.alert('提示', "只能在班次，车辆下面自定义节点!", "warning");
+				}
+			}
+		},
+		setUserNode:function() {
+			//var row = $("#tdDuty").treegrid("getSelected");
+			var tv = $("#dutyItemTV").data("kendoTreeView");
+			var row=tv.dataItem(tv.select());
+			if (row == null) {
+				//$.messager.alert('提示', "请选择编组!", "warning");
+				$("body").popjs({"title":"提示","content":"请选择编组"}); 
+			} else if (row.itemTypeId != 999) {
+				//$.messager.alert('提示', "请选择编组所在行!", "warning");
+				$("body").popjs({"title":"提示","content":"请选择编组所在行!"}); 
+			} else {
+				$('#txtUserNodeName').val(row.name);
+				m_userNode.targetRow = row;
+				m_userNode.editType = "edit";
+				//$('#userNodeWindows').window('open');
+				var winUserNode= $("#userNodeWindow").data("kendoWindow");
+				winUserNode.open();
+			}
+		},
+		/**
+		 * 显示关联任务对话框
+		 */
+		setTask:function(){
+			var tv = $("#dutyItemTV").data("kendoTreeView");
+			var row=tv.dataItem(tv.select());
+			
+			if (row != null) {
+				if (row.itemTypeId == 2) {
+					var dutyTypeRow = DutyItemManage.findDutyTypeRow(row);
+					var taskType = dutyTypeRow.taskType;
+
+					if (taskType > 0) {
+						DutyItemManage.loadTaskTarget(taskType);
+						$('#lblPoliceInfo').text(row.name + " 关联任务");
+						
+						m_target = row;
+						//setCheckBoxOfTarget(row);
+						//$('#taskWindow').window('open');
+						var winTask= $("#taskWindow").data("kendoWindow");
+						winTask.open();
+					} else {
+						$("body").popjs({"title":"提示","content":"当前勤务类型没有关联任务!"}); 
+					}
+				} else {
+					$("body").popjs({"title":"提示","content":"只能在警员上设置关联任务!!"}); 
+				}
+			} else {
+				$("body").popjs({"title":"提示","content":"请选择操作数据，只能在警员上设置关联任务"}); 
+			}
+		},
+		loadTaskTarget:function(taskType) {
+			var pars = {
+				'orgId' : m_dutyprepare_Org.id,
+				'taskType' : taskType
+			};
+
+			$.ajax({
+				url:"/BPHCenter/dutyWeb/loadTaskTargetByOrg.do",
+				type : "POST",
+				dataType : "json",
+				data : pars,
+				async : false,
+				success : function(req) {
+					if(req.code == 200){
+						if(req.data != null){
+							
+							var ds = new kendo.data.DataSource({
+								data:req.data,
+								  schema: {
+									    model: { id: "targetId" }
+									  }
+							});
+							
+							$("#taskGrid").remove();
+							$("taskGridBox").append("<div id='taskGrid'></div>");
+							
+							switch(taskType){
+							case 1:
+								$("#taskGrid").kendoGrid(	{
+									dataSource:ds,
+									height : 450,
+									sortable : true,
+									selectable : "multiple", 
+									columns : [{
+											title : "名称",
+											field:"areaName"
+										},{
+											title:"点位名称",
+											field : "name"
+										},{
+											title : "操作",
+											template:""
+										} ]
+								}); 
+								break;
+							case 2:
+								$("#taskGrid").kendoGrid(	{
+									height : 550,
+									sortable : true,
+									selectable : "multiple", 
+									columns : [{
+											title : "名称",
+											field:"areaName"
+										},{
+											title:"点位名称",
+											field : "name"
+										},{
+											title : "经过次数",
+											field : "count"
+										},{
+											title : "停留时间(分钟)",
+											field : "stayTime"
+										},{
+											title : "操作",
+											template:""
+										} ]
+								}); 
+								break;
+							case 3:
+								$("#taskGrid").kendoGrid(	{
+									dataSource:ds,
+									height : 450,
+									sortable : true,
+									selectable : "multiple", 
+									columns : [{
+											title : "名称",
+											field:"areaName"
+										},{
+											title:"点位名称",
+											field : "name"
+										},{
+											title : "操作",
+											template:""
+										} ]
+								}); 
+								break;
+							}
+							
+						}
+					}else{
+						$("body").popjs({"title":"提示","content":"获取关联任务数据信息失败"}); 
+					}
+				}
+			});
+		},
+		onShiftConfirm:function(){
+			var tpkBeginTime = $("#tpkBeginTime").data("kendoTimePicker");
+			var tpkEndTime = $("#tpkEndTime").data("kendoTimePicker");
+			var name = $('#txtShiftName').val();
+			
+			var bt=tpkBeginTime.value();
+			var et=tpkEndTime.value();
+			
+			if ($('#chkDayType').prop('checked')) {
+				et.add('d', 1);
+			}
+
+			var tv=$("#dutyItemTV").data("kendoTreeView");
+					
+			if (!verifyTime(bt, et)) {
+				//$.messager.alert('提示', "结束时间不能小于开始时间", "warning");
+				$("body").popjs({"title":"提示","content":"结束时间不能小于开始时间"}); 
+				return;
+			} else if (name == null || name.length == 0) {
+				//$.messager.alert('提示', "请输入班次名称!", "warning");
+				$("body").popjs({"title":"提示","content":"请输入班次名称!"}); 
+			} else {
+				if (m_shift.editType == 'new') {
+					var row = {};
+					row.beginTime2 = bt;
+					row.endTime2 = et;
+
+					DutyItemManage.genDutyRow(0, name, 101, 0, '班次', row);
+					
+					tv.append(row,  tv.findByUid(m_shift.targetRow.uid));
+					//DutyItemManage.reCalcDuty();					
+				} else {
+					m_shift.targetRow.name = name;
+					m_shift.targetRow.displayName = name;
+					m_shift.targetRow.itemInnerTypeName = name;
+					m_shift.targetRow.beginTime2 = bt;
+					m_shift.targetRow.endTime2 = et;
+					
+					
+				}
+				DutyItemManage.reCalcDuty();
+				var winShift= $("#shiftWindow").data("kendoWindow");
+				winShift.close();
+				//$('#shiftWindows').window('close');
+			}
+			function verifyTime(b, e) {
+				if (b.dateDiff('n', e) < 0) {
+					return false;
+				} else {
+					return true;
+				}
+			}
+		},
+		onUserNodeConfirm:function(){
+			var name = $('#txtUserNodeName').val();
+			
+			var tv=$("#dutyItemTV").data("kendoTreeView");
+			
+			if (name == '') {
+				//$.messager.alert('提示', "请输入编组名称", "warning");
+				$("body").popjs({"title":"提示","content":"请输入编组名称"}); 
+			} else {
+				if (m_userNode.editType == 'new') {
+					var row = {};
+					DutyItemManage.genDutyRow(0, name, 999, 0, '编组', row);
+					
+					tv.append(row,  tv.findByUid(m_userNode.targetRow.uid));
+					
+				} else {
+					m_userNode.targetRow.name = name;
+					m_userNode.targetRow.displayName = name;
+				}
+				DutyItemManage.reCalcDuty();
+				//$('#userNodeWindows').window('close');
+				var winUserNode= $("#userNodeWindow").data("kendoWindow");
+				winUserNode.close();
+			}	
+		},
+		onTaskConfirm:function(){
+			
+		},
+		onDeleteNode:function(uid){
+			var tv = $("#dutyItemTV").data("kendoTreeView");
+
+			var re=tv.findByUid(uid);
+			var row=tv.dataItem(re);
+			
+			if(row.items !==null && row.items.length>0){
+				$("body").tyWindow({content:"确定要删除[ " + row.name + " ]及下级所有节点?",center:true,ok:true,no:true,
+					okCallback:function(){ 
+						tv.remove(re);
+						DutyItemManage.reCalcDuty();
+				}});	
+			}else{
+				tv.remove(re);
+				DutyItemManage.reCalcDuty();
+			}
+		},
+		/**
+		 * 克隆一个items,
+		 * SB kendo ui
+		 * @param items
+		 */
+		rebuildItems:function(items,parent){
+			var items2=[];
+			
+			$.each(items, function(i, v) {
+				var v2={};
+				v2.id=v.id;
+				v2.xid =v.xid;
+				v2.name = v.name;
+				v2.itemTypeId = v.itemTypeId;
+				v2.itemId =v.itemId;
+				v2.itemInnerTypeId = v.itemInnerTypeId;
+				v2.itemInnerTypeName =v.itemInnerTypeName;
+				v2.displayName = v.displayName;
+				v2.itemTypeName =v.displayName;
+				v2.beginTime2=v.beginTime2;
+				v2.endTime2=v.endTime2;
+				
+				v2.beginTime=v.beginTime;
+				v2.endTime=v.endTime;
+				
+				v2.maxPolice = v.maxPolice;
+				v2.taskType = v.taskType;
+				v2.targets = v.targets;
+
+				v2.getParent = function() {
+					return parent;
+				};
+				
+				/* 初始化数量等于0 */
+				v2.velicleCount = 0;
+				v2.policeCount = 0;
+				v2.weaponCount = 0;
+				v2.gpsCount = 0;
+				v2.xid =DutyItemManage.genXId(v2.itemTypeId); //为什么要重新设置xid? 
+
+				if (v2.itemTypeId == 101) {
+					DutyItemManage.initDate(v2);
+				}
+
+				//itemiconCls = createIconStyle(item, item.itemTypeId, item.iconUrl);
+
+				switch (v2.itemTypeId) {
+				case 1:
+					v2.velicleCount = 1;
+					break;
+				case 2:
+					v2.policeCount = 1;
+					break;
+				case 3:
+					v2.weaponCount = 1;
+					break;
+				case 4:
+					v2.gpsCount = 1;
+					break;
+				}
+
+				if(v.items != null && v.items.length>0){
+					v2.items=DutyItemManage.rebuildItems(v.items,v);
+					v2.expanded =true;
+				}
+				
+				if(parent !=undefined && parent != null){
+					parent.velicleCount += v.velicleCount;
+					parent.policeCount += v.policeCount;
+					parent.weaponCount += v.weaponCount;
+					parent.gpsCount += v.gpsCount;
+				}
+
+				items2.push(v2);
+			});
+			return items2;
+		},
+		clearId:function(duty) {
+			duty.id = 0;
+			if (duty.items != null) {
+				$.each(duty.items, function(i, v) {
+					DutyItemManage.clearItemId(v);
+				});
+			}
+		},
+		clearItemId:function(item) {
+			item.id = 0;
+			if (item.targets != null) {
+				$.each(item.targets, function(i, v) {
+					v.id = 0;
+				});
+			}
+			if (item.children != null) {
+				$.each(item.items, function(i2, v2) {
+					DutyItemManage.clearItemId(v2);
+				});
+			}
+		}
+};
+
+/*
+ * 
+ * 
+ */
+//日期格式化
+var YMD = {
+		createNew : function(ymd) {
+			var _ymd = {};
+			_ymd.ymd = ymd;
+
+			var yearStr = ymd.substr(0, 4);
+			var monthStr = ymd.substr(4, 2);
+			var dayStr = ymd.substr(6, 2);
+		
+			var year = Number(yearStr);
+			var month = Number(monthStr);
+			var day = Number(dayStr);
+
+			_ymd.getYear = function() {
+				return year;
+			};
+			_ymd.getMonth = function() {
+				return month;
+			};
+			_ymd.getDay = function() {
+				return day;
+			};
+
+			var date=new Date();
+			date.setFullYear(year, month, day);
+			
+			_ymd.getDate=function(){
+				return date;
+			};
+			
+			_ymd.format = function() {
+				return yearStr + '-' + monthStr + '-' + dayStr;
+			};
+			return _ymd;
+		}
+	};
+//类型关联规则
+var dutyItemRelate = {
+		root : {
+			children : [ 100 /* 勤务类型 */
+			]
+		},
+		dutytype : {
+			children : [ 101 /* 班次 */
+			]
+		},
+		shift : {
+			children : [ 1, 2, 999 ]
+		},
+
+		vehicle : {
+			children : [ 2, 4, 999 ]
+		},
+		police : {
+			children : [ 3, 4 ]
+		},
+		weapon : {
+			children : []
+		},
+		gps : {
+			children : []
+		},
+		usernode : {
+			children : [ 1, 2 ]
+		},
+		/**
+		 * 检查拖动是否符合规则
+		 * 
+		 * @param parenttype
+		 * @param childtype
+		 * @returns {Boolean}
+		 */
+		check : function(parenttype, childtype) {
+			var p = null;
+			switch (parenttype) {
+			case 0:
+				p = this.root;
+			case 100:
+				p = this.dutytype;
+				break;
+			case 101:
+				p = this.shift;
+				break;
+			case 999:
+				p = this.usernode;
+				break;
+			case 1:
+				p = this.vehicle;
+				break;
+			case 2:
+				p = this.police;
+				break;
+			case 3:
+				p = this.weapon;
+				break;
+			case 4:
+				p = this.gps;
+				break;
+			}
+
+			if ($.inArray(childtype, p.children) >= 0) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+	};

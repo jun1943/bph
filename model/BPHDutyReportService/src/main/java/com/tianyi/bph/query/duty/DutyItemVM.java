@@ -38,7 +38,7 @@ public class DutyItemVM extends DutyItems{
 	/**
 	 * 报备子节点，内循环
 	 */
-	private List<DutyItemVM> children;
+	private List<DutyItemVM> items;
 
 	/**
 	 * 警员关联任务
@@ -77,12 +77,12 @@ public class DutyItemVM extends DutyItems{
 		this.displayName = displayName;
 	}
 
-	public List<DutyItemVM> getChildren() {
-		return children;
+	public List<DutyItemVM> getItems() {
+		return items;
 	}
 
-	public void setChildren(List<DutyItemVM> children) {
-		this.children = children;
+	public void setItems(List<DutyItemVM> items) {
+		this.items = items;
 	}
 
 	public String getItemInnerTypeName() {
