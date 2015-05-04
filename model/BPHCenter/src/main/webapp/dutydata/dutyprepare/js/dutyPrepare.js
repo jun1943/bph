@@ -1172,18 +1172,16 @@ var DutyItemManage={
 				rs = row.itemInnerTypeName + ":" + row.name;
 				break;
 			case 100:
-				rs = row.name;
+				rs =  row.name;
 				break;
 			case 101:
 				var bts =row.beginTime2.getHours() + ":" +row.beginTime2.getMinutes();
 				var ets=row.endTime2.getHours() + ":" +row.endTime2.getMinutes();
-				rs = row.name +" [" + bts +"到" + (row.isOverDay?"第二天":"") + ets +"] ";
+				rs =  row.name +"  [" + bts +"到" + (row.isOverDay?"第二天":"") + ets +"] ";
 				
 				break;
 			case 999:
-				var x=new Date();
-				x.getHours();
-				rs = row.name;
+				rs = row.itemInnerTypeName + ":" + row.name;
 				break;
 			}
 			var sts=DutyItemManage.getRowStatistics(row);
