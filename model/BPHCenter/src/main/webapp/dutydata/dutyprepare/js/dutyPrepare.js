@@ -1111,6 +1111,8 @@ var DutyItemManage={
 			duty.maxPolice = value.maxPolice;
 			duty.taskType = value.assoTaskType;
 			duty.targets = [];
+			duty.expanded =true;
+			
 			var shift = {};
 			this.genDutyRow(value.id, value.name, 100, value.typeId, value.name, duty);
 			shift.getParent = function() {
@@ -1317,7 +1319,7 @@ var DutyItemManage={
 				dragend:DutyItemManage.onDutyItemDragEnd,
 				dataTextField:["displayName"]
 			}).data("kendoTreeView");
-			tv.expand(".k-item");
+			//tv.expand(".k-item");
 		},
 		structureItemTree:function(items) {
 			$.each(items, function(i, val) {
@@ -1909,7 +1911,7 @@ var DutyItemManage={
 
 				if(v.items != null && v.items.length>0){
 					v2.items=DutyItemManage.rebuildItems(v.items,v);
-					v2.expanded =true;
+					v2.expanded =v.expanded;
 				}
 				
 				if(parent !=undefined && parent != null){
