@@ -41,7 +41,7 @@ public class OrganResourceController {
 	 * @param request
 	 * @return
 	 */
-	@RequestMapping(value = "list.do")
+	@RequestMapping(value = "/list.do")
 	public @ResponseBody
 	String List(
 			@RequestParam(value = "orgCode", required = false) String orgCode,
@@ -68,7 +68,7 @@ public class OrganResourceController {
 	 * @param request
 	 * @return
 	 */
-	@RequestMapping(value = "treelist.do")
+	@RequestMapping(value = "/treelist.do")
 	public @ResponseBody
 	ReturnResult treelist(
 			@RequestParam(value = "orgCode", required = false) String orgCode,
@@ -198,7 +198,7 @@ public class OrganResourceController {
 	 * @param request
 	 * @return
 	 */
-	@RequestMapping(value = "loadListByName.do")
+	@RequestMapping(value = "/loadListByName.do")
 	public @ResponseBody
 	String loadListByName(
 			@RequestParam(value = "name", required = false) String name,

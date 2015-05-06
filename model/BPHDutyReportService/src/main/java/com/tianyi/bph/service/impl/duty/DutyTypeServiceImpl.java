@@ -20,27 +20,27 @@ import com.tianyi.bph.query.duty.DutyItemCountVM;
 import com.tianyi.bph.query.duty.DutyTypePropertyVM;
 import com.tianyi.bph.query.duty.DutyTypeVM;
 import com.tianyi.bph.service.duty.DutyTypeService;
- 
-
 
 /**
  * 勤务类型服务接口实现
+ * 
  * @author lq
- *
+ * 
  */
 @Service
 public class DutyTypeServiceImpl implements DutyTypeService {
 
-	@Autowired DutyTypeMapper dutyTypeMapper;
-	
-	@Autowired DutyTypePropertyRelateMapper dtprMapper;
-	
+	@Autowired
+	DutyTypeMapper dutyTypeMapper;
+
+	@Autowired
+	DutyTypePropertyRelateMapper dtprMapper;
 
 	/**
 	 * 获取勤务类型属性列表
 	 */
 	public List<DutyTypePropertyVM> loadProperties() {
-		
+
 		return dutyTypeMapper.loadProperties();
 	}
 
@@ -48,8 +48,8 @@ public class DutyTypeServiceImpl implements DutyTypeService {
 	 * 获取勤务类型列表数据
 	 */
 	public List<DutyTypeVM> loadDutyTypeVM(Boolean isUsed) {
-		Map<String,Object> map=new HashMap<String,Object>();
-		map.put("isUsed", isUsed); 
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("isUsed", isUsed);
 		return dutyTypeMapper.loadDutyTypeVM(map);
 	}
 
@@ -58,19 +58,20 @@ public class DutyTypeServiceImpl implements DutyTypeService {
 	 */
 	@Transactional
 	public void save(DutyTypeVM vm) {
-		DutyType parent=null;
-		DutyType target=new DutyType();
-		
-		if(vm.getParentId() !=null && vm.getParentId() !=0)
-			parent=dutyTypeMapper.selectByPrimaryKey(vm.getParentId());
+		DutyType parent = null;
+		DutyType target = new DutyType();
+
+		if (vm.getParentId() != null && vm.getParentId() != 0)
+			parent = dutyTypeMapper.selectByPrimaryKey(vm.getParentId());
 		else
-			parent=new DutyType();
+			parent = new DutyType();
 		//
 		target.setId(vm.getId());
 		target.setName(vm.getName());
 		target.setParentId(vm.getParentId());
-		target.setFullpath(parent.getFullpath()==null?target.getName():parent.getFullpath()+"."+target.getName());
-		target.setLevel(parent.getLevel()+1);
+		target.setFullpath(parent.getFullpath() == null ? target.getName()
+				: parent.getFullpath() + "." + target.getName());
+		target.setLevel(parent.getLevel() + 1);
 		target.setIsLeaf(vm.getIsLeaf());
 		target.setMaxPolice(vm.getMaxPolice());
 		target.setAssoTaskType(vm.getAssoTaskType());
@@ -78,51 +79,49 @@ public class DutyTypeServiceImpl implements DutyTypeService {
 		target.setArmamentType(vm.getArmamentType());
 		target.setIsShowname(vm.getIsShowname());
 		target.setIsUsed(vm.getIsUsed());
-		
-		if(target.getId()==0){
+
+		if (target.getId() == 0) {
 			dutyTypeMapper.insert(target);
 			vm.setId(target.getId());
-		}else{
+		} else {
 			dutyTypeMapper.updateByPrimaryKey(target);
 		}
-		
-		//修改父节点的isLeaf=false!
-		if(parent.getId()!=0 && parent.getIsLeaf()){
+
+		// 修改父节点的isLeaf=false!
+		if (parent.getId() != 0 && parent.getIsLeaf()) {
 			parent.setIsLeaf(false);
 			dutyTypeMapper.updateByPrimaryKey(parent);
 		}
-		
-		//先删除以前关联的属性子表数据
-		dtprMapper.deleteByDutyTypeId(target.getId());
-		
-		for(DutyTypePropertyVM  dtpvm: vm.getProperties()){
 
-			DutyTypePropertyRelate dtpr=new DutyTypePropertyRelate();
-			
+		// 先删除以前关联的属性子表数据
+		dtprMapper.deleteByDutyTypeId(target.getId());
+
+		for (DutyTypePropertyVM dtpvm : vm.getProperties()) {
+
+			DutyTypePropertyRelate dtpr = new DutyTypePropertyRelate();
+
 			dtpr.setDutyTypeId(target.getId());
 			dtpr.setPropertyId(dtpvm.getId());
-			
+
 			dtprMapper.insert(dtpr);
-			
+
 		}
-		
+
 	}
 
 	/**
-	 * 更新勤务类型状态，启用或者锁定
-	 * 启用，只能一级一级启用，
-	 * 锁定，锁定上级节点，一并锁定下级节点
+	 * 更新勤务类型状态，启用或者锁定 启用，只能一级一级启用， 锁定，锁定上级节点，一并锁定下级节点
 	 */
-	public void updateUseStateByFullPath(Integer id,Boolean isUsed){
-		Map<String,Object> map=new HashMap<String,Object>();
-		
-		DutyType dt=dutyTypeMapper.selectByPrimaryKey(id);
-		
-		if(dt !=null){
+	public void updateUseStateByFullPath(Integer id, Boolean isUsed) {
+		Map<String, Object> map = new HashMap<String, Object>();
+
+		DutyType dt = dutyTypeMapper.selectByPrimaryKey(id);
+
+		if (dt != null) {
 			map.put("fullPath", dt.getFullpath());
 			map.put("isUsed", isUsed);
 			map.put("name", dt.getName());
-			List<String> ls=TreeHelper.getAllParentFullPath(dt.getFullpath());
+			List<String> ls = TreeHelper.getAllParentFullPath(dt.getFullpath());
 			map.put("list", ls);
 			dutyTypeMapper.updateUseStateByFullPath(map);
 		}
@@ -132,27 +131,16 @@ public class DutyTypeServiceImpl implements DutyTypeService {
 	 * 根据id，删除勤务类型数据
 	 */
 	@Transactional
-	public ResultMsg deleteNode(Integer id) {
-		
-		ResultMsg rm=null;
-		
-		DutyType dt=dutyTypeMapper.selectByPrimaryKey(id);
-		
-		int usedCount=dutyTypeMapper.checkUsed(dt.getFullpath());
-			
-		if(usedCount>0){
-			rm=new ResultMsg(false,"勤务类型已经被使用，不能删除!");
-				
-		}else if(!dt.getIsLeaf()){
-			rm=new ResultMsg(false,"只能删除末级节点!");
-		}else{
+	public boolean deleteNode(Integer id) {
+		boolean rm = false;
+		DutyType dt = dutyTypeMapper.selectByPrimaryKey(id);
+		int usedCount = dutyTypeMapper.checkUsed(dt.getFullpath());
+		if (usedCount == 0) {
 			dutyTypeMapper.deleteByPrimaryKey(id);
-			rm=new ResultMsg(true,null);
+			rm = true;
 		}
-		
 		return rm;
 	}
- 
 
 	/**
 	 * 获取勤务类型列表数据，用于勤务类型选择
@@ -178,6 +166,11 @@ public class DutyTypeServiceImpl implements DutyTypeService {
 		// TODO Auto-generated method stub
 		return dutyTypeMapper.updateByPrimaryKey(dutytype);
 	}
- 
-	
+
+	@Override
+	public List<DutyType> loadDutyTypeByParentId(Integer pid) {
+		// TODO Auto-generated method stub
+		return dutyTypeMapper.loadDutyTypeByParentId(pid);
+	}
+
 }

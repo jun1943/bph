@@ -53,7 +53,8 @@ $(document).ready(function() {
 		<div class="ty-decorate1"></div> 
                    <span id="btnaddParentNode" class="k-button"  onclick="DutyTyepManage.addParentNode()">新建根节点</span>
                    <span id="btnaddChildNode" class="k-button"  onclick="DutyTyepManage.addChildNode()">新建子节点</span> 
-                   <span id="btndeleteNode" class="k-button"  onclick="DutyTyepManage.deleteNode()">删除</span> 
+                   <span id="btnaddChildNode" class="k-button"  onclick="DutyTyepManage.editDutyType()">编辑</span> 
+                   <span id="btndeleteNode" class="k-button"  onclick="DutyTyepManage.deleteDutyType()">删除</span> 
                    <span id="btnunLockNode" class="k-button"  onclick="DutyTyepManage.unLockNode()">启用</span> 
                    <span id="btnlockNode" class="k-button"  onclick="DutyTyepManage.lockNode()">锁定</span> 
 	</div>
