@@ -1,148 +1,234 @@
 <%@ page language="java" import="java.util.*" pageEncoding="utf-8"%>
-<%
-String path = request.getContextPath();
-String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
-%>
 
+<%
+	String path = request.getContextPath();
+	String basePath = request.getScheme() + "://"
+			+ request.getServerName() + ":" + request.getServerPort()
+			+ path + "/";
+%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
-  <head>
-    <base href="<%=basePath%>">
-    
-    <title>My JSP 'gpsgroupAddMember.jsp' starting page</title>
-    
-	<meta http-equiv="pragma" content="no-cache">
-	<meta http-equiv="cache-control" content="no-cache">
-	<meta http-equiv="expires" content="0">    
-	<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
-	<meta http-equiv="description" content="This is my page">
-	<!--
-	<link rel="stylesheet" type="text/css" href="styles.css">
-	-->
+<head>
+<base href="<%=basePath%>">
+
+<title>扁平化客户端</title>
+<%@ include file="../../../emulateIE.jsp" %>
 	<script type="text/javascript">
+	var sessionId = $("#token").val();
+	
+	var m_org_id;
+	var m_memberDt =[];
+	var m_group_id;
 	$(function() {
-		var kGrid = $("#dtGpsGroup").data("kendoGrid");
-		var row = kGrid.dataItem(kGrid.select());
-		var groupId = row.id;
+		m_org_id = $("#organId").val();
+		m_group_id = $("#txtGpsGroupId").val();
 		
-		//GpsGroupManage.getloadorgTree();
+		var treeData = new kendo.data.HierarchicalDataSource({
+	        transport: {
+				read: {
+					url : "<%=basePath%>organWeb/listWithGps.do?sessionId="+sessionId +"&rootId=" + m_org_id, 
+					dataType: "json"
+				}
+			},
+			schema: {
+	 			model: {
+					id: "id",
+					hasChildren: "isOrg"
+	           	}
+			}
+		});
+	
+		$("#treeOrgWithGps").kendoTreeView({
+			dataSource: treeData,
+			dataTextField: "name",
+			selectable: "row"
+		});
+		 
 		$.ajax({
-			type: "post",
-			url: "gpsGroupTest/loadMemberByGroupId.do?groupId="+groupId,
-			dataType: "json", 
-			success: function(req) {
-				if (req.code==200) {
-					var pdata = req.data;
-
-								var dataSo = new kendo.data.DataSource({
-									data: pdata
-								});
-								$("#dtSelGroupMember").kendoGrid({
-									dataSource: dataSo,
-									columns : [ {
-										title : 'id',
-										field : 'id',
-										hidden : true
-									}, {
-										title : '设备类型',
-										field : 'typeName'
-									}, {
-										title : '设别编号',
-										field : 'number'
-									}, ],
-									selectable: "row"
-								});
-								//GpsGroupManage.showGroupMemberDlg();
-							}
-						}
-			});
-			var = rootId = m_gpsGroup_Org.id
-		 $.ajax({
-			url : "orgTest/listWithGps.do?rootId=" + rootId,
-			type : "POST",
-			dataType : "json", 
-			success:function(req){
-				var count = req.length;
-		//		alert(count);
-				 for(var j=0; j<count;j++) {
-					var r = req[j];  
-					r.ReportsTo = r.reportsTo; 
-					if(r.state=="colsed") {
-						$.ajax({
-							url : "orgTest/listWithGps.do?rootId=" + r.rid,
-							type : "post",
-							dataType : "json",
-							success:function(req){
-								var childOrg = req;
-							}
-							
+					type: "post",
+					url: "<%=basePath%>gpsGroupWeb/loadMemberByGroupId.do?sessionId="+sessionId+"&groupId="+m_group_id,
+					dataType: "json", 
+					success: function(req) {
+						if (req.code==200) {
+							var pdata = req.data; 
+							m_memberDt = pdata;
+										var dataSo = new kendo.data.DataSource({
+											data: pdata
+										});
+										$("#dtSelGroupMember").kendoGrid({
+											dataSource: dataSo,
+											columns : [ {
+														title : 'id',
+														field : 'id', 
+														hidden : true
+													}, {
+														title : '所属单位',
+														field : 'orgShortName'
+													}, {
+														title : '设备类型',
+														field : 'typeName'
+													}, {
+														title : '设别编号',
+														field : 'number'
+													},{
+														title : '设备名称',
+														field : 'gpsName'
+													} ],
+											selectable: "row"
+										});
+									}else{ 
+										$("#dtSelGroupMember").kendoGrid({
+											dataSource: [],
+											columns : [ {
+														title : 'id',
+														field : 'id', 
+														hidden : true
+													}, {
+														title : '所属单位',
+														field : 'orgShortName'
+													}, {
+														title : '设备类型',
+														field : 'typeName'
+													}, {
+														title : '设别编号',
+														field : 'number'
+													} ],
+											selectable: "row"
+										});
+									}
+								}
+							});
+	}); 	
+	var GpsGroupManage ={ 
+			selectMember:function() {
+				var rows = $("#treeOrgWithGps").data("kendoTreeView");
+				var node = rows.dataItem(rows.select()); 
+				GpsGroupManage.selectMemberModel(node);
+			}, 
+			unselectMember:function() {
+				var rows = $("#dtSelGroupMember").data("kendoGrid");
+				var row = rows.dataItem(rows.select()); 
+				for (var i = 0; i<m_memberDt.length; i++) {
+					 if(row.gpsId==m_memberDt[i].gpsId){ 
+						 m_memberDt.splice(i, 1);
+					 }
+				}
+				var dataSource = new kendo.data.DataSource({
+  							data: m_memberDt
 						});
-					}
-				} 
-				var s  = req;
-				/* m_orgPolicepackage = req;
-				 var inline = new kendo.data.HierarchicalDataSource({
-					 data:s,
-					 schema: {
-						    model: {
-						      id: "rid",
-						      hasChildren: "state"
-						    }
-						  }
+						//替换以前的dataSource
+				var grid = $("#dtSelGroupMember").data("kendoGrid");
+				grid.setDataSource(dataSource); 
+			},
+			selectMemberModel:function(node) {
+				 
+				 if (node != null && node.dataType == 2) {
 
-				 }); */ 
-				$("#treeOrgWithGps").kendoTreeView({
-					dataSource:s,
-					dataTextField: "name",
-					dataUrlField:"rid",
-					selectable: "row"
-					  /* expand: function(e) {
-						  var baseurl  = e.node.baseURI;
-						  var innertext = e.node.childNodes[0].childNodes[1].childNodes[0].data;
-						  var subStr = e.node.childNodes[0].childNodes[1].href;
-						  var rid = subStr.replace(baseurl,"");
-						  //var rid =
-						  getsubOrgTree(rid,innertext);
-					}  */
+					var datas = $("#dtSelGroupMember").data("kendoGrid");
+
+					var count = datas._data.length;
+
+					var exists = false;
+
+					for ( var i = 0; i < count; i++) {
+						var row = datas._data[i];
+						if (row.gpsId == node.rid) {
+							exists = true;
+							break;
+						}
+					}
+
+					if (!exists) {
+					
+						var obj = {};
+						obj.id = node.rid;
+						obj.groupId = m_group_id;
+						var codeStr = "("+node.code+")";
+						var typenameStr =  node.typename+"(";
+						var numberStr = ":"+node.code+")";
+						obj.name = node.name.replace(codeStr,"");
+						obj.number = node.code;
+						obj.orgName = node.orgName;
+						obj.orgShortName =  node.orgName;
+						obj.typeName = node.typename;
+						var subStr = node.name.replace(typenameStr,"");
+						obj.gpsName =subStr.replace(numberStr,"");
+						obj.gpsId = node.rid; 
+						m_memberDt.push(obj);
+						var dataSource = new kendo.data.DataSource({
+  							data: m_memberDt
+						});
+						//替换以前的dataSource
+						var grid = $("#dtSelGroupMember").data("kendoGrid");
+						grid.setDataSource(dataSource); 
+					} 
+				} else {
+					$("body").popjs({"title":"提示","content":"不能选择组织机构作为组成员"}); 
+				}
+			},
+			//组员保存
+			appendMember:function() {
+				var members = []; 
+				var groupid = m_group_id;
+ 
+				for ( var i = 0; i < m_memberDt.length; i++) {
+					var data = m_memberDt[i];
+					var member = {};
+					member.id = 0;
+					member.groupId = groupid;
+					member.gpsId = data.gpsId;
+					members.push(member);
+				}
+
+				$.ajax({
+					url : "<%=basePath%>gpsGroupWeb/appendMember.do?sessionId="+sessionId,
+					type : "POST",
+					dataType : "json",
+					data : {
+						"members" : JSON.stringify(members)
+					},
+					async : false,
+					success : function(req) {
+						if (req.code == 200) { 
+							 $("body").popjs({"title":"提示","content":"分组成员信息保存成功","callback":function(){ 
+								window.parent.window.parent.GpsGroupManage.onCloseMember();
+								window.parent.$("#dialog").tyWindow.onCloseMember();
+							}}); 
+						} else {
+							$("body").popjs({"title":"提示","content":"分组成员信息保存失败"});
+						}
+					}
 				});
 			}
-		});	
-				
-	});
-	
+	};
 	</script>
 	
   </head>
   
   <body>
     <!-- <div id="vertical" style="overflow-x:hidden;"> -->
-		<div id="winPGMember" title="组成员选择" style="width:450px;height:400px;">
-			<div class="pane-content">
+		<div id="winPG" style="width:660px;height:320px;" title="定位设备分组成员管理">
+			<div style="width:650px;margin-top:10px;">
 				<!-- 左开始 -->
 				<div class="demo-section k-header"> 
-					<input id="txtGpsGroupId"  type="hidden"></input>
-					<ul>
-						<li class="ty-input">
-							<div class="groupmemberwindowdiv">
-								<label id="treetitle" class="treetitle"></label>
-								<ul id="treeOrgWithGps" style="overflow:auto"></ul>
+					<input id="txtGpsGroupId"  type="hidden"  value="${groupId }"></input>
+				 
+							<div style="width:200px;float:left;height:230px">  
+								<ul id="treeOrgWithGps" style="overflow:auto;height:450px"></ul>
 							</div>
-						</li>
-						<li class="ty-input">
-							<button onclick="GpsGroupManage.selectMember()">&gt&gt</button>
-							<button onclick="GpsGroupManage.unselectMember()">&lt&lt</button>
-						</li>
-						<li class="ty-input">
-							<div id="dtSelGroupMember" fit="true"></div>
-						</li>
-						
-					</ul>
+					 	    <div  style="width:40px;float:left;height:230px;margin-top:120px">
+								<button onclick="GpsGroupManage.selectMember()">&gt&gt</button>
+								<button onclick="GpsGroupManage.unselectMember()">&lt&lt</button>
+						    </div>
+						    <div  style="width:350px;float:left"> 
+							<div id="dtSelGroupMember"></div>
+					 
 					<p style="float:left;width:100%;margin-top:10px;">
 						<span class="k-button"  onclick="GpsGroupManage.appendMember()">保存</span>
 					</p>
+					</div>
 				</div>
-			</div>
-		<!-- </div> -->
+			</div> 
 	</div>
   </body>
 </html>

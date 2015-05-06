@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.tianyi.bph.dao.duty.OrgMapper" >
   <resultMap id="BaseResultMap" type="com.tianyi.bph.domain.duty.Org" >
-    <id column="id" property="id" jdbcType="INTEGER" />
+    <id column="ORGAN_ID" property="id" jdbcType="INTEGER" />
     <result column="parent_id" property="parentId" jdbcType="INTEGER" />
     <result column="name" property="name" jdbcType="VARCHAR" />
     <result column="short_name" property="shortName" jdbcType="VARCHAR" />
@@ -13,6 +13,7 @@
     <resultMap id="OrgWithPoliceResultMap" type="com.tianyi.bph.query.duty.OrgWithPoliceVM" >
     	<id column="rid" property="rid" jdbcType="INTEGER" />
     	<id column="id" property="id" jdbcType="VARCHAR" />
+    	<id column="orgName" property="orgName" jdbcType="VARCHAR" />
     	<result column="data_type" property="dataType" jdbcType="INTEGER" />
     	<result column="name" property="name" jdbcType="VARCHAR" />
     	<result column="code" property="code" jdbcType="VARCHAR" />
@@ -21,6 +22,7 @@
     <resultMap id="OrgWithVehicleResultMap" type="com.tianyi.bph.query.duty.OrgWithVehicleVM" >
     	<id column="rid" property="rid" jdbcType="INTEGER" />
     	<id column="id" property="id" jdbcType="VARCHAR" />
+    	<id column="orgName" property="orgName" jdbcType="VARCHAR" />
     	<result column="data_type" property="dataType" jdbcType="INTEGER" />
     	<result column="name" property="name" jdbcType="VARCHAR" /> 
     	<result column="typename" property="typename" jdbcType="VARCHAR" />
@@ -29,6 +31,7 @@
     <resultMap id="OrgWithWeaponResultMap" type="com.tianyi.bph.query.duty.OrgWithWeaponVM" >
     	<id column="rid" property="rid" jdbcType="INTEGER" />
     	<id column="id" property="id" jdbcType="VARCHAR" />
+    	<id column="orgName" property="orgName" jdbcType="VARCHAR" />
     	<result column="data_type" property="dataType" jdbcType="INTEGER" />
     	<result column="name" property="name" jdbcType="VARCHAR" />
     	<result column="typename" property="typename" jdbcType="VARCHAR" />
@@ -37,10 +40,16 @@
     <resultMap id="OrgWithGpsResultMap" type="com.tianyi.bph.query.duty.OrgWithGpsVM" >
     	<id column="rid" property="rid" jdbcType="INTEGER" />
     	<id column="id" property="id" jdbcType="VARCHAR" />
+    	<id column="orgName" property="orgName" jdbcType="VARCHAR" />
     	<result column="data_type" property="dataType" jdbcType="INTEGER" />
     	<result column="name" property="name" jdbcType="VARCHAR" />
     	<result column="typename" property="typename" jdbcType="VARCHAR" />
     	<result column="code" property="code" jdbcType="VARCHAR" />
+  </resultMap>
+    <resultMap id="OrgWithSourceResultMap" type="com.tianyi.bph.query.duty.OrganGroupVM" >
+    	<id column="id" property="id" jdbcType="INTEGER" />
+    	<id column="groupid" property="groupId" jdbcType="INTEGER" />
+    	<result column="organid" property="organId" jdbcType="INTEGER" /> 
   </resultMap>
    
    
@@ -59,34 +68,39 @@
 		ORGAN_ID, parent_id, name, short_name, code,path
 		
 	from t_organ as org
-  	where
-  		org.code =#{orgCode,jdbcType=VARCHAR} or
-  		org.path like CONCAT(#{orgPath,jdbcType=VARCHAR},"/",#{orgCode,jdbcType=VARCHAR},"%")
+  	where  
+  		 
+  			org.path like CONCAT(#{orgPath,jdbcType=VARCHAR},"%")
+  		 
   	order by org.ORGAN_ID
   		
   </select>
   
   <select id="loadOrgWithPoliceVMList" parameterType="java.util.Map" resultMap="OrgWithPoliceResultMap">
-	select      rid,     name,     data_type,id,code     
+	select      rid,     name,     data_type,id,code ,orgName
 	from 
 	 (    
-		select    ORGAN_ID as rid,short_name as name,  1 as data_type,CONCAT("org_",ORGAN_ID) as id,code  from t_organ as org    where  org.parent_id= #{id,jdbcType=INTEGER}  
+		select    ORGAN_ID as rid,short_name as name,  1 as data_type,CONCAT("org_",ORGAN_ID) as id,code ,short_name as orgName from t_organ as org    where  org.parent_id= #{id,jdbcType=INTEGER}  
 		 
 		union    
-		select     id as rid,name, 2 as data_type,CONCAT("pol_",id) as id,number as code    from t_police as p    where p.isUsed = 1 and p.org_id=#{id,jdbcType=INTEGER}  
+		select     id as rid, CONCAT(p.name,"(",number,")") as name, 2 as data_type,CONCAT("pol_",id) as id,p.number as code , og.short_name as orgName   from t_police as p    
+		
+			left join t_organ as og on og.organ_id = p.org_id
+		where p.isUsed = 1 and p.org_id=#{id,jdbcType=INTEGER}  
 	 ) as t    
 	order by t.data_type desc,t.rid
   </select>
   
     <select id="loadOrgWithVehicleVMList" parameterType="java.util.Map" resultMap="OrgWithVehicleResultMap">
-	select      rid,  typename,   name,     data_type,id,code     
+	select      rid,  typename,   name,     data_type,id,code     ,orgName
 	from 
 	 (    
-		select    ORGAN_ID as rid,"" as typename,short_name as name,  1 as data_type,CONCAT("org_",ORGAN_ID) as id,code  from t_organ as org    where    org.parent_id= #{id,jdbcType=INTEGER}  
+		select    ORGAN_ID as rid,"" as typename,short_name as name,  1 as data_type,CONCAT("org_",ORGAN_ID) as id,code,short_name as orgName  from t_organ as org    where    org.parent_id= #{id,jdbcType=INTEGER}  
 		 
 		union    
-		 select     p.id as rid,t.name as typename,number as name,   2 as data_type,CONCAT("veh_",p.id) as id,number as code    from t_vehicle as p    
+		 select     p.id as rid,t.name as typename,CONCAT(t.name,"(",p.number,")") as name,   2 as data_type,CONCAT("veh_",p.id) as id,p.number as code , og.short_name as orgName   from t_vehicle as p    
 			left join t_vehicletype as t on t.id = p.vehicle_type_id 
+			left join t_organ as og on og.organ_id = p.org_id
 		
 		where p.org_id=#{id,jdbcType=INTEGER}   
 	 ) as t    
@@ -95,14 +109,15 @@
   
   
     <select id="loadOrgWithWeaponVMList" parameterType="java.util.Map" resultMap="OrgWithWeaponResultMap">
-	select      rid,   typename,  name,     data_type,id,code     
+	select      rid,   typename,  name,     data_type,id,code  ,orgName   
 	from 
 	 (    
-		select    ORGAN_ID as rid,"" as typename,short_name as name,  1 as data_type,CONCAT("org_",ORGAN_ID) as id,code  from t_organ as org    where      org.parent_id= #{id,jdbcType=INTEGER}  
+		select    ORGAN_ID as rid,"" as typename,short_name as name,  1 as data_type,CONCAT("org_",ORGAN_ID) as id,code,short_name as orgName  from t_organ as org    where      org.parent_id= #{id,jdbcType=INTEGER}  
 		 
 		union    
-		select     p.id as rid,t.name as typename,number as name, 2 as data_type,CONCAT("wea_",p.id) as id,number as code    from t_weapon as p  
+		select     p.id as rid,t.name as typename, CONCAT(t.name,"(",p.number,")") as name, 2 as data_type,CONCAT("wea_",p.id) as id,p.number as code, og.short_name as orgName   from t_weapon as p  
 			left join t_weapontype as t on t.id = p.type_id
+			left join t_organ as og on og.organ_id = p.org_id
 		
 		  where p.org_id=#{id,jdbcType=INTEGER}  
 	 ) as t    
@@ -111,16 +126,16 @@
   
   
     <select id="loadOrgWithGpsVMList" parameterType="java.util.Map" resultMap="OrgWithGpsResultMap">
-	select      rid,  typename,   name,     data_type,id,code     
+	select      rid,  typename,   name,     data_type,id,code     ,orgName
 	from 
 	 (    
-		select    org.ORGAN_ID as rid,"" as typename,short_name as name,  1 as data_type,CONCAT("org_",org.ORGAN_ID) as id,code  from t_organ as org    where    org.parent_id= #{id,jdbcType=INTEGER}  
+		select    org.ORGAN_ID as rid,"" as typename,short_name as name,  1 as data_type,CONCAT("org_",org.ORGAN_ID) as id,code,short_name as orgName  from t_organ as org    where    org.parent_id= #{id,jdbcType=INTEGER}  
 		 
 		union    
 		
-		select     p.id as rid,gt.name as typename,number as name , 2 as data_type,CONCAT("gps_",p.id) as id,number as code    from t_gps as p  
+		select     p.id as rid,gt.name as typename,CONCAT(gt.name,"(",p.gps_name,":",p.number,")") as name , 2 as data_type,CONCAT("gps_",p.id) as id,p.number as code ,og.short_name as orgName    from t_gps as p  
 			left join t_gpstype as gt on gt.id = p.type_id
-		
+			left join t_organ as og on og.organ_id = p.org_id
 		  where p.org_id=#{id,jdbcType=INTEGER}  
 	 ) as t    
 	order by t.data_type desc,t.rid
@@ -128,6 +143,23 @@
   
   <select id="loadListByName" parameterType="java.util.Map" resultMap="BaseResultMap">
   
+  </select>
+  
+  <select id="loadOrgVehicleGroupVMList"  parameterType="java.util.Map"  resultMap="OrgWithSourceResultMap">
+  	select id as id,vehicle_group_id as groupid,org_id as organid from t_duty_vehicle_group_org 
+  	where vehicle_group_id = #{groupId,jdbcType=INTEGER}  and org_id =  #{orgId,jdbcType=INTEGER}  
+  </select>
+  <select id="loadOrgPoliceGroupVMList"  parameterType="java.util.Map"  resultMap="OrgWithSourceResultMap">
+  	select id as id,police_group_id as groupid,org_id as organid from t_duty_police_group_org 
+  	where police_group_id = #{groupId,jdbcType=INTEGER}  and org_id =  #{orgId,jdbcType=INTEGER}  
+  </select>
+  <select id="loadOrgWeaponGroupVMList"  parameterType="java.util.Map"  resultMap="OrgWithSourceResultMap">
+  	select id as id,weapon_group_id as groupid,org_id as organid from t_duty_weapon_group_org 
+  	where weapon_group_id = #{groupId,jdbcType=INTEGER}  and org_id =  #{orgId,jdbcType=INTEGER}  
+  </select>
+  <select id="loadOrgGpsGroupVMList"  parameterType="java.util.Map"  resultMap="OrgWithSourceResultMap">
+  	select id as id,gps_group_id as groupid,org_id as organid from t_duty_gps_group_org 
+  	where gps_group_id = #{groupId,jdbcType=INTEGER}  and org_id =  #{orgId,jdbcType=INTEGER}  
   </select>
   
 </mapper>

@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.tianyi.bph.common.MessageCode;
 import com.tianyi.bph.common.ReturnResult;
+import com.tianyi.bph.domain.duty.PoliceGroupMember;
 import com.tianyi.bph.domain.duty.VehicleGroup;
 import com.tianyi.bph.domain.duty.VehicleGroupMember;
 import com.tianyi.bph.domain.duty.VehicleGroupOrg;
@@ -35,10 +36,10 @@ public class VehicleGroupController {
 	protected VehicleGroupService vehicleGroupService;
 	@Autowired
 	private OrganService organService;
-	
 
 	/**
 	 * 查询车辆分组列表
+	 * 
 	 * @param query
 	 * @param page
 	 * @param rows
@@ -46,58 +47,57 @@ public class VehicleGroupController {
 	 * @return
 	 */
 	@RequestMapping(value = "list.do")
-	public @ResponseBody ReturnResult List(
+	public @ResponseBody
+	ReturnResult List(
 			@RequestParam(value = "vehicleGroup_Query", required = false) String query,
-			@RequestParam(value = "page", required = false) Integer page,
-			@RequestParam(value = "rows", required = false) Integer rows,
 			HttpServletRequest request) {
-	
-		JSONObject joQuery =JSONObject.fromObject(query);
 
-		int orgId=joQuery.getInt("orgId");
-		String orgCode=joQuery.getString("orgCode");
-		
+		JSONObject joQuery = JSONObject.fromObject(query);
+
+		int orgId = joQuery.getInt("orgId");
+
 		Map<String, Object> map = new HashMap<String, Object>();
-		page = page == 0 ? 1 : page;
-		map.put("pageStart", (page-1) * rows);
-		map.put("pageSize", rows);
-		map.put("orgCode", orgCode);
-		map.put("orgId", orgId);
-		
-		map.put("inSubOrg", 0);
-		
-		int total=vehicleGroupService.loadVMCountByOrgId(map);
 
-		List<VehicleGroupVM> pgvms=vehicleGroupService.loadVMListByOrgId(map);
-		
-		
-		return ReturnResult.MESSAGE(MessageCode.STATUS_SUCESS, "", total, pgvms);
-		
+		map.put("pageStart", 0);
+		map.put("pageSize", 10);
+		map.put("orgId", orgId);
+
+		map.put("inSubOrg", 0);
+
+		int total = vehicleGroupService.loadVMCountByOrgId(map);
+
+		List<VehicleGroupVM> pgvms = vehicleGroupService.loadVMListByOrgId(map);
+
+		return ReturnResult
+				.MESSAGE(MessageCode.STATUS_SUCESS, "", total, pgvms);
+
 	}
-	
+
 	/**
 	 * 获取当前组织机构及下级机构
+	 * 
 	 * @param vehicleGroupId
 	 * @param request
 	 * @return
 	 */
 	@RequestMapping(value = "getShareOrgs.do")
-	public @ResponseBody String getShareOrgs(
+	public @ResponseBody
+	String getShareOrgs(
 			@RequestParam(value = "vehicleGroupId", required = false) Integer vehicleGroupId,
-			HttpServletRequest request
-			){
-		
-		
-		List<VehicleGroupOrg> ls = vehicleGroupService.loadShareOrgList(vehicleGroupId);
-		
-		String rs=JSONArray.fromObject(ls).toString();
-		
+			HttpServletRequest request) {
+
+		List<VehicleGroupOrg> ls = vehicleGroupService
+				.loadShareOrgList(vehicleGroupId);
+
+		String rs = JSONArray.fromObject(ls).toString();
+
 		return rs;
-		
+
 	}
-	
+
 	/**
 	 * 根据分组id，获取组成员列表
+	 * 
 	 * @param query
 	 * @param page
 	 * @param rows
@@ -105,108 +105,202 @@ public class VehicleGroupController {
 	 * @return
 	 */
 	@RequestMapping(value = "loadMemberByGroupId.do")
-	public @ResponseBody ReturnResult loadMemberByGroupId(
+	public @ResponseBody
+	ReturnResult loadMemberByGroupId(
 			@RequestParam(value = "groupId", required = false) Integer groupId,
-			@RequestParam(value = "page", required = false) Integer page,
-			@RequestParam(value = "rows", required = false) Integer rows,
 			HttpServletRequest request) {
-		
+
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("pageStart", 0);
 		map.put("pageSize", 10);
 		map.put("groupId", groupId);
-		
-		int total=vehicleGroupService.countMemberByGroupId(groupId);
 
-		List<VehicleGroupMemberVM> ms=vehicleGroupService.loadMemberByGroupId(map);
-	
-		
+		int total = vehicleGroupService.countMemberByGroupId(groupId);
+
+		List<VehicleGroupMemberVM> ms = vehicleGroupService
+				.loadMemberByGroupId(map);
+
 		return ReturnResult.MESSAGE(MessageCode.STATUS_SUCESS, "", total, ms);
 	}
 
 	/**
 	 * 增加组成员
+	 * 
 	 * @param members
 	 * @param request
 	 * @return
 	 */
 	@RequestMapping(value = "appendMember.do")
-	public @ResponseBody String appendMember(
+	public @ResponseBody
+	ReturnResult appendMember(
 			@RequestParam(value = "members", required = false) String members,
-			HttpServletRequest request
-			){
-		
-		JSONArray jaMembers=JSONArray.fromObject(members);
-				
-		//Collection<PoliceGroupMember> collection=JSONArray.toCollection(jaMembers, PoliceGroupMember.class);
+			HttpServletRequest request) {
+		try {
+			JSONArray jaMembers = JSONArray.fromObject(members); 
+			List<?> list2 = JSONArray.toList(jaMembers,
+					new VehicleGroupMember(), new JsonConfig());// 参数1为要转换的JSONArray数据，参数2为要转换的目标数据，即List盛装的数据
 
-		List<?> list2 = JSONArray.toList(jaMembers, new VehicleGroupMember(), new JsonConfig());//参数1为要转换的JSONArray数据，参数2为要转换的目标数据，即List盛装的数据
-		
-		List<VehicleGroupMember> ls=new ArrayList<VehicleGroupMember>();
-		
-		for(Object o:list2){
-			VehicleGroupMember pgm=(VehicleGroupMember)o;
-			ls.add(pgm);
-		}
-		
-		vehicleGroupService.appendMemeber(ls);
+			List<VehicleGroupMember> ls = new ArrayList<VehicleGroupMember>();
 
-		JSONObject rs=new JSONObject();
-		rs.accumulate("isSuccess", true);
-		
-		return rs.toString();
+			for (Object o : list2) {
+				VehicleGroupMember pgm = (VehicleGroupMember) o;
+				ls.add(pgm);
+			}
+			vehicleGroupService.appendMemeber(ls);
+			return ReturnResult.MESSAGE(MessageCode.STATUS_SUCESS, "删除成功", 0,
+					null);
+
+		} catch (Exception ex) {
+			return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL, "查询数据出错", 0,
+					null);
+		} 
 	}
-	
+
 	/**
 	 * 保存车辆分组信息
+	 * 
 	 * @param vehicleGroup
 	 * @param request
 	 * @return
 	 */
 	@RequestMapping(value = "saveVehicleGroup.do")
-	public @ResponseBody String saveVehicleGroup(
+	public @ResponseBody
+	ReturnResult saveVehicleGroup(
 			@RequestParam(value = "vehicleGroup", required = false) String vehicleGroup,
-			HttpServletRequest request
-			){
-		
-		JSONObject joPG =JSONObject.fromObject(vehicleGroup);
-		
-		VehicleGroup pg=new VehicleGroup();
-		pg.setId(joPG.getInt("id"));
-		pg.setName(joPG.getString("name"));
-		pg.setShareType(joPG.getInt("shareType"));
-		pg.setOrgId(joPG.getInt("orgId"));
-		
-		JSONArray jaOrgIds=joPG.getJSONArray("shareOrgIds");
-		
-		Object[] orgIds=jaOrgIds.toArray();
-		
-		vehicleGroupService.saveVehicleGroup(pg, orgIds);
-		
-		JSONObject rs=new JSONObject();
-		rs.accumulate("isSuccess", true);
-		rs.accumulate("msg", "");
-		rs.accumulate("id", pg.getId());
-		return rs.toString();
+			HttpServletRequest request) {
+		try {
+			JSONObject joPG = JSONObject.fromObject(vehicleGroup);
+
+			VehicleGroup pg = new VehicleGroup();
+			pg.setId(joPG.getInt("id"));
+			pg.setName(joPG.getString("name"));
+			pg.setShareType(joPG.getInt("shareType"));
+			pg.setOrgId(joPG.getInt("orgId"));
+			pg.setPlatformId(1);
+			pg.setSyncState(true);
+			JSONArray jaOrgIds = joPG.getJSONArray("shareOrgIds");
+
+			Object[] orgIds = jaOrgIds.toArray();
+
+			vehicleGroupService.saveVehicleGroup(pg, orgIds);
+			return ReturnResult.MESSAGE(MessageCode.STATUS_SUCESS, "", 0, null);
+		} catch (Exception ex) {
+			return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL, "", 0, null);
+		}
 	}
+
 	/**
 	 * 删除车辆组
+	 * 
 	 * @param vehicleGroupId
 	 * @param request
 	 * @return
 	 */
 	@RequestMapping(value = "deleteVehicleGroup.do")
-	 public @ResponseBody String deleteVehicleGroup(
-			 @RequestParam(value="vehicleGroupId",required=false) Integer vehicleGroupId,
-				HttpServletRequest request
-				){
-		 
-		 vehicleGroupService.deleteById(vehicleGroupId);
-		 
-		JSONObject rs=new JSONObject();
-		rs.accumulate("isSuccess", true);
-		rs.accumulate("msg", "");
-		 	
-		return rs.toString();
-	 }
+	public @ResponseBody
+	ReturnResult deleteVehicleGroup(
+			@RequestParam(value = "vehicleGroupId", required = false) Integer vehicleGroupId,
+			HttpServletRequest request) {
+		try {
+			if (vehicleGroupId > 0) {
+				vehicleGroupService.deleteById(vehicleGroupId);
+				return ReturnResult.MESSAGE(MessageCode.STATUS_SUCESS, "删除成功",
+						0, null);
+			} else {
+				return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL, "删除成功", 0,
+						null);
+			}
+		} catch (Exception ex) {
+			return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL, "查询数据出错", 0,
+					null);
+		}
+	}
+
+	/**
+	 * 删除组成员
+	 * 
+	 * @param memberId
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "delMemberById.do")
+	public @ResponseBody
+	ReturnResult delMemberById(
+			@RequestParam(value = "memberId", required = false) Integer memberId,
+			HttpServletRequest request) {
+		try {
+			if (memberId > 0) {
+				vehicleGroupService.delMemberById(memberId);
+				return ReturnResult.MESSAGE(MessageCode.STATUS_SUCESS, "删除成功",
+						0, null);
+			} else {
+				return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL, "删除成功", 0,
+						null);
+			}
+		} catch (Exception ex) {
+			return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL, "查询数据出错", 0,
+					null);
+		}  
+	}
+	/**
+	 * 清除组成员
+	 * 
+	 * @param vehicleGroupId
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "cleanMemberByGroupId.do")
+	public @ResponseBody
+	ReturnResult cleanMemberByGroupId(
+			@RequestParam(value = "vehicleGroupId", required = false) Integer vehicleGroupId,
+			HttpServletRequest request) {
+		try {
+			if (vehicleGroupId > 0) {
+				vehicleGroupService.cleanMember(vehicleGroupId);
+				return ReturnResult.MESSAGE(MessageCode.STATUS_SUCESS, "删除成功",
+						0, null);
+			} else {
+				return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL, "删除成功", 0,
+						null);
+			}
+		} catch (Exception ex) {
+			return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL, "查询数据出错", 0,
+					null);
+		} 
+	}
+	 
+	/**
+	 * 判断是否有有分组存在
+	 * 
+	 * 判断是否分组名称重复；
+	 */
+	@RequestMapping(value = "isExistGroup.do")
+	public @ResponseBody
+	ReturnResult isExistGroup(
+			@RequestParam(value = "name", required = false) String name,
+			@RequestParam(value = "optType", required = false) Integer optType,
+			@RequestParam(value = "groupId", required = false) Integer groupId,
+			@RequestParam(value = "orgId", required = false) Integer orgId)
+			throws Exception {
+		try {
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("name", name);
+			map.put("groupId", groupId);
+			map.put("optType", optType);
+			map.put("orgId", orgId);
+			List<VehicleGroup> vehicleGroup = vehicleGroupService
+					.findByNameAndOrg(map);
+			if (vehicleGroup.size() > 0) {
+				return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL, "", 0,
+						null);
+			} else {
+				return ReturnResult.MESSAGE(MessageCode.STATUS_SUCESS, "", 0,
+						null);
+			}
+		} catch (Exception ex) {
+			return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL, "查询数据出错", 0,
+					null);
+		}
+	}
+
 }

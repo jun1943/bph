@@ -2,6 +2,7 @@
 
 <script type="text/javascript"> 
 var sessionId = $("#token").val(); 
+var m_gpsgroup_Id;
 var opteType = "";
 $(function() {
 	$("#dtGpsGroup").empty();
@@ -9,6 +10,7 @@ $(function() {
 });
 function loadData(pageNo){  
 	GpsgroupManage.pageNo = pageNo;
+	GpsgroupManage.packageGroupData(pageNo);
 	GpsgroupManage.loadGroupData(pageNo); 
 	
 }
@@ -16,28 +18,62 @@ var m_gpsGroup_Query = {};
 
 var GpsgroupManage = { 
 	pageNo:1,
+	packageGroupData:function(pageNo){
+		m_gpsGroup_Query.orgId =1;// $("#organId").val();
+		m_gpsGroup_Query.orgPath = $("#organPath").val();
+		m_gpsGroup_Query.orgCode = $("#organCode").val();
+		m_gpsGroup_Query.page = pageNo;
+		m_gpsGroup_Query.pageSize = 10; 
+	},
+	gpsGroupDataSource:[],
 	loadGroupData : function(pageNo) {
 		$.ajax({
 		type: "post",
-		url: "",
+		url: "<%=basePath%>gpsGroupWeb/list.do",
 		dataType: "json",
 		data: {
-			"gpsGroup_Query": JSON.stringify(m_gpsGroup_Query),
-			page: 0,
-			rows: 500 //最大500条（必须是最大值）
+			"gpsGroup_Query": JSON.stringify(m_gpsGroup_Query) 
 		},
 		success: function(req) {
 			if (req.code == 200) { 
 				if(req.data != null){
 				var rows =req.data; 
-				var dataSource = new kendo.data.DataSource({
+				GpsgroupManage.gpsGroupDataSource = new kendo.data.DataSource({
 					data: rows,
 					batch: true,
 					pageSize: 20
 				});
 				
 				$("#dtGpsGroup").kendoGrid({
-					dataSource: dataSource,
+					dataSource: GpsgroupManage.gpsGroupDataSource,
+					pageable: true,
+					columns : [ {
+						title : 'Id',
+						field : 'id',
+						align : 'left',
+						width : 10,
+						hidden : true
+					}, {
+						title : '组名称',
+						field : 'name',
+						align : 'left',
+						width : 150
+					}, {
+						title : '共享类型',
+						field : 'shareTypeDesc',
+						align : 'left',
+						width : 200
+					} ],
+					selectable: "row",
+					change : function(e) {
+						var groupId = e.sender.selectable.userEvents.currentTarget.cells[0].innerHTML; 
+						m_gpsgroup_Id = groupId;
+						GpsgroupManage.loadMemberData(groupId);
+					}
+				}); 
+					} else{
+						$("#dtGpsGroup").kendoGrid({
+					dataSource: GpsgroupManage.gpsGroupDataSource,
 					pageable: true,
 					columns : [ {
 						title : 'Id',
@@ -73,14 +109,14 @@ var GpsgroupManage = {
 		$("#dialog").kendoWindow({
 			width : "680px",
 			height : "500px",
-			title : "GPS组创建",
+			title : "新建定位设备分组",
 			position : {
 				top : "100px"
 			},
-		content: "<%=basePath%>gpsGroupWeb/gotoGpsgroupCreate.do?organId=" + organId+"&sessionId="+sessionId,
+		content: "<%=basePath%>dutyGroupRouteWeb/gotoGpsGroupAdd.do?organId=" + organId+"&sessionId="+sessionId,
 					iframe : true, 
-					closeCallback :GpsgroupManage.onClose,
-					okCallback:GpsgroupManage.onClose
+					closeCallback :GpsgroupManage.onCloseGorup,
+					okCallback:GpsgroupManage.onCloseGorup
 				});
 	//	GpsGroupManage.showGpsGroupDlg();
 	},
@@ -93,20 +129,20 @@ var GpsgroupManage = {
 			position : {
 				top : "100px"
 			},
-		content: "<%=basePath%>gpsGroupWeb/gotoGpsgroupEdit.do?gpsId="
-							+ gpsId + "&organId=" + organId+"&sessionId="+sessionId,
+		content: "<%=basePath%>dutyGroupRouteWeb/gotoGpsGroupEdit.do?groupId="
+							+ m_gpsgroup_Id + "&organId=" + organId+"&sessionId="+sessionId,
 					iframe : true,
-					closeCallback :GpsgroupManage.onClose,
-					okCallback:GpsgroupManage.onClose
+					closeCallback :GpsgroupManage.onCloseGorup,
+					okCallback:GpsgroupManage.onCloseGorup
 				});
 	},
 	deleteGroup:function(){
-		
 			var kGrid = $("#dtGpsGroup").data("kendoGrid");
 			var row = kGrid.dataItem(kGrid.select());
 			if (row != null) {
+			$("body").tyWindow({"content":"确定要删除?","center":true,"ok":true,"no":true,"okCallback":function(){ 
 				$.ajax({
-					url : "gpsGroupTest/deleteGpsGroup.do",
+					url : "<%=basePath%>gpsGroupWeb/deleteGpsGroup.do",
 					type : "POST",
 					dataType : "json",
 					data : {
@@ -114,22 +150,24 @@ var GpsgroupManage = {
 					},
 					async : false,
 					success : function(req) {
-						if (req.isSuccess) {
-							alert('提示, 删除成功!');
-							//$('#dtGpsGroup').datagrid('reload');
-							bindDtGroup("gpsGroupTest/list.do");
-							GpsGroupManage.getMemberBygroupId(m_gpsgroup_Id);
+						if (req.code == 200) { 
+							$("body").popjs({"title":"提示","content":"删除成功"}); 
+							GpsGroupManage.onCloseGorup()
+							$("#dtGroupMember").empty();
 						} else {
-							$.messager.alert("提示,"+req.msg+", "+warning+"");
+							$("body").popjs({"title":"提示","content":"删除分组数据失败"}); 
 						}
 					}
-				});
-	}
+					});
+				}});
+			} else {
+				$("body").popjs({"title":"提示","content":"请选择要操作的数据"}); 
+			}
 	},
 	loadMemberData:function(groupId){
 		$.ajax({
 					type: "post",
-					url: "gpsGroupTest/loadMemberByGroupId.do?groupId="+groupId,
+					url: "<%=basePath%>gpsGroupWeb/loadMemberByGroupId.do?groupId="+groupId, 
 					dataType: "json", 
 					success: function(req) {
 						if (req.code==200) {
@@ -156,7 +194,7 @@ var GpsgroupManage = {
 											}, {
 												title : '设备名称',
 												field : 'gpsName'
-											}, ],
+											}],
 											selectable: "row"
 										});
 									}
@@ -164,27 +202,38 @@ var GpsgroupManage = {
 							});
 						} ,
 	addMember:function(){
-		var organId = $("#organId").val();
+			var organId = $("#organId").val();
+		var kGrid = $("#dtGpsGroup").data("kendoGrid");
+			var row = kGrid.dataItem(kGrid.select());
+			if (row != null) {
+			var groupId = row.id;
 		$("#dialog").kendoWindow({
 			width : "680px",
 			height : "500px",
-			title : "GPS组管理",
+			title : "分组成员管理",
 			position : {
 				top : "100px"
 			},
-		content: "<%=basePath%>gpsGroupWeb/gotoGpsgroupAdd.do?gpsId="
-							+ gpsId + "&organId=" + organId+"&sessionId="+sessionId,
+		content: "<%=basePath%>dutyGroupRouteWeb/gotoGpsGroupAddMember.do?groupId="
+							+ groupId + "&organId=" + organId+"&sessionId="+sessionId,
 					iframe : true,
-					closeCallback :GpsgroupManage.onClose,
-					okCallback:GpsgroupManage.onClose
+					closeCallback :GpsgroupManage.onCloseMember,
+					okCallback:GpsgroupManage.onCloseMember
 				});
+				} else {
+				$("body").popjs({"title":"提示","content":"请选择要操作的分组对象"}); 
+			}
 	},
 	deleteMember:function(){
 		var kGrid = $("#dtGroupMember").data("kendoGrid");
 		var row = kGrid.dataItem(kGrid.select());
+		var kgroupGrid = $("#dtGpsGroup").data("kendoGrid");
+		var grouprow = kgroupGrid.dataItem(kgroupGrid.select());
+		var groupId = grouprow.id;
 		if (row != null) {
+		$("body").tyWindow({"content":"确定要删除该成员?","center":true,"ok":true,"no":true,"okCallback":function(){ 
 			$.ajax({
-				url : "gpsGroupTest/delMemberById.do",
+				url : "<%=basePath%>gpsGroupWeb/delMemberById.do?sessionId="+sessionId,
 				type : "POST",
 				dataType : "json",
 				data : {
@@ -192,24 +241,27 @@ var GpsgroupManage = {
 				},
 				async : false,
 				success : function(req) {
-					if (req.isSuccess) {
-						alert("删除成功！");
-						GpsGroupManage.getMemberBygroupId(m_gpsgroup_Id);
-						//$('#dtGroupMember').datagrid('reload');
-					}
+					if (req.code == 200) { 
+									$("body").popjs({"title":"提示","content":"删除成功"});    
+									GpsgroupManage.loadMemberData(groupId);
+								} else {
+									$("body").popjs({"title":"提示","content":"清空分组成员列表失败"}); 
+								}
 				}
 			});
+			}});
 		} else {
-			alert('提示, 请先选择警员!!');
+			$("body").popjs({"title":"提示","content":"请选择要操作的数据"}); 
 		}
 	},
 	clearUpMember:function(){
-	var kGrid = $("#dtGpsGroup").data("kendoGrid");
-	var row = kGrid.dataItem(kGrid.select());
-
-	if (row != null) {
+		var kGrid = $("#dtGpsGroup").data("kendoGrid");
+			var row = kGrid.dataItem(kGrid.select());
+			if (row != null) {
+			var groupId = row.id;
+			$("body").tyWindow({"content":"确定要清空当前分组成员列表?","center":true,"ok":true,"no":true,"okCallback":function(){ 
 						$.ajax({
-							url : "gpsGroupTest/cleanMemberByGroupId.do",
+							url : "<%=basePath%>gpsGroupWeb/cleanMemberByGroupId.do?sessionId="+sessionId,
 							type : "POST",
 							dataType : "json",
 							data : {
@@ -217,20 +269,22 @@ var GpsgroupManage = {
 							},
 							async : false,
 							success : function(req) {
-								if (req.isSuccess) {
-									alert("清空完成！");
-									GpsGroupManage.getMemberBygroupId(m_gpsgroup_Id);
-									//$('#dtGroupMember').datagrid('reload');
+								if (req.code == 200) { 
+									$("body").popjs({"title":"提示","content":"清除成功"});   
+									$("#dtGroupMember").empty();
+									GpsgroupManage.loadMemberData(groupId);
+								} else {
+									$("body").popjs({"title":"提示","content":"清空分组成员列表失败"}); 
 								}
 							}
-						});
-	} else {
-		alert('提示, 请先选择车辆组!!');
-	}
+						});}});
+			} else {
+				$("body").popjs({"title":"提示","content":"请选择要操作的分组"}); 
+			}
 	},
 	
 	onCloseMember:function(e){
-		GpsgroupManage.loadMemberData(GpsgroupManage.pageNo);  
+		GpsgroupManage.loadMemberData(m_gpsgroup_Id);  
 	},
 	onCloseGorup:function(e){
 		GpsgroupManage.loadGroupData(GpsgroupManage.pageNo);  
@@ -238,7 +292,7 @@ var GpsgroupManage = {
 };
 
 </script>
-<div id="dtGpsGroup" style="width:70%"></div>   
-<div id="dtGroupMember" style="width:60%"></div> 
+<div id="dtGpsGroup" style="width:330px;float:left"></div>   
+<div id="dtGroupMember" style="width:300px;float:left"></div> 
 <div id="dialog"></div> 
 

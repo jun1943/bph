@@ -126,6 +126,10 @@
     
          <select id="findByNameAndOrg" resultType="com.tianyi.bph.domain.duty.GpsGroup" parameterType="java.util.Map">  
        		select * from t_duty_gps_group where name = #{name} and org_id = #{orgId}
+       		
+       		<if test="optType >0 ">
+       			and id != #{groupId,jdbcType=INTEGER}
+       		</if>
     	 </select> 
   
   
@@ -156,7 +160,7 @@
 		org.path 			as 	orgPath
   	from 
   		t_duty_gps_group as g
-  		left join t_organ as org on g.org_id=org.id
+  		left join t_organ as org on g.org_id=org.organ_id
   	where
 		g.org_id=#{orgId,jdbcType=INTEGER}
   	
@@ -182,7 +186,7 @@ select distinct	g.id,
 		org.path 			as 	orgPath
  		from t_duty_gps_group g 
 			left join t_duty_gps_group_org  pgo on g.id = pgo.gps_group_id 
-			left join t_organ org on g.org_id = org.id
+			left join t_organ org on g.org_id = org.organ_id
   	where
 		pgo.org_id=#{orgId,jdbcType=INTEGER}
   	 

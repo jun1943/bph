@@ -131,7 +131,7 @@
     from t_duty_vehicle_group_member as m
     left join t_vehicle as p on m.vehicle_id=p.id
     left join t_vehicletype t on p.vehicle_type_id = t.id 
-    left join t_organ as org on p.org_id=org.id
+    left join t_organ as org on p.org_id=org.organ_id
     where group_id = #{groupId,jdbcType=INTEGER}
     order by m.id
   		<if test="pageStart != null">

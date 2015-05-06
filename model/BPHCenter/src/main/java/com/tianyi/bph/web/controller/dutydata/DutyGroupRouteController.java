@@ -11,7 +11,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.tianyi.bph.domain.duty.GpsGroup;
 import com.tianyi.bph.domain.duty.PoliceGroup;
+import com.tianyi.bph.domain.duty.VehicleGroup;
+import com.tianyi.bph.domain.duty.WeaponGroup;
 import com.tianyi.bph.domain.system.Organ;
 import com.tianyi.bph.query.duty.PoliceGroupVM;
 import com.tianyi.bph.query.system.UserQuery;
@@ -24,7 +27,7 @@ import com.tianyi.bph.service.system.OrganService;
 
 
 @Controller
-@RequestMapping("/dutyTypeRouteWeb")
+@RequestMapping("/dutyGroupRouteWeb")
 public class DutyGroupRouteController {
 
 
@@ -79,6 +82,10 @@ public class DutyGroupRouteController {
 			organ = organService.getOrganByPrimaryKey(organId);
 		}  
 		mv.addObject("organ", organ); 
+		mv.addObject("organId", organId);
+		mv.addObject("organCode", organ.getCode());
+		mv.addObject("organPath", organ.getPath()); 
+		
 		mv.addObject("num", "200");
 		return mv;
 	}
@@ -93,12 +100,18 @@ public class DutyGroupRouteController {
 		ModelAndView mv = new ModelAndView(
 				"/dutydata/dutygroup/policegroup/policegroupEditGroup.jsp");
 		Organ organ = new Organ();
+		PoliceGroup policegroup = new PoliceGroup();
 		if (organId != null) {
 			organ = organService.getOrganByPrimaryKey(organId);
 		} 
-		PoliceGroup pg = policeGroupService.loadById(groupId);
-		mv.addObject("organ", organ); 
-		mv.addObject("policeGroup", pg); 
+		if(groupId!=null){
+			policegroup = policeGroupService.loadById(groupId);
+		} 
+		mv.addObject("organ", organ);
+		mv.addObject("organId", organId);
+		mv.addObject("organCode", organ.getCode());
+		mv.addObject("organPath", organ.getPath()); 
+		mv.addObject("policegroup", policegroup); 
 		mv.addObject("num", "200");
 		return mv;
 	}
@@ -125,7 +138,10 @@ public class DutyGroupRouteController {
 		query.setPageNo(years);
 		query.setPageSize(month);
 		mv.addObject("organ", organ);
-		mv.addObject("query", query);
+		mv.addObject("organId", organId);
+		mv.addObject("organCode", organ.getCode());
+		mv.addObject("organPath", organ.getPath()); 
+		mv.addObject("groupId", groupId); 
 		mv.addObject("num", "200");
 		return mv;
 	}
@@ -147,7 +163,7 @@ public class DutyGroupRouteController {
 			HttpServletRequest request) {
 		UserQuery query = new UserQuery();
 		ModelAndView mv = new ModelAndView(
-				"/dutydata/dutygroup/vehiclegroup/vehclegroupList.jsp");
+				"/dutydata/dutygroup/vehiclegroup/vehiclegroupList.jsp");
 		Organ organ = new Organ();
 		if (organId != null) {
 			organ = organService.getOrganByPrimaryKey(organId);
@@ -173,7 +189,7 @@ public class DutyGroupRouteController {
 			HttpServletRequest request) {
 		UserQuery query = new UserQuery();
 		ModelAndView mv = new ModelAndView(
-				"/dutydata/dutygroup/policegroup/policegroupAddGroup.jsp");
+				"/dutydata/dutygroup/vehiclegroup/vehiclegroupAddGroup.jsp");
 		Organ organ = new Organ();
 		if (organId != null) {
 			organ = organService.getOrganByPrimaryKey(organId);
@@ -186,7 +202,9 @@ public class DutyGroupRouteController {
 		query.setPageNo(years);
 		query.setPageSize(month);
 		mv.addObject("organ", organ);
-		mv.addObject("query", query);
+		mv.addObject("organId", organId);
+		mv.addObject("organCode", organ.getCode());
+		mv.addObject("organPath", organ.getPath()); 
 		mv.addObject("num", "200");
 		return mv;
 	}
@@ -202,10 +220,13 @@ public class DutyGroupRouteController {
 		ModelAndView mv = new ModelAndView(
 				"/dutydata/dutygroup/vehiclegroup/vehiclegroupEditGroup.jsp");
 		Organ organ = new Organ();
+		VehicleGroup vehiclegroup = new VehicleGroup();
 		if (organId != null) {
 			organ = organService.getOrganByPrimaryKey(organId);
 		}
-
+		if(groupId!=null){
+			vehiclegroup = vehicleGroupService.loadById(groupId);
+		}
 		Calendar c = Calendar.getInstance();
 		int years = c.get(Calendar.YEAR);
 		int month = c.get(Calendar.MONTH) + 1;
@@ -213,7 +234,10 @@ public class DutyGroupRouteController {
 		query.setPageNo(years);
 		query.setPageSize(month);
 		mv.addObject("organ", organ);
-		mv.addObject("query", query);
+		mv.addObject("organId", organId);
+		mv.addObject("organCode", organ.getCode());
+		mv.addObject("organPath", organ.getPath()); 
+		mv.addObject("vehiclegroup", vehiclegroup); 
 		mv.addObject("num", "200");
 		return mv;
 	}
@@ -240,8 +264,10 @@ public class DutyGroupRouteController {
 		query.setPageNo(years);
 		query.setPageSize(month);
 		mv.addObject("organ", organ);
-		mv.addObject("query", query);
-		mv.addObject("num", "200");
+		mv.addObject("organId", organId);
+		mv.addObject("organCode", organ.getCode());
+		mv.addObject("organPath", organ.getPath()); 
+		mv.addObject("groupId", groupId); 
 		return mv;
 	}
 	
@@ -300,7 +326,9 @@ public class DutyGroupRouteController {
 		query.setPageNo(years);
 		query.setPageSize(month);
 		mv.addObject("organ", organ);
-		mv.addObject("query", query);
+		mv.addObject("organId", organId);
+		mv.addObject("organCode", organ.getCode());
+		mv.addObject("organPath", organ.getPath()); 
 		mv.addObject("num", "200");
 		return mv;
 	}
@@ -316,10 +344,13 @@ public class DutyGroupRouteController {
 		ModelAndView mv = new ModelAndView(
 				"/dutydata/dutygroup/weapongroup/weapongroupEditGroup.jsp");
 		Organ organ = new Organ();
+		WeaponGroup weapongroup = new WeaponGroup();
 		if (organId != null) {
 			organ = organService.getOrganByPrimaryKey(organId);
 		}
-
+		if(groupId!=null){
+			weapongroup = weaponGroupService.loadById(groupId);
+		}
 		Calendar c = Calendar.getInstance();
 		int years = c.get(Calendar.YEAR);
 		int month = c.get(Calendar.MONTH) + 1;
@@ -327,8 +358,10 @@ public class DutyGroupRouteController {
 		query.setPageNo(years);
 		query.setPageSize(month);
 		mv.addObject("organ", organ);
-		mv.addObject("query", query);
-		mv.addObject("num", "200");
+		mv.addObject("organId", organId);
+		mv.addObject("organCode", organ.getCode());
+		mv.addObject("organPath", organ.getPath()); 
+		mv.addObject("weapongroup", weapongroup); 
 		return mv;
 	}
 	
@@ -345,8 +378,7 @@ public class DutyGroupRouteController {
 		Organ organ = new Organ();
 		if (organId != null) {
 			organ = organService.getOrganByPrimaryKey(organId);
-		}
-
+		} 
 		Calendar c = Calendar.getInstance();
 		int years = c.get(Calendar.YEAR);
 		int month = c.get(Calendar.MONTH) + 1;
@@ -354,8 +386,10 @@ public class DutyGroupRouteController {
 		query.setPageNo(years);
 		query.setPageSize(month);
 		mv.addObject("organ", organ);
-		mv.addObject("query", query);
-		mv.addObject("num", "200");
+		mv.addObject("organId", organId);
+		mv.addObject("organCode", organ.getCode());
+		mv.addObject("organPath", organ.getPath()); 
+		mv.addObject("groupId", groupId); 
 		return mv;
 	}
 	
@@ -415,7 +449,9 @@ public class DutyGroupRouteController {
 		query.setPageNo(years);
 		query.setPageSize(month);
 		mv.addObject("organ", organ);
-		mv.addObject("query", query);
+		mv.addObject("organId", organId);
+		mv.addObject("organCode", organ.getCode());
+		mv.addObject("organPath", organ.getPath()); 
 		mv.addObject("num", "200");
 		return mv;
 	}
@@ -431,10 +467,13 @@ public class DutyGroupRouteController {
 		ModelAndView mv = new ModelAndView(
 				"/dutydata/dutygroup/gpsgroup/gpsgroupEditGroup.jsp");
 		Organ organ = new Organ();
+		GpsGroup gpsgroup = new GpsGroup();
 		if (organId != null) {
 			organ = organService.getOrganByPrimaryKey(organId);
 		}
-
+		if(groupId!=null){
+			gpsgroup = gpsGroupService.loadById(groupId);
+		}
 		Calendar c = Calendar.getInstance();
 		int years = c.get(Calendar.YEAR);
 		int month = c.get(Calendar.MONTH) + 1;
@@ -442,8 +481,10 @@ public class DutyGroupRouteController {
 		query.setPageNo(years);
 		query.setPageSize(month);
 		mv.addObject("organ", organ);
-		mv.addObject("query", query);
-		mv.addObject("num", "200");
+		mv.addObject("organId", organId);
+		mv.addObject("organCode", organ.getCode());
+		mv.addObject("organPath", organ.getPath()); 
+		mv.addObject("gpsgroup", gpsgroup); 
 		return mv;
 	}
 	
@@ -461,7 +502,6 @@ public class DutyGroupRouteController {
 		if (organId != null) {
 			organ = organService.getOrganByPrimaryKey(organId);
 		}
-
 		Calendar c = Calendar.getInstance();
 		int years = c.get(Calendar.YEAR);
 		int month = c.get(Calendar.MONTH) + 1;
@@ -469,8 +509,10 @@ public class DutyGroupRouteController {
 		query.setPageNo(years);
 		query.setPageSize(month);
 		mv.addObject("organ", organ);
-		mv.addObject("query", query);
-		mv.addObject("num", "200");
+		mv.addObject("organId", organId);
+		mv.addObject("organCode", organ.getCode());
+		mv.addObject("organPath", organ.getPath()); 
+		mv.addObject("groupId", groupId); 
 		return mv;
 	}
 	

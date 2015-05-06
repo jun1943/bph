@@ -1,12 +1,14 @@
 package com.tianyi.bph.service.duty;
 
 import java.util.List;
+import java.util.Map;
 
 import com.tianyi.bph.domain.duty.Org;
 import com.tianyi.bph.query.duty.OrgWithGpsVM;
 import com.tianyi.bph.query.duty.OrgWithPoliceVM;
 import com.tianyi.bph.query.duty.OrgWithVehicleVM;
 import com.tianyi.bph.query.duty.OrgWithWeaponVM;
+import com.tianyi.bph.query.duty.OrganGroupVM;
  
 
 /**
@@ -54,4 +56,9 @@ public interface OrgService {
 	List<OrgWithGpsVM> loadOrgWithGpsVMList(Integer id);
 
 	Org selectByPrimaryKey(Integer qid);
+
+	java.util.List<OrganGroupVM> loadOrgVehicleGroupVMList(Map<String, Object> map);
+	java.util.List<OrganGroupVM> loadOrgPoliceGroupVMList(Map<String, Object> map);
+	java.util.List<OrganGroupVM> loadOrgWeaponGroupVMList(Map<String, Object> map);
+	java.util.List<OrganGroupVM> loadOrgGpsGroupVMList(Map<String, Object> map);
 }

@@ -1,36 +1,42 @@
 <%@ page language="java" pageEncoding="UTF-8"%>
 
 <script type="text/javascript"> 
-var sessionId = $("#token").val(); 
+var sessionId = $("#token").val();  
+var m_vehiclegroup_Id;
 $(function() {
 	$("#dtVehicleGroup").empty();
 	loadData(1);
 });
 function loadData(pageNo){  
 	VehicleGroupManage.pageNo = pageNo;
+	VehicleGroupManage.packageGroupData(pageNo);
 	VehicleGroupManage.loadGroupData(pageNo); 
 	
 }
-var m_gpsGroup_Query = {};
+var m_vehicleGroup_Query = {};
 
 var VehicleGroupManage = { 
 	pageNo:1,
+	packageGroupData:function(pageNo){
+		m_vehicleGroup_Query.orgId =1;// $("#organId").val();
+		m_vehicleGroup_Query.orgPath = $("#organPath").val();
+		m_vehicleGroup_Query.orgCode = $("#organPath").val();
+		m_vehicleGroup_Query.page = pageNo;
+		m_vehicleGroup_Query.pageSize = 10; 
+	},
+	vehicleGroupDataSource:[],
 	loadGroupData : function(pageNo) {
 		$.ajax({
 						type : "post",
-						url : url,
+						url: "<%=basePath%>vehicleGroupWeb/list.do",
 						dataType : "json",
 						data : {
-							"vehicleGroup_Query" : JSON
-									.stringify(m_vehicleGroup_Query),
-							page : 0,
-							rows : 500
-						//最大500条（必须是最大值）
+							"vehicleGroup_Query" : JSON.stringify(m_vehicleGroup_Query) 
 						},
 						success : function(req) {
 							if (req.code == 200) {
 								var rows = req.data;
-								var dataSource = new kendo.data.DataSource({
+								VehicleGroupManage.vehicleGroupDataSource = new kendo.data.DataSource({
 									data : rows,
 									batch : true,
 									pageSize : 20
@@ -39,7 +45,7 @@ var VehicleGroupManage = {
 								$("#dtVehicleGroup")
 										.kendoGrid(
 												{
-													dataSource : dataSource,
+													dataSource : VehicleGroupManage.vehicleGroupDataSource,
 													pageable : true,
 													columns : [
 															{
@@ -65,7 +71,41 @@ var VehicleGroupManage = {
 													change : function(e) {
 														var groupId = e.sender.selectable.userEvents.currentTarget.cells[0].innerHTML;
 														m_vehiclegroup_Id = groupId;
-														VehicleGroupManage.getMemberBygroupId(groupId);
+														VehicleGroupManage.loadMemberData(groupId);
+													}
+												});
+							}else{
+								
+								$("#dtVehicleGroup")
+										.kendoGrid(
+												{
+													dataSource : VehicleGroupManage.vehicleGroupDataSource,
+													pageable : true,
+													columns : [
+															{
+																title : 'Id',
+																field : 'id',
+																align : 'left',
+																width : 10,
+																hidden : true
+															},
+															{
+																title : '组名称',
+																field : 'name',
+																align : 'left',
+																width : 150
+															},
+															{
+																title : '共享类型',
+																field : 'shareTypeDesc',
+																align : 'left',
+																width : 200
+															} ],
+													selectable : "row",
+													change : function(e) {
+														var groupId = e.sender.selectable.userEvents.currentTarget.cells[0].innerHTML;
+														m_vehiclegroup_Id = groupId;
+														VehicleGroupManage.loadMemberData(groupId);
 													}
 												});
 							}
@@ -77,40 +117,43 @@ var VehicleGroupManage = {
 		$("#dialog").kendoWindow({
 			width : "680px",
 			height : "500px",
-			title : "车辆信息",
+			title : "车辆分组信息",
 			position : {
 				top : "100px"
 			},
-		content: "<%=basePath%>VehicleGroupWeb/gotoVehiclegroupCreate.do?gpsId="
-							+ gpsId + "&organId=" + organId+"&sessionId="+sessionId,
+		content: "<%=basePath%>dutyGroupRouteWeb/gotoVehicleGroupAdd.do?organId=" + organId+"&sessionId="+sessionId,
 					iframe : true,
-					closeCallback :VehiclegroupManage.onClose,
-					okCallback:VehiclegroupManage.onClose
+					closeCallback :VehicleGroupManage.onCloseGorup,
+					okCallback:VehicleGroupManage.onCloseGorup
 				});
 	},
 	editGroup:function(){
 		var organId = $("#organId").val();
+		if(m_vehiclegroup_Id!=undefined){
 		$("#dialog").kendoWindow({
 			width : "680px",
 			height : "500px",
-			title : "车辆信息",
+			title : "车辆分组信息",
 			position : {
 				top : "100px"
 			},
-		content: "<%=basePath%>VehicleGroupWeb/gotoVehiclegroupEdit.do?gpsId="
-							+ gpsId + "&organId=" + organId+"&sessionId="+sessionId,
+		content: "<%=basePath%>dutyGroupRouteWeb/gotoVehicleGroupEdit.do?groupId="
+							+ m_vehiclegroup_Id + "&organId=" + organId+"&sessionId="+sessionId,
 					iframe : true,
-					closeCallback :VehiclegroupManage.onClose,
-					okCallback:VehiclegroupManage.onClose
+					closeCallback :VehicleGroupManage.onCloseGorup,
+					okCallback:VehicleGroupManage.onCloseGorup
 				});
+				}else{
+				$("body").popjs({"title":"提示","content":"请选择要操作的对象"}); 
+				}
 	},
-	deleteGroup:function(){
-		
+	deleteGroup:function(){ 
 			var kGrid = $("#dtVehicleGroup").data("kendoGrid");
 			var row = kGrid.dataItem(kGrid.select());
 			if (row != null) {
+			$("body").tyWindow({"content":"确定要删除?","center":true,"ok":true,"no":true,"okCallback":function(){ 
 				$.ajax({
-					url : "vehicleGroupTest/deleteVehicleGroup.do",
+					url : "<%=basePath%>vehicleGroupWeb/deleteVehicleGroup.do",
 					type : "POST",
 					dataType : "json",
 					data : {
@@ -118,22 +161,24 @@ var VehicleGroupManage = {
 					},
 					async : false,
 					success : function(req) {
-						if (req.isSuccess) {
-							alert('提示, 删除成功!');
-							VehicleGroupManage.bindDtGroup("vehicleGroupTest/list.do");
-							VehicleGroupManage.getMemberBygroupId(m_vehiclegroup_Id);
-							//$('#dtVehicleGroup').datagrid('reload');
+						if (req.code == 200) { 
+							$("body").popjs({"title":"提示","content":"删除成功"}); 
+							VehicleGroupManage.onCloseGorup()
+							$("#dtGroupMember").empty();
 						} else {
-							alert("提示, " + req.msg + ", warning");
+							$("body").popjs({"title":"提示","content":"删除分组数据失败"}); 
 						}
 					}
 				});
+				}});
+			} else {
+				$("body").popjs({"title":"提示","content":"请选择要操作的数据"}); 
 			}
 	},
 	loadMemberData:function(groupId){
 		$.ajax({
 				type : "post",
-				url : "vehicleGroupTest/loadMemberByGroupId.do?groupId="
+				url : "<%=basePath%>vehicleGroupWeb/loadMemberByGroupId.do?groupId="
 						+ groupId,
 				dataType : "json",
 				success : function(req) {
@@ -169,81 +214,95 @@ var VehicleGroupManage = {
 			});
 	} ,
 	addMember:function(){
-		var organId = $("#organId").val();
+			var organId = $("#organId").val();
+		var kGrid = $("#dtVehicleGroup").data("kendoGrid");
+			var row = kGrid.dataItem(kGrid.select());
+			if (row != null) {
+			var groupId = row.id;
 		$("#dialog").kendoWindow({
 			width : "680px",
 			height : "500px",
-			title : "车辆信息",
+			title : "分组成员信息",
 			position : {
 				top : "100px"
 			},
-		content: "<%=basePath%>VehicleGroupWeb/gotoVehiclegroupAdd.do?gpsId="
-							+ gpsId + "&organId=" + organId+"&sessionId="+sessionId,
+		content: "<%=basePath%>dutyGroupRouteWeb/gotoVehicleGroupAddMember.do?groupId="
+							+ groupId + "&organId=" + organId+"&sessionId="+sessionId,
 					iframe : true,
-					closeCallback :VehiclegroupManage.onClose,
-					okCallback:VehiclegroupManage.onClose
-				});
+					closeCallback :VehicleGroupManage.onCloseMember,
+					okCallback:VehicleGroupManage.onCloseMember
+				});} else {
+				$("body").popjs({"title":"提示","content":"请选择要操作的分组对象"}); 
+			}
 	},
 	deleteMember:function(){
 		var kGrid = $("#dtGroupMember").data("kendoGrid");
-			var row = kGrid.dataItem(kGrid.select());
-			if (row != null) {
-				$.ajax({
-					url : "vehicleGroupTest/delMemberById.do",
-					type : "POST",
-					dataType : "json",
-					data : {
-						'memberId' : row.id
-					},
-					async : false,
-					success : function(req) {
-						if (req.isSuccess) {
-							alert("删除成功！");
-							VehicleGroupManage.getMemberBygroupId(m_vehiclegroup_Id);
-							//$('#dtGroupMember').datagrid('reload');
-						}
-					}
-				});
-			} else {
-				alert('提示, 请先选择车辆!!');
-			}
+		var row = kGrid.dataItem(kGrid.select());
+		var kgroupGrid = $("#dtVehicleGroup").data("kendoGrid");
+		var grouprow = kgroupGrid.dataItem(kgroupGrid.select());
+		var groupId = grouprow.id;
+		if (row != null) {
+		$("body").tyWindow({"content":"确定要删除该成员?","center":true,"ok":true,"no":true,"okCallback":function(){ 
+			$.ajax({
+				url : "<%=basePath%>vehicleGroupWeb/delMemberById.do?sessionId="+sessionId,
+				type : "POST",
+				dataType : "json",
+				data : {
+					'memberId' : row.id
+				},
+				async : false,
+				success : function(req) {
+					if (req.code == 200) { 
+									$("body").popjs({"title":"提示","content":"删除成功"});    
+									VehiclegroupManage.loadMemberData(groupId);
+								} else {
+									$("body").popjs({"title":"提示","content":"清空分组成员列表失败"}); 
+								}
+				}
+			});
+			}});
+		} else {
+			$("body").popjs({"title":"提示","content":"请选择要操作的数据"}); 
+		}
 	},
 	clearUpMember:function(){
-	var kGrid = $("#dtVehicleGroup").data("kendoGrid");
+		var kGrid = $("#dtVehicleGroup").data("kendoGrid");
 			var row = kGrid.dataItem(kGrid.select());
-
 			if (row != null) {
-				$.ajax({
-					url : "vehicleGroupTest/cleanMemberByGroupId.do",
-					type : "POST",
-					dataType : "json",
-					data : {
-						"vehicleGroupId" : row.id
-					},
-					async : false,
-					success : function(req) {
-						if (req.isSuccess) {
-							alert("清空完成！");
-							VehicleGroupManage.getMemberBygroupId(m_vehiclegroup_Id);
-							//$('#dtGroupMember').datagrid('reload');
-						}
-					}
-				});
+			var groupId = row.id;
+			$("body").tyWindow({"content":"确定要清空当前分组成员列表?","center":true,"ok":true,"no":true,"okCallback":function(){ 
+						$.ajax({
+							url : "<%=basePath%>vehicleGroupWeb/cleanMemberByGroupId.do?sessionId="+sessionId,
+							type : "POST",
+							dataType : "json",
+							data : {
+								"vehicleGroupId" : row.id
+							},
+							async : false,
+							success : function(req) {
+								if (req.code == 200) { 
+									$("body").popjs({"title":"提示","content":"清除成功"});   
+									$("#dtGroupMember").empty();
+									VehiclegroupManage.loadMemberData(groupId);
+								} else {
+									$("body").popjs({"title":"提示","content":"清空分组成员列表失败"}); 
+								}
+							}
+						});}});
 			} else {
-				alert('提示, 请先选择车辆组!!');
+				$("body").popjs({"title":"提示","content":"请选择要操作的分组"}); 
 			}
 	},
-	
 	onCloseMember:function(e){
-		VehiclegroupManage.loadMemberData(VehiclegroupManage.pageNo);  
+		VehicleGroupManage.loadMemberData(VehicleGroupManage.pageNo);  
 	},
 	onCloseGorup:function(e){
-		VehiclegroupManage.loadGroupData(VehiclegroupManage.pageNo);  
+		VehicleGroupManage.loadGroupData(VehicleGroupManage.pageNo);  
 	}
 };
 
 </script>
-<div id="dtVehicleGroup" style="width:70%"></div>   
-<div id="dtGroupMember" style="width:60%"></div> 
+<div id="dtVehicleGroup" style="width:330px;float:left"></div>   
+<div id="dtGroupMember" style="width:300px;float:left"></div> 
 <div id="dialog"></div> 
 

@@ -80,7 +80,7 @@ public class WeaponGroupServiceImpl implements WeaponGroupService  {
 		 * 保存武器分组组织机构对应关系
 		 */
 		for(Object oid : orgIds){
-			Integer id=(Integer)oid;
+			Integer id=Integer.parseInt(oid.toString());
 			
 			WeaponGroupOrg pgo=new WeaponGroupOrg();
 			pgo.setOrgId(id.intValue());

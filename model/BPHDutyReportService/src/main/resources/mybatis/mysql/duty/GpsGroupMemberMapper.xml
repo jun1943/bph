@@ -129,7 +129,7 @@
     from t_duty_gps_group_member as m
     left join t_gps as p on m.gps_id=p.id
     left join t_gpstype t on t.id = p.type_id
-    left join t_organ as org on p.org_id=org.id
+    left join t_organ as org on p.org_id=org.organ_id
     where group_id = #{groupId,jdbcType=INTEGER}
     order by m.id
   		<if test="pageStart != null">

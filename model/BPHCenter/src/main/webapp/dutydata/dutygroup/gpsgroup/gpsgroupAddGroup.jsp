@@ -1,79 +1,46 @@
-<%@ page language="java" pageEncoding="utf-8"%>
-<%@ include file="/view/lib.jsp"%>
+<%@ page language="java" import="java.util.*" pageEncoding="utf-8"%>
 
-
+<%
+	String path = request.getContextPath();
+	String basePath = request.getScheme() + "://"
+			+ request.getServerName() + ":" + request.getServerPort()
+			+ path + "/";
+%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
 <base href="<%=basePath%>">
-<!--  
-<link href='//cdn.datatables.net/plug-ins/a5734b29083/integration/jqueryui/dataTables.jqueryui.css' type='text/css' />
--->	<link rel="stylesheet" type="text/css" href="asset/css/images/dateStyle.css"/>
-<%-- <script src='<%=basePath%>script/duty/gpsgroup.js'
-	type='text/javascript'></script> --%>
-<link href="kendoUI/examples-offline.css" rel="stylesheet">
-<link href="kendoUI/kendo.common.min.css" rel="stylesheet">
-<link href="kendoUI/kendo.rtl.min.css" rel="stylesheet">
-<link href="kendoUI/kendo.default.min.css" rel="stylesheet">
-<link href="kendoUI/kendo.dataviz.min.css" rel="stylesheet">
-<link href="kendoUI/kendo.dataviz.default.min.css" rel="stylesheet">
-<link href="kendoUI/kendo.mobile.all.min.css" rel="stylesheet">
-<script src="kendoUI/jquery.min.js"></script>
-<script src="kendoUI/angular.min.js"></script>
-<script src="kendoUI/kendo.all.min.js"></script>
-<script src="kendoUI/console.js"></script>
 
-<title>定位设备分组</title>
-
+<title>扁平化客户端</title>
+<%@ include file="../../../emulateIE.jsp" %>
 <script type="text/javascript">
 
+var sessionId = $("#token").val(); 
+var bph_Exist_OrgName; 
+var m_checkedNodes_id ="" ;
+var m_gpsGroup_Org = {
+	id:$("#organId").val(),
+	orgCode: "",
+	orgPath :$("#organPath").val(),
+	groupId : 0,
+	sourceType:"Gps"
+};
 $(function() {
-	var pg = {};
-		pg.shareOrgs = [];
-		pg.id = 0;
-		pg.shareType = 0;
-		var po = {};
-		po.orgId = m_gpsGroup_Org.id;
-		pg.shareOrgs.push(po);
-		$("#txtGpsGroupId").val(pg.id);
-		$("#txtGpsGroupName").val(pg.name);
-
-		if (pg.shareType == 0) {
-			$("#radioShare1").prop("checked", true);
-
-			$("#divOrg").css("visibility", "hidden");
-		} else {
-			$("#radioShare2").prop("checked", true);
-			$("#divOrg").css("visibility", "visible");
-			//GpsGroupManage.loadOrgs();
-		}
-//		cleanShareOrgs();
-		var count = pg.shareOrgs.length;
-		/* for ( var i = 0; i < count; i++) {
-			var pgo = pg.shareOrgs[i];
-			var node = $("#treeOrg").tree('find', pgo.orgId);
-			$('#treeOrg').tree('check', node.target);
-		} */
-		//显示创建共享单位树信息
+	//获取树的所有信息
 		$.ajax({
-			url : "orgTest/treelist.do",
+			url : "<%=basePath%>organWeb/treelist.do?sessionId="+sessionId,
 			type : "POST",
 			dataType : "json",
-			data : {
-				orgId : m_gpsGroup_Org.id,
-				orgCode : m_gpsGroup_Org.code,
-				orgPath : m_gpsGroup_Org.path
-			},
+			data : m_gpsGroup_Org,
 			// async : false,
 			success : function(req) {
-				if (req.code==200) {
-
+				if (req.code==200) { 
 					var json_data = JSON.stringify(req.data);
 					
 					$("#treeOrg").kendoTreeView({ 
 					    checkboxes: true,
 					    dataTextField: "shortName",
-					    check: GpsGroupManage.onCheck,//check复选框
+					    check : GpsGroupManage.onCheck,//check复选框
 					    dataSource: [eval('(' + json_data + ')')]
 					}).data("kendoTreeView");
 				} else {
@@ -81,10 +48,11 @@ $(function() {
 				}
 			}
 		});
+		$("#radio_unshared").attr("checked","checked");
+		$("#divOrg").css("visibility", "hidden");
 });
 
-var GpsGroupManage ={
-	
+var GpsGroupManage ={ 
 	//判断是否共享事件
 	changeShareType:function() {
 		var val = $('input:radio[name="shareType"]:checked').val();
@@ -134,57 +102,42 @@ var GpsGroupManage ={
 		}
 		// pg.name = $('#txtGpsGroupName').val();
 		var groupName = $.trim($("#txtGpsGroupName").val());
+				if (groupName == "" && groupName == undefined) { 
+					$("body").popjs({"title":"提示","content":"请填写分组名称","callback":function(){
+								$("#txtGpsGroupName").focus();
+								return;
+							}});     
+					return;
+				}
 
-		if (groupName == "" && groupName == undefined) {
-			alert("操作提示, 请填写分组名称", "error");
-			$("#txtGpsGroupName").focus();
-			return;
-		}
-
-		if(groupName.length>20){
-			alert("错误提示, 分组名称长度过长，限制长度1-20！", "error");
-			$("#txtGpsGroupName").focus();
-			return;
-		}
-		var myReg = /^[^|"'<>]*$/;
-		if(!myReg.test(groupName)){
-			alert("错误提示, 分组名称含有非法字符！", "error");
-			$("#txtGpsGroupName").focus();
-			return;
-		}
-		if (opteType == "add") {
-			GpsGroupManage.isExistGroup(groupName, m_gpsGroup_Org.id);
-			if (!isExist) {
-				alert("错误提示, 该分组名称已存在，请重新填写分组名称", "error");
-				$("#txtGpsGroupName").focus();
-				return;
-			}
-		}
+				if (groupName.length > 20) {
+					$("body").popjs({"title":"提示","content":"分组名称长度过长","callback":function(){
+								$("#txtGpsGroupName").focus();
+								return;
+							}});      
+						return;  
+				}   
 		
 		pg.name = groupName;
 
 		pg.shareType = $('input:radio[name="shareType"]:checked').val();
-		var s = m_checkedNodes_id;
-		 
-		 if(m_checkedNodes_id.length>0){
-		 	pg.shareOrgIds = m_checkedNodes_id.split(",");
-		 }
-		/**
-		 * 强制选择根节点！
-		 */
-		/* var node = $('#treeOrg').tree('find', m_gpsGroup_Org.id);
-		$('#treeOrg').tree('check', node.target);
+		
+				pg.shareType = $('input:radio[name="shareType"]:checked').val();
+				if(pg.shareType==""||pg.shareType ==undefined){
+					$("body").popjs({"title":"提示","content":"请选择共享类型"});
+					return;
+				}
+				var s = m_checkedNodes_id;
+				if(pg.shareType ==0||pg.shareType=="0"){
+					pg.shareOrgIds = [];
+				}else{
+					if (m_checkedNodes_id.length > 0) {
+						pg.shareOrgIds = m_checkedNodes_id.split(",");
+					} 
+				}
 
-		var nodes = $('#treeOrg').tree('getChecked');
-		var count = nodes.length;
-
-		for ( var i = 0; i < count; i++) {
-			var n = nodes[i];
-			pg.shareOrgIds.push(n.id);
-		} */
-
-		$.ajax({
-			url : "gpsGroupTest/saveGpsGroup.do",
+		$.ajax({ 
+			url : "<%=basePath%>gpsGroupWeb/saveGpsGroup.do?sessionId="+sessionId,
 			type : "POST",
 			dataType : "json",
 			data : {
@@ -192,39 +145,53 @@ var GpsGroupManage ={
 			},
 			async : false,
 			success : function(req) {
-				if (req.isSuccess) {
-//					$('#dtGpsGroup').datagrid('reload');
-					$("#txtGpsGroupId").val(req.id);// 回写保存后的id
-//					$('#winPG').window('close');
-					GpsGroupManage.bindDtGroup("gpsGroupTest/list.do");
-					$("#winPG").data("kendoWindow").close();
-					alert("提示, 保存成功!");
-				} else {
-					alert("提示, "+req.msg+", warning");
-				}
+				if (req.code == 200) { 
+							 $("body").popjs({"title":"提示","content":"分组信息保存成功","callback":function(){ 
+								window.parent.window.parent.GpsGroupManage.onCloseGorup();
+								window.parent.$("#dialog").tyWindow.onCloseGorup();
+							}}); 
+						} else {
+							$("body").popjs({"title":"提示","content":"分组信息保存失败"});
+						}
 			}
 		});
 	},
 	
-	//创建时，判断GPS组名是否存在
-	isExistGroup:function(name, orgId) {
-		isExist = false;
-		$.ajax({
-			url : "gpsGroup/isExistGroup.do",
-			type : "POST",
-			dataType : "json",
-			async : false,
-			data : {
-				"name" : name,
-				"orgId" : orgId
-			},
-			success : function(req) {
-				if (req.isSuccess && req.Message == "UnExits") {
-					isExist = true;
+			isExistGroup : function() {
+				isExist = false;
+				var name =  $.trim($("#txtGpsGroupName").val());
+				var myReg = /^[^|"'<>]*$/;
+				if (!myReg.test(name)) {
+					$("body").popjs({"title":"提示","content":"分组名称包含特殊字符，请重新输入"}); 
+					$("#txtGpsGroupName").focus();
+					return;
+				}  
+				if(name.length>0){
+					$.ajax({
+						url : "<%=basePath%>gpsGroupWeb/isExistGroup.do?sessionId="+sessionId,
+						type : "POST",
+						dataType : "json",
+						async : false,
+						data : {
+							"name" : name,
+							"orgId" : $("#organId").val(),
+							"groupId" :0,
+							"optType":0
+						},
+						success : function(req) {
+							if (req.code!=200) {  
+									bph_Exist_OrgName = req.description;
+									$("body").popjs({"title":"提示","content":"该分组名称当前机构下已存在，请确认后添加","callback":function(){
+									$("#txtGpsGroupName").focus(); 
+									return;
+							}});    
+							return;
+							
+							}
+						}
+					});
 				}
 			}
-		});
-	},
 	
 };
 
@@ -233,36 +200,34 @@ var GpsGroupManage ={
 </head>  
   <body>
 		<!-- <div id="vertical" style="overflow-x:hidden;"> -->
-		<div id="winPG" style="width:330px;height:320px;" title="组成员选择">
-			<div class="pane-content">
+		<div id="winPG" style="width:560px;height:320px;" title="定位设备分组管理">
+			<div style="float:left;width:250px;margin-top:10px;">
 				<!-- 左开始 -->
 				<div class="demo-section k-header"> 
 					<input type="hidden" id="txtGpsGroupId"></input>
 					<ul>
 						<li class="ty-input"><label class="ty-input-label" for="txtGpsGroupName">组名称:</label><input
-							type="text" class="k-textbox" name="txtGpsGroupName"
+							type="text" class="k-textbox" name="txtGpsGroupName"  onblur="GpsGroupManage.isExistGroup();"
 							id="txtGpsGroupName" /></li>
-						<li class="ty-input"><label class="ty-input-label" for="shareType">共享类型:</label>
-							<label><input type="radio" class="k-textbox" name="shareType" value="0"
-							onclick="GpsGroupManage.changeShareType()" id="radioShare1" />不共享</label>
-							<label><input type="radio" class="k-textbox" name="shareType" value="1"
-							onclick="GpsGroupManage.changeShareType()" id="radioShare2" />共享到下级</label>
-							</li>
-						<li class="ty-input">
-							<div class="groupwindowdiv">
-								<div id="divOrg">
-									<ul id="treeOrg" style="overflow:auto"></ul>
-								</div>
-							</div>
-						</li>
+						<li class="ty-input"><label>共享类型:</label>
+							<label><input id="radio_unshared" type="radio" name="shareType" value="0"
+							onclick="GpsGroupManage.changeShareType()" />不共享</label>
+							<label><input id="radio_shared"  type="radio" name="shareType" value="1"
+							onclick="GpsGroupManage.changeShareType()" />共享到下级</label>
+							</li>  
 						
 					</ul>
 					<p style="float:left;width:100%;margin-top:10px;">
 						<span class="k-button"  onclick="GpsGroupManage.saveGpsGroup()">保存</span>
 					</p>
 				</div>
-			</div>
-		<!-- </div> -->
+			</div> 
+			
+							<div  style="width:300px; float:left">
+								<div id="divOrg" style="height:450px; overflow:auto" >
+									<ul id="treeOrg" style="overflow:auto"></ul>
+								</div>
+							</div>
 	</div>
   </body>
 </html>

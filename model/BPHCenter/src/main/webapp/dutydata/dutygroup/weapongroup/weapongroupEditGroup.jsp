@@ -6,31 +6,33 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
-  <head>
-    <base href="<%=basePath%>">
-    
-    <title>My JSP 'gpsgroupEditGroup.jsp' starting page</title>
-    
-	<meta http-equiv="pragma" content="no-cache">
-	<meta http-equiv="cache-control" content="no-cache">
-	<meta http-equiv="expires" content="0">    
-	<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
-	<meta http-equiv="description" content="This is my page">
-	<!--
-	<link rel="stylesheet" type="text/css" href="styles.css">
-	-->
+<head>
+<base href="<%=basePath%>">
+
+<title>扁平化客户端</title>
+<%@ include file="../../../emulateIE.jsp" %>
+
+
 <script type="text/javascript">
-	var opteType = "";
+var sessionId = $("#token").val(); 
+var m_group_Id = 0;
+var bph_Exist_OrgName; 
+var m_checkedNodes_id ="";
+var m_weaponGroup_Org = {
+	id : $("#organId").val(),
+	orgCode : "",
+	orgPath : $("#organPath").val(),
+	groupId : m_group_Id,
+	sourceType:"Weapon"
+}; 
 	$(function() {
+		m_group_Id =  $("#txtWeaponGroupId").val();
+		m_weaponGroup_Org.groupId = m_group_Id;
 	$.ajax({
-			url : "orgTest/treelist.do",
+			url : "<%=basePath%>organWeb/treelist.do?sessionId="+sessionId,
 			type : "POST",
 			dataType : "json",
-			data : {
-				orgId : m_weaponGroup_Org.id,
-				orgCode : m_weaponGroup_Org.code,
-				orgPath : m_weaponGroup_Org.path
-			},
+			data : m_weaponGroup_Org,
 			// async : false,
 			success : function(req) {
 				if (req.code==200) {
@@ -48,25 +50,13 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 				}
 			}
 		});
-		
-		opteType = optType;
-//		var row = $("#dtWeaponGroup").datagrid("getSelected");
-		var kGrid = $("#dtWeaponGroup").data("kendoGrid");
-		var row = kGrid.dataItem(kGrid.select());
-		if (row !== null) {
-			var id = row.id;
-			$.ajax({
-				url : "weaponGroup/loadWeaponGroup.do",
-				type : "POST",
-				dataType : "json",
-				data : {
-					'weaponGroupId' : id
-				},
-				// async : false,
-				success : function(req) {
-					WeaponGroupManage.displayWeaponGroup(req);
-				}
-			});
+		 var isshared = $("#txtIsShared").val();
+		if(isshared==0||isshared=="0"){
+			$("#radio_unshared").attr("checked","checked");
+				$("#divOrg").css("visibility", "hidden");
+		}else{
+			$("#radio_shared").attr("checked","checked");
+				$("#divOrg").css("visibility", "visible");
 		}
 });
 var WeaponGroupManage ={
@@ -117,55 +107,44 @@ var WeaponGroupManage ={
 			pg.id=0;
 		}
 		var groupName = $.trim($("#txtWeaponGroupName").val());
-		if (groupName == "" && groupName == undefined) {
-			alert("操作提示, 请填写分组名称", "error");
-			$("#txtWeaponGroupName").focus();
-			return;
-		}
-
-		if(groupName.length>20){
-			alert("错误提示, 分组名称长度过长，限制长度1-20！", "error");
-			$("#txtWeaponGroupName").focus();
-			return;
-		}
-		
-		var myReg = /^[^|"'<>]*$/;
-		if(!myReg.test(groupName)){
-			alert("错误提示, 分组名称含有非法字符！", "error");
-			$("#txtWeaponGroupName").focus();
-			return;
-		}
-		if (opteType == "add") {
-			WeaponGroupManage.isExistGroup(groupName, m_weaponGroup_Org.id);
-			if (!isExist) {
-				alert("错误提示, 该分组名称已存在，请重新填写分组名称", "error");
-				$("#txtWeaponGroupName").focus();
-				return;
+			if (groupName == "" && groupName == undefined) {
+					$("body").popjs({"title":"提示","content":"请填写分组名称","callback":function(){
+								$("#txtWeaponGroupName").focus();
+								return;
+							}});     
+					return;
 			}
-		}
+
+				if (groupName.length > 20) {
+					$("body").popjs({"title":"提示","content":"分组名称长度过长","callback":function(){
+								$("#txtWeaponGroupName").focus();
+								return;
+							}});      
+						return;  
+				} 
+ 
 		pg.name = groupName;
 		pg.shareType = $('input:radio[name="shareType"]:checked').val();
-		var s = m_checkedNodes_id;
-		 
-		 if(m_checkedNodes_id.length>0){
-		 	pg.shareOrgIds = m_checkedNodes_id.split(",");
-		 }
-		/**
-		 * 强制选择根节点！
-		 */
-		/* var node = $('#treeOrg').tree('find', m_weaponGroup_Org.id);
-		$('#treeOrg').tree('check', node.target);
-
-		var nodes = $('#treeOrg').tree('getChecked');
-		var count = nodes.length;
-
-		for ( var i = 0; i < count; i++) {
-			var n = nodes[i];
-			pg.shareOrgIds.push(n.id);
-		} */
-
+		
+			if(pg.shareType ==0||pg.shareType=="0"){
+				pg.shareOrgIds = [];
+			}else{
+ 				var selectIds ="";
+ 				var  selectNode = $("#treeOrg").data("kendoTreeView");
+ 				var checkedNodes = [];
+ 				WeaponGroupManage.checkedNodeIds(selectNode.dataSource.view(),
+						checkedNodes);
+				if (checkedNodes.length > 0) {
+					selectIds = checkedNodes.join(","); 
+				} else {
+					selectIds = "";
+				}		
+				if (selectIds.length > 0) {
+					pg.shareOrgIds = selectIds.split(",");
+				}		
+			}
 		$.ajax({
-			url : "weaponGroupTest/saveWeaponGroup.do",
+			url : "<%=basePath%>weaponGroupWeb/saveWeaponGroup.do?sessionId="+sessionId, 
 			type : "POST",
 			dataType : "json",
 			data : {
@@ -173,97 +152,86 @@ var WeaponGroupManage ={
 			},
 			async : false,
 			success : function(req) {
-				if (req.isSuccess) {
-					/* $('#dtWeaponGroup').datagrid('reload');
-					$('#txtWeaponGroupId').val(req.id);// 回写保存后的id
-					$('#winPG').window('close'); */
-					WeaponGroupManage.bindDtGroup("weaponGroupTest/list.do");
-					alert("提示, 保存成功!");
-					$("#winPG").data("kendoWindow").close();
-				} else {
-					alert("提示, "+req.msg+", warning");
-				}
+				if (req.code == 200) { 
+							 $("body").popjs({"title":"提示","content":"分组信息保存成功","callback":function(){ 
+								window.parent.window.parent.WeaponGroupManage.onCloseGorup();
+								window.parent.$("#dialog").tyWindow.onCloseGorup();
+							}}); 
+						} else {
+							$("body").popjs({"title":"提示","content":"分组信息保存失败"});
+						}
 			}
 		});
 	},
-	//查询武器组名，用于判断创建时组名是否存在
-	isExistGroup:function(name, orgId) {
-		isExist = false;
-		$.ajax({
-			url : "weaponGroupTest/isExistGroup.do",
-			type : "POST",
-			dataType : "json",
-			async : false,
-			data : {
-				"name" : name,
-				"orgId" : orgId
-			},
-			success : function(req) {
-				if (req.isSuccess && req.Message == "UnExits") {
-					isExist = true;
+			isExistGroup : function() {
+				isExist = false;
+				var name =  $.trim($("#txtWeaponGroupName").val());
+				var myReg = /^[^|"'<>]*$/;
+				if (!myReg.test(name)) {
+					$("body").popjs({"title":"提示","content":"分组名称包含特殊字符，请重新输入"}); 
+					$("#txtWeaponGroupName").focus();
+					return;
+				}  
+				if(name.length>0){
+					$.ajax({
+						url : "<%=basePath%>weaponGroupWeb/isExistGroup.do?sessionId="+sessionId,
+						type : "POST",
+						dataType : "json",
+						async : false,
+						data : {
+							"name" : name,
+							"orgId" : $("#organId").val(),
+							"groupId" :$("#txtWeaponGroupId").val(),
+							"optType":1
+						},
+						success : function(req) {
+							if (req.code!=200) {  
+									bph_Exist_OrgName = req.description;
+									$("body").popjs({"title":"提示","content":"该分组名称当前机构下已存在，请确认后添加","callback":function(){
+									$("#txtWeaponGroupName").focus(); 
+									return;
+							}});    
+							return;
+							
+							}
+						}
+					});
 				}
 			}
-		});
-	},
-	//显示武器组信息
-	displayWeaponGroup:function(pg) {
-		$("#txtWeaponGroupId").val(pg.id);
-		
-		$("#txtWeaponGroupName").val(pg.name);
-
-		if (pg.shareType == 0) {
-			$("#radioShare1").prop("checked", true);
-
-			$("#divOrg").css("visibility", "hidden");
-		} else {
-			$("#radioShare2").prop("checked", true);
-			$("#divOrg").css("visibility", "visible");
-		}
-//		cleanShareOrgs();
-		var count = pg.shareOrgs.length;
-		/* for ( var i = 0; i < count; i++) {
-			var pgo = pg.shareOrgs[i];
-			var node = $('#treeOrg').tree('find', pgo.orgId);
-			$('#treeOrg').tree('check', node.target);
-		} */
-	},
-};
+	};
 </script>
 
   </head>
   
   <body>
 		<!-- <div id="vertical" style="overflow-x:hidden;"> -->
-		<div id="winPG" title="武器分组管理" style="width:330px;height:320px;">
-			<div class="pane-content">
+	<div id="winPG" style="width:560px;height:320px;" title="武器分组管理">
+			<div style="float:left;width:250px;margin-top:10px;">
 				<!-- 左开始 -->
 				<div class="demo-section k-header"> 
-					<input type="hidden" id="txtWeaponGroupId"></input>
+					<input type="hidden" id="txtWeaponGroupId" value="${weapongroup.id}"></input>
+					<input type="hidden" id="txtIsShared" value="${weapongroup.shareType}"></input>
 					<ul>
 						<li class="ty-input"><label class="ty-input-label" for="txtWeaponGroupName">组名称:</label><input
-							type="text" class="k-textbox" name="txtWeaponGroupName"
+							type="text" class="k-textbox" name="txtWeaponGroupName"   value="${weapongroup.name}"  onblur="WeaponGroupManage.isExistGroup();"
 							id="txtWeaponGroupName" /></li>
-						<li class="ty-input"><label class="ty-input-label" for="shareType">共享类型:</label>
-							<label><input type="radio" class="k-textbox" name="shareType" value="0"
-							onclick="WeaponGroupManage.changeShareType()" id="radioShare1" />不共享</label>
-							<label><input type="radio" class="k-textbox" name="shareType" value="1"
-							onclick="WeaponGroupManage.changeShareType()" id="radioShare2" />共享到下级</label>
-							</li>
-						<li class="ty-input">
-							<div class="groupwindowdiv">
-								<div id="divOrg">
-									<ul id="treeOrg" style="overflow:auto"></ul>
-								</div>
-							</div>
-						</li>
-						
+						<li class="ty-input"><label>共享类型:</label>
+							<label><input id="radio_unshared"  type="radio" name="shareType" value="0"
+							onclick="WeaponGroupManage.changeShareType()" />不共享</label>
+							<label><input id="radio_shared"  type="radio" name="shareType" value="1"
+							onclick="WeaponGroupManage.changeShareType()" />共享到下级</label>
+							</li> 
 					</ul>
-					<p style="float:left;width:100%;margin-top:10px;">
+					<p style="float:left;width:250px;margin-top:10px;">
 						<span class="k-button"  onclick="WeaponGroupManage.saveWeaponGroup()">保存</span>
 					</p>
 				</div>
 			</div>
-		<!-- </div> -->
+							<div style="width:300px; float:left">
+								<div id="divOrg" style="height:450px; overflow:auto" >
+									<ul id="treeOrg" style="overflow:auto"></ul>
+								</div>
+							</div> 
 	</div>
   </body>
 </html>

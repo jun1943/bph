@@ -126,6 +126,9 @@
     
          <select id="findByNameAndOrg" resultType="com.tianyi.bph.domain.duty.WeaponGroup" parameterType="java.util.Map">  
        		select * from t_duty_weapon_group where name = #{name} and org_id = #{orgId}
+       		<if test="optType >0 ">
+       			and id != #{groupId,jdbcType=INTEGER}
+       		</if>
     	 </select> 
   
   

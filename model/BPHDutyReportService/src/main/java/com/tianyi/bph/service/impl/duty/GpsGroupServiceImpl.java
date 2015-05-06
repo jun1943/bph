@@ -73,7 +73,7 @@ public class GpsGroupServiceImpl implements GpsGroupService {
 		}
 
 		for(Object oid : orgIds){
-			Integer id=(Integer)oid;
+			Integer id=Integer.parseInt(oid.toString());
 			
 			GpsGroupOrg pgo=new GpsGroupOrg();
 			pgo.setOrgId(id.intValue());

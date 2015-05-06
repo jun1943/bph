@@ -16,6 +16,9 @@
   
 </head>  
   <body>
+  
+<script src="<%=basePath %>JS/extend/moment.min.js" type='text/javascript'></script>
+<script src="<%=basePath %>JS/extend/fullcalendar.min.js" type='text/javascript'></script>	
     <div id="wrapper">
 		<div id='main-nav-bg'></div>
 		<nav class="" id="main-nav">

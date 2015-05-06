@@ -110,22 +110,23 @@
     	from t_duty_police_group_member as m
     	where m.group_id = #{groupId,jdbcType=INTEGER}
   </select>
-  
+   
   
   <select id="loadMemberByGroupId" parameterType="java.util.Map" resultMap="MemeberResultMap">
     select 
     	m.id as id,
-    	m.group_id,
-    	m.police_id,
+    	m.group_id as group_id,
+    	m.police_id as police_id,
     	org.name as org_name,
     	org.short_name as org_short_name,
     	p.name as p_name,
     	p.number as p_number,
     	p.title as p_title
     from t_duty_police_group_member as m
-    left join t_police as p on m.police_id=p.id
-    left join t_organ as org on p.org_id=org.id
-    where p.isUsed =1 and  group_id = #{groupId,jdbcType=INTEGER}
+	left join t_duty_police_group dpg on dpg.id = m.group_id
+    left join t_police as p on m.police_id=p.id and  p.isUsed =1
+    left join t_organ as org on dpg.org_id=org.organ_id
+    where group_id = #{groupId,jdbcType=INTEGER}
     order by m.id
   		<if test="pageStart != null">
 	    	limit #{pageStart,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}

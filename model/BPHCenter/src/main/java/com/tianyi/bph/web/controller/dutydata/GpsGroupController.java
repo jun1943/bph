@@ -21,7 +21,8 @@ import com.tianyi.bph.common.MessageCode;
 import com.tianyi.bph.common.ReturnResult;
 import com.tianyi.bph.domain.duty.GpsGroup;
 import com.tianyi.bph.domain.duty.GpsGroupMember;
-import com.tianyi.bph.domain.duty.GpsGroupOrg;
+import com.tianyi.bph.domain.duty.GpsGroupOrg; 
+import com.tianyi.bph.domain.duty.PoliceGroupMember;
 import com.tianyi.bph.query.duty.GpsGroupMemberVM;
 import com.tianyi.bph.query.duty.GpsGroupVM;
 import com.tianyi.bph.service.duty.GpsGroupService;
@@ -51,21 +52,15 @@ public class GpsGroupController {
 	@RequestMapping(value = "list.do")
 	public @ResponseBody
 	ReturnResult List(
-			@RequestParam(value = "gpsGroup_Query", required = false) String query,
-			@RequestParam(value = "page", required = false) Integer page,
-			@RequestParam(value = "rows", required = false) Integer rows,
+			@RequestParam(value = "gpsGroup_Query", required = false) String query, 
 			HttpServletRequest request) {
 		try {
 			JSONObject joQuery = JSONObject.fromObject(query);
 
-			int orgId = joQuery.getInt("orgId");
-			String orgCode = joQuery.getString("orgCode");
-
-			Map<String, Object> map = new HashMap<String, Object>();
-			page = page == 0 ? 1 : page;
-			map.put("pageStart", (page - 1) * rows);
-			map.put("pageSize", rows);
-			map.put("orgCode", orgCode);
+			int orgId = joQuery.getInt("orgId"); 
+			Map<String, Object> map = new HashMap<String, Object>(); 
+			map.put("pageStart", 0);
+			map.put("pageSize", 10); 
 			map.put("orgId", orgId);
 
 			map.put("inSubOrg", 0);
@@ -145,31 +140,31 @@ public class GpsGroupController {
 	 */
 	@RequestMapping(value = "appendMember.do")
 	public @ResponseBody
-	String appendMember(
+	ReturnResult appendMember(
 			@RequestParam(value = "members", required = false) String members,
 			HttpServletRequest request) {
-		try{
-			JSONArray jaMembers = JSONArray.fromObject(members);
-	
-			List<?> list2 = JSONArray.toList(jaMembers, new GpsGroupMember(),
-					new JsonConfig());// 参数1为要转换的JSONArray数据，参数2为要转换的目标数据，即List盛装的数据
-	
+		
+		try {
+			JSONArray jaMembers = JSONArray.fromObject(members); 
+			List<?> list2 = JSONArray.toList(jaMembers,
+					new GpsGroupMember(), new JsonConfig());// 参数1为要转换的JSONArray数据，参数2为要转换的目标数据，即List盛装的数据
+
 			List<GpsGroupMember> ls = new ArrayList<GpsGroupMember>();
-	
+
 			for (Object o : list2) {
 				GpsGroupMember pgm = (GpsGroupMember) o;
 				ls.add(pgm);
 			}
-	
 			gpsGroupService.appendMemeber(ls);
-	
-			JSONObject rs = new JSONObject();
-			rs.accumulate("isSuccess", true);
-	
-			return rs.toString();
-		}catch(Exception ex){
-			return "";
+			return ReturnResult.MESSAGE(MessageCode.STATUS_SUCESS, "删除成功", 0,
+					null);
+
+		} catch (Exception ex) {
+			return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL, "查询数据出错", 0,
+					null);
 		}
+		
+		 
 	}
 
 	/**
@@ -180,29 +175,29 @@ public class GpsGroupController {
 	 */
 	@RequestMapping(value = "saveGpsGroup.do")
 	public @ResponseBody
-	String saveGpsGroup(
+	ReturnResult saveGpsGroup(
 			@RequestParam(value = "gpsGroup", required = false) String gpsGroup,
 			HttpServletRequest request) {
 
-		JSONObject joPG = JSONObject.fromObject(gpsGroup);
+		try {
+			JSONObject joPG = JSONObject.fromObject(gpsGroup);
 
-		GpsGroup pg = new GpsGroup();
-		pg.setId(joPG.getInt("id"));
-		pg.setName(joPG.getString("name"));
-		pg.setShareType(joPG.getInt("shareType"));
-		pg.setOrgId(joPG.getInt("orgId"));
+			GpsGroup pg = new GpsGroup();
+			pg.setId(joPG.getInt("id"));
+			pg.setName(joPG.getString("name"));
+			pg.setShareType(joPG.getInt("shareType"));
+			pg.setOrgId(joPG.getInt("orgId"));
+			pg.setPlatformId(1);
+			pg.setSyncState(true);
+			JSONArray jaOrgIds = joPG.getJSONArray("shareOrgIds");
 
-		JSONArray jaOrgIds = joPG.getJSONArray("shareOrgIds");
+			Object[] orgIds = jaOrgIds.toArray();
 
-		Object[] orgIds = jaOrgIds.toArray();
-
-		gpsGroupService.saveGpsGroup(pg, orgIds);
-
-		JSONObject rs = new JSONObject();
-		rs.accumulate("isSuccess", true);
-		rs.accumulate("msg", "");
-		rs.accumulate("id", pg.getId());
-		return rs.toString();
+			gpsGroupService.saveGpsGroup(pg, orgIds);
+			return ReturnResult.MESSAGE(MessageCode.STATUS_SUCESS, "", 0, null);
+		} catch (Exception ex) {
+			return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL, "", 0, null);
+		} 
 	}
 
 	/**
@@ -214,16 +209,108 @@ public class GpsGroupController {
 	 */
 	@RequestMapping(value = "deleteGpsGroup.do")
 	public @ResponseBody
-	String deleteGpsGroup(
+	ReturnResult deleteGpsGroup(
 			@RequestParam(value = "gpsGroupId", required = false) Integer gpsGroupId,
 			HttpServletRequest request) {
+		try {
+			if (gpsGroupId > 0) {
+				gpsGroupService.deleteById(gpsGroupId);
+				return ReturnResult.MESSAGE(MessageCode.STATUS_SUCESS, "删除成功",
+						0, null);
+			} else {
+				return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL, "删除成功", 0,
+						null);
+			}
+		} catch (Exception ex) {
+			return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL, "查询数据出错", 0,
+					null);
+		} 
+	}
 
-		gpsGroupService.deleteById(gpsGroupId);
+	/**
+	 * 删除组成员
+	 * 
+	 * @param memberId
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "delMemberById.do")
+	public @ResponseBody
+	ReturnResult delMemberById(
+			@RequestParam(value = "memberId", required = false) Integer memberId,
+			HttpServletRequest request) {
+		try {
+			if (memberId > 0) {
+				gpsGroupService.delMemberById(memberId);
+				return ReturnResult.MESSAGE(MessageCode.STATUS_SUCESS, "删除成功",
+						0, null);
+			} else {
+				return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL, "删除成功", 0,
+						null);
+			}
+		} catch (Exception ex) {
+			return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL, "查询数据出错", 0,
+					null);
+		}  
+	}
 
-		JSONObject rs = new JSONObject();
-		rs.accumulate("isSuccess", true);
-		rs.accumulate("msg", "");
-
-		return rs.toString();
+	/**
+	 * 清除组成员
+	 * 
+	 * @param gpsGroupId
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "cleanMemberByGroupId.do")
+	public @ResponseBody
+	ReturnResult cleanMemberByGroupId(
+			@RequestParam(value = "gpsGroupId", required = false) Integer gpsGroupId,
+			HttpServletRequest request) {
+		try {
+			if (gpsGroupId > 0) {
+				gpsGroupService.cleanMember(gpsGroupId);
+				return ReturnResult.MESSAGE(MessageCode.STATUS_SUCESS, "删除成功",
+						0, null);
+			} else {
+				return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL, "删除成功", 0,
+						null);
+			}
+		} catch (Exception ex) {
+			return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL, "查询数据出错", 0,
+					null);
+		} 
+	}
+	/**
+	 * 判断是否有有分组存在
+	 * 
+	 * 判断是否分组名称重复；
+	 */
+	@RequestMapping(value = "isExistGroup.do")
+	public @ResponseBody
+	ReturnResult isExistGroup(
+			@RequestParam(value = "name", required = false) String name,
+			@RequestParam(value = "optType", required = false) Integer optType,
+			@RequestParam(value = "groupId", required = false) Integer groupId,
+			@RequestParam(value = "orgId", required = false) Integer orgId)
+			throws Exception {
+		try {
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("name", name);
+			map.put("groupId", groupId);
+			map.put("optType", optType);
+			map.put("orgId", orgId);
+			List<GpsGroup> vehicleGroup = gpsGroupService
+					.findByNameAndOrg(map);
+			if (vehicleGroup.size() > 0) {
+				return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL, "", 0,
+						null);
+			} else {
+				return ReturnResult.MESSAGE(MessageCode.STATUS_SUCESS, "", 0,
+						null);
+			}
+		} catch (Exception ex) {
+			return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL, "查询数据出错", 0,
+					null);
+		}
 	}
 }
