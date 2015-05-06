@@ -998,9 +998,8 @@ var DutyItemManage={
 			$("#dutyItemTV").kendoTreeView({
 				template:kendo.template($("#dutyItem-template").html()),
 				dragAndDrop: true,
-				drop: function(e) {
-					//e.setValid(false);
-				},
+				drop: DutyItemManage.onDutyItemDrop,
+				dragend:DutyItemManage.onDutyItemDragEnd,
 				dataTextField:["displayName"]
 			});	     
 
@@ -1112,6 +1111,8 @@ var DutyItemManage={
 			duty.maxPolice = value.maxPolice;
 			duty.taskType = value.assoTaskType;
 			duty.targets = [];
+			duty.expanded =true;
+			
 			var shift = {};
 			this.genDutyRow(value.id, value.name, 100, value.typeId, value.name, duty);
 			shift.getParent = function() {
@@ -1161,30 +1162,28 @@ var DutyItemManage={
 			var rs = '';
 			switch (row.itemTypeId) {
 			case 1:
-				rs = row.iteminnerTypeName + ":" + row.name;
+				rs = row.itemInnerTypeName + ":" + row.name;
 				break;
 			case 2:
-				rs = row.name;
+				rs = row.itemInnerTypeName + ":" + row.name;
 				break;
 			case 3:
-				rs = row.iteminnerTypeName + ":" + row.name;
+				rs = row.itemInnerTypeName + ":" + row.name;
 				break;
 			case 4:
-				rs = row.iteminnerTypeName + ":" + row.name;
+				rs = row.itemInnerTypeName + ":" + row.name;
 				break;
 			case 100:
-				rs = row.name;
+				rs =  row.name;
 				break;
 			case 101:
 				var bts =row.beginTime2.getHours() + ":" +row.beginTime2.getMinutes();
 				var ets=row.endTime2.getHours() + ":" +row.endTime2.getMinutes();
-				rs = row.name +" [" + bts +"到" + (row.isOverDay?"第二天":"") + ets +"] ";
+				rs =  row.name +"  [" + bts +"到" + (row.isOverDay?"第二天":"") + ets +"] ";
 				
 				break;
 			case 999:
-				var x=new Date();
-				x.getHours();
-				rs = row.name;
+				rs = row.itemInnerTypeName + ":" + row.name;
 				break;
 			}
 			var sts=DutyItemManage.getRowStatistics(row);
@@ -1316,12 +1315,11 @@ var DutyItemManage={
 				template:kendo.template($("#dutyItem-template").html()),
 				dataSource:ds,
 				dragAndDrop: true,
-				drop: function(e) {
-					//e.setValid(false);
-				},
+				drop: DutyItemManage.onDutyItemDrop,
+				dragend:DutyItemManage.onDutyItemDragEnd,
 				dataTextField:["displayName"]
 			}).data("kendoTreeView");
-			tv.expand(".k-item");
+			//tv.expand(".k-item");
 		},
 		structureItemTree:function(items) {
 			$.each(items, function(i, val) {
@@ -1744,7 +1742,7 @@ var DutyItemManage={
 			}
 			var row=tv.dataItem(re);
 			
-			if(row.items !==null && row.items.length>0){
+			if(row.items !=null && row.items.length>0){
 				$("body").tyWindow({content:"确定要删除[ " + row.name + " ]及下级所有节点?",center:true,ok:true,no:true,
 					okCallback:function(){ 
 						tv.remove(re);
@@ -1913,7 +1911,7 @@ var DutyItemManage={
 
 				if(v.items != null && v.items.length>0){
 					v2.items=DutyItemManage.rebuildItems(v.items,v);
-					v2.expanded =true;
+					v2.expanded =v.expanded;
 				}
 				
 				if(parent !=undefined && parent != null){
@@ -1948,6 +1946,24 @@ var DutyItemManage={
 					DutyItemManage.clearItemId(v2);
 				});
 			}
+		},
+		onDutyItemDrop:function(e){
+			var point=e.dropPosition;
+			var sRow=$("#dutyItemTV").data("kendoTreeView").dataItem(e.sourceNode);
+			var tRow=$("#dutyItemTV").data("kendoTreeView").dataItem(e.destinationNode );
+			
+			if(tRow==null || sRow == null){
+				e.setValid(false);
+			}
+			
+			if(DutyItemManage.checkDrop(tRow,sRow,point)){
+				DutyItemManage.doDrop(tRow, sRow, point);
+			}else{
+				e.setValid(false);
+			}
+		},
+		onDutyItemDragEnd:function(e){
+			DutyItemManage.reCalcDuty();
 		}
 };
 
