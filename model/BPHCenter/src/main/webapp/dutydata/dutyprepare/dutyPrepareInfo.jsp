@@ -56,7 +56,7 @@
 				<div class="policeresourcetoolbar"> 
                 	<span id="undo" class="k-button" onclick="DutyBaseManage.selectPolResCondition();">过滤条件</span> 
                 	<input type="search" class="k-textbox" id="policeresName" name="policeresName" style="width:100px"  placeholder="等待输入..." />
-                	<span id="undo" class="k-button" onclick="DutyBaseManage.searchPoliceRescource();">查询</span>  
+                	<span id="undo" class="k-button" onclick="DutyBaseManage.searchPoliceResWithOutList();">查询</span>  
                 </div>
         		<div id='policeSourceTV'  style="height:700px;overflow;auto"></div>
         	</div>
@@ -126,7 +126,7 @@
 
 <div id="policeResConWindow" style="display:none">
 	<div id="polResConWindow">
-		<div><span id="undo" class="k-button" onclick="DutyBaseManage.searchPoliceRescource();">查询</span></div>
+		<div><span id="undo" class="k-button" onclick="DutyBaseManage.searchPoliceResWithList();">查询</span></div>
 		<div id="polGroupgrid" style="width:45%; float:left"></div>
 		<div id="polTypegrid" style="width:45%; float:left"></div>
     </div> 

@@ -355,7 +355,16 @@ var DutyBaseManage = {
 		DutyBaseManage.bph_police_query.orgId = $("#organId").val();
 		DutyBaseManage.bph_police_query.orgCode = $("#organCode").val();
 		DutyBaseManage.bph_police_query.orgPath = $("#organPath").val();
-		DutyBaseManage.bph_police_query.name = "";//$("#policeresName").val();
+		var policeresname =  $.trim($("#policeresName").val());
+		if(policeresname.length>0){
+			var myReg = /^[^|"'<>]*$/;
+			if (!myReg.test(policeresname)) {
+						$("body").popjs({"title":"提示","content":"过滤条件名称包含特殊字符，请重新输入"}); 
+						$("#policeresName").focus();
+						return;
+			} 
+		}
+		DutyBaseManage.bph_police_query.name = policeresname;
 		DutyBaseManage.bph_police_query.typeId = "";
 		DutyBaseManage.bph_police_query.groupId = "";  
 	},
@@ -402,12 +411,13 @@ var DutyBaseManage = {
 			}
 		}); 
 	},
-	polGroupResData:null,
-	polTypeResData:null,
-	selectPolResCondition:function(){
+	polGroupResData:[],
+	polTypeResData:[],
+	loadPolResCondition:function(){ 
 		$.ajax({
 			url : "/BPHCenter/dutyResourceWeb/getPoliceGrouplist.do?sessionId="+sessionId,
 					type : "post",
+					async:false,
 					data : {
 						"orgId" : m_dutyprepare_Org.id
 					},
@@ -425,6 +435,7 @@ var DutyBaseManage = {
 		$.ajax({
 			url : "/BPHCenter/dutyResourceWeb/getPoliceTypeList.do?sessionId="+sessionId,
 					type : "post", 
+					async:false,
 					dataType : "json",
 					success:function(req){
 						if(req.code==200){
@@ -436,6 +447,9 @@ var DutyBaseManage = {
 						}
 					} 
 		});
+	},
+	selectPolResCondition:function(){
+		DutyBaseManage.loadPolResCondition();
 				 $("#polGroupgrid").kendoGrid({
                          dataSource: {
                             data: DutyBaseManage.polGroupResData
@@ -447,8 +461,8 @@ var DutyBaseManage = {
 									field : 'id',
 									hidden: true
 								},{
-									title : '组名称',
-									field : 'name'
+									title : '组名称', 
+									template: "<input type='checkbox' id='ty_ck_#: id #' value='#: id #' /> #: name # "
 								}] 
                     });
                      $("#polTypegrid").kendoGrid({
@@ -462,29 +476,95 @@ var DutyBaseManage = {
 									field : 'id',
 									hidden: true
 								},{
-									title : '类型名称',
-									field : 'name'
+									title : '类型名称', 
+									template: "<input type='checkbox' id='ty_ck_#: id #' value='#: id #' /> #: name #  "
 								}]
                     });
-		  var polResConWindow = $("#polResConWindow");
-		  if (!polResConWindow.data("kendoWindow")) {
-                        polResConWindow.kendoWindow({
-                            width: "400px",
-                            title: "警员资源过滤条件",
-                            actions: [ 
-                                "Close"
-                            ]
-                        });
-                    }  
+                    
+                    var win =$('#polResConWindow');
+			win.kendoWindow({
+	                        width: "450px",
+	                        title: "警员分组过滤条件"
+	                    });
+			win.data("kendoWindow").open(); 
+	}, 
+	searchPoliceResWithOutList:function(){ 
+		DutyBaseManage.initPoliceResource();
 	},
-	searchPoliceRescource:function(){ 
+	searchPoliceResWithList:function(){ 
 		DutyBaseManage.bph_police_query.orgId = $("#organId").val();
 		DutyBaseManage.bph_police_query.orgCode = $("#organCode").val();
 		DutyBaseManage.bph_police_query.orgPath = $("#organPath").val();
 		DutyBaseManage.bph_police_query.name = $("#policeresName").val();
 
-		DutyBaseManage.bph_police_query.typeId = "";
-		DutyBaseManage.bph_police_query.groupId = ""; 
+		var pol_groupId ="";
+		var pol_typeId = "";
+		var g = $("#polGroupgrid input:checkbox:checked").length; 
+		if(g>0){ 
+			var groupObj = $("#polGroupgrid input:checkbox:checked");
+			$.each(groupObj, function(index, gobj){
+				pol_groupId +=gobj.value+",";
+			});
+			if(pol_groupId.length>0){
+				pol_groupId = pol_groupId.substring(0,pol_groupId.length-1);
+			}
+		}
+		var t = $("#polTypegrid input:checkbox:checked").length;
+		if(t>0){ 
+			var typeObj = $("#polTypegrid input:checkbox:checked");
+			$.each(typeObj, function(index, tobj){
+				if(tobj.value!="-1"){
+					pol_typeId +=tobj.value+",";
+				}
+			});
+			if(pol_typeId.length>0){
+				pol_typeId = pol_typeId.substring(0,pol_typeId.length-1);
+			}
+		} 
+		DutyBaseManage.bph_police_query.typeId = pol_typeId;
+		DutyBaseManage.bph_police_query.groupId =pol_groupId; 
+		$("#policeSourceTV").empty();
+		
+		$("#policeSourceTV").kendoTreeView({
+			//toolbar: kendo.template($("#polContemplate").html()),
+			dragAndDrop: true,
+			drop:function(e){
+				var point=e.dropPosition;
+				var sRow=$("#policeSourceTV").data("kendoTreeView").dataItem(e.sourceNode);
+				var tRow=$("#dutyItemTV").data("kendoTreeView").dataItem(e.destinationNode );
+				
+				if(tRow==null || sRow == null){
+					e.setValid(false);
+				}
+				
+				if(DutyItemManage.checkDrop(tRow,sRow,point)){
+					DutyItemManage.doDrop(tRow, sRow, point);
+				}else{
+					e.setValid(false);
+				}
+			},
+			dragend:DutyItemManage.doDragEnd,
+			template: kendo.template($("#policeSource-template").html()),
+			dataTextField:["name","number"]
+			});
+		
+		$.ajax({
+			url : "/BPHCenter/dutyResourceWeb/getPoliceSource.do?sessionId="+sessionId,
+			type : "POST",
+			dataType : "json",
+			data : {
+						"police_Query" : JSON.stringify(DutyBaseManage.bph_police_query)
+					},
+			success : function(req) {
+				if(req.code == 200){
+					if(req.data != null){
+						m_policesourceData = req.data;
+						$("#policeSourceTV").data("kendoTreeView").setDataSource(req.data);
+					} 
+				}
+			}
+		}); 
+		
 	},
 	bph_vehicle_query:{},
 	packageVelQuery:function(){
