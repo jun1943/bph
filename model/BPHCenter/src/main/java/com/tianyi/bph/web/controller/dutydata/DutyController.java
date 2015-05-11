@@ -50,7 +50,7 @@ public class DutyController {
 	@Autowired
 	private DutyTaskService dutyTaskService; 
 
-	@RequestMapping(value = "loadDutyByOrgIdAndYMD.do")
+	@RequestMapping(value = "/loadDutyByOrgIdAndYMD.do")
 	public @ResponseBody
 	ReturnResult loadDutyByOrgIdAndYMD(
 			@RequestParam(value = "orgId", required = false) Integer orgId,
@@ -75,7 +75,7 @@ public class DutyController {
 	
 
 
-	@RequestMapping(value = "loadTemplateByOrgId.do")
+	@RequestMapping(value = "/loadTemplateByOrgId.do")
 	public @ResponseBody
 	ReturnResult loadTemplateByOrgId(
 			@RequestParam(value = "orgId", required = false) Integer orgId,
@@ -93,7 +93,7 @@ public class DutyController {
 	}
  
 
-	@RequestMapping(value = "save.do")
+	@RequestMapping(value = "/save.do")
 	public @ResponseBody
 	ReturnResult save(@RequestParam(value = "duty", required = false) String dvm,
 			HttpServletRequest request) {
@@ -125,7 +125,7 @@ public class DutyController {
 		} 
 	}
 
-	@RequestMapping(value = "deleteDutyTemplateAction.do")
+	@RequestMapping(value = "/deleteDutyTemplateAction.do")
 	public @ResponseBody
 	ReturnResult deleteDutyTemplateAction(
 			@RequestParam(value = "temId", required = false) Integer param,
@@ -148,7 +148,7 @@ public class DutyController {
 	}
 	
 
-	@RequestMapping(value = "loadTaskTargetByOrg.do")
+	@RequestMapping(value = "/loadTaskTargetByOrg.do")
 	public @ResponseBody
 	ReturnResult loadTaskTargetByOrg(
 			@RequestParam(value = "orgId", required = false) Integer orgId,

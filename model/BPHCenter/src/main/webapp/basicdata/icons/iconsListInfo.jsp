@@ -5,9 +5,10 @@ var bph_Icon_query ={};
 var sessionId = $("#token").val();
 $(function() {
 	loadData(1);
-	$("#iconsName").keyup(function(){
+	$("#iconsName").keydown(function(){
         if(event.keyCode == 13){
             IconManage.search();
+            $("#iconsName").focus();
         }
     });
 });
@@ -19,7 +20,7 @@ function loadData(pageNo){
 var IconManage ={
 	icon_pageNo :1,
 	packageQuery:function(pageNo){
-		bph_Icon_query.name = $("#iconsName").val();
+		bph_Icon_query.name = $.trim($("#iconsName").val());
 		var typeId =  $("#iconType").val();
 		if(typeId>0){
 			bph_Icon_query.typeId = typeId;
@@ -34,7 +35,10 @@ var IconManage ={
        			url:"<%=basePath%>iconsWeb/getIconsList.do?sessionId="+sessionId,
 				type : "post",
 				data : {
-						"icons_Query" : JSON.stringify(bph_Icon_query)
+						"icons_Query" : JSON.stringify(bph_Icon_query),
+						"expandeds"		:expandeds,
+						"organId":$("#organId").val(),
+						"organPath":$("#organPath").val()
 					},
 				dataType : "json",
 				success : function(req) {
@@ -67,31 +71,19 @@ var IconManage ={
 										field : 'name' 
 									},{
 										title : '图标预览',
-										template: "<img width='25px' height='25px' src='<%=basePath %>#: iconUrl #'> ",
+										template: "<img style='width:25px;height:25px;' src='<%=basePath %>#: iconUrl #'> ",
              							width:120
 									}
 								],
 								change: function (e) {
 	                                var userId = e.sender.selectable.userEvents.currentTarget.cells[0].innerHTML; 
 	                            }
-							});
-							
-						$("#iconsgrid .k-grid-content").mCustomScrollbar( {scrollButtons:{enable:true},advanced:{ updateOnContentResize: true } });
-               						//alert(pageNo);
-               						//alert(total);
-               						//alert("size="+pageSize);
-               						//var pg = pagination(pageNo,total,'loadData',pageSize,0);
-               						var pg = pagination(pageNo,total,'loadData',10);
-               						 
-               	                	$("#page").html(pg);
-						}else
-						{ 
-							$("body").popjs({"title":"提示","content":"获取图标数据失败"});
-						}
-					}else
-						{ 
-							$("body").popjs({"title":"提示","content":"获取图标数据失败"});
-						}
+							}); 
+								$("#iconsgrid .k-grid-content").mCustomScrollbar( {scrollButtons:{enable:true},advanced:{ updateOnContentResize: true } });
+               					var pg = pagination(pageNo,total,'loadData',10);
+               	                $("#page").html(pg);
+						} 
+					} 
 				}
 		});
 	},
@@ -113,13 +105,22 @@ var IconManage ={
 		}});
 	},
 	search:function(){ 
+		var iconsName = $("#iconsName").val();
+		if(iconsName.length>0)
+		{
+			var myReg = /^[^@\/\'\\\"#$%&\^\*]+$/;
+			if(!myReg.test(iconsName)){
+				$("body").popjs({"title":"提示","content":"查询条件不能包含非法字符"}); 
+				return;
+			}
+		}
 		IconManage.packageQuery(1);
 		IconManage.loadData(1);
 	},
 	addIcon:function(){ 
 		$("#dialog").tyWindow({
-			width : "480px",
-			height : "440px",
+			width : "600px",
+			height : "500px",
 			title : "新增图标信息",
 			position : {
 				top : "100px"

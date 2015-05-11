@@ -1,13 +1,16 @@
 package com.tianyi.bph.web.controller.basicdata;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.imageio.ImageIO;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -129,29 +132,47 @@ public class FileUploadServlet extends HttpServlet {
 					} else {
 						name = "temp";
 					}
+
 					String path = uploadPath + "/" + name; 
-					String sql = "insert into t_icon (type_id,name,icon_url,sync_state, platform_id) values (?,?,?,?,?)";				
-					try {
-						conn = DBClassMysql.getMysql(); 
-						ps = conn.prepareStatement(sql);
-						ps.setInt(1, icons.getTypeId());
-						ps.setString(2, icons.getName());
-						ps.setString(3, "uploadIcon/" + name);
-						ps.setBoolean(4, true);
-						ps.setInt(5, 1);
-
-						iconId = ps.executeUpdate();
-					} catch (SQLException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-						request.setAttribute("uploadError", "写入数据库出错");
-						request.getRequestDispatcher
-
-						("/basicdata/icons/iconsAdd.jsp?optType=5").forward(request, response);
-						return;
-					}
+					String sql = "insert into t_icon (type_id,name,icon_url,sync_state, platform_id) values (?,?,?,?,?)";	
 					try {
 						item.write(new File(path));
+						BufferedImage bi = ImageIO.read(new File(path));
+						if(bi == null){ 
+							request.setAttribute("uploadError", "上传文件格式出错，不是png格式的图片文件，请重新选择文件上传");
+							request.getRequestDispatcher
+
+							("/basicdata/icons/iconsAdd.jsp?optType=5").forward(request, response);
+							return;
+						}else{
+
+							List<String> s = new ArrayList<String>();
+							s.add("zhangsan");
+							s.add("zhangsan");
+							s.add("zhangsan");
+							s.add("zhangsan");
+							request.setAttribute("uploadError", "图片上传成功"); 
+							
+							try {
+								conn = DBClassMysql.getMysql(); 
+								ps = conn.prepareStatement(sql);
+								ps.setInt(1, icons.getTypeId());
+								ps.setString(2, icons.getName());
+								ps.setString(3, "uploadIcon/" + name);
+								ps.setBoolean(4, true);
+								ps.setInt(5, 1);
+
+								iconId = ps.executeUpdate();
+							} catch (SQLException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+								request.setAttribute("uploadError", "写入数据库出错");
+								request.getRequestDispatcher
+
+								("/basicdata/icons/iconsAdd.jsp?optType=5").forward(request, response);
+								return;
+							}
+						}
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -160,7 +181,7 @@ public class FileUploadServlet extends HttpServlet {
 
 						("/basicdata/icons/iconsAdd.jsp?optType=5").forward(request, response);
 						return;
-					}
+					}	
 				}
 			}
 		} else {
@@ -168,8 +189,7 @@ public class FileUploadServlet extends HttpServlet {
 			request.getRequestDispatcher("/basicdata/icons/iconsAdd.jsp?optType=6").forward(request,
 					response);
 			return;
-		}
-		request.setAttribute("uploadError", "上传成功");
+		} 
 		request.getRequestDispatcher("/basicdata/icons/iconsAdd.jsp").forward(request,
 				response);
 	}

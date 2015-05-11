@@ -184,7 +184,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 						if (req.code == 200) { 
 							 $("body").popjs({"title":"提示","content":"分组成员信息保存成功","callback":function(){ 
 								window.parent.window.parent.PoliceGroupManage.onCloseMember();
-								window.parent.$("#dialog").tyWindow.onCloseMember();
+								window.parent.$("#dialog").tyWindow.close();
 							}}); 
 						} else {
 							$("body").popjs({"title":"提示","content":"分组成员信息保存失败"});

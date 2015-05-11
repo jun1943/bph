@@ -1,9 +1,7 @@
 <%@ page language="java" pageEncoding="UTF-8"%>
 
 <script>
-$(document).ready(function() {    
-	$("#organLevel").kendoComboBox();
-	$("#vehicleNumber").kendoMaskedTextBox(); 
+$(document).ready(function() {     
 	//屏幕模式
 	$("#tyScreenMode i").each(function(i){
 		$(this).click(function(){

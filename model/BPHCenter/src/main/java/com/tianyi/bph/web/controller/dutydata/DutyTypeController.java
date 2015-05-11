@@ -51,14 +51,13 @@ public class DutyTypeController {
 
 		ModelAndView mv = new ModelAndView(
 				"/dutydata/dutytype/dutyTypeList.jsp");
-		mv.addObject("num", "200");
+		mv.addObject("num", "300");
 		return mv;
 	}
 
 	@RequestMapping({ "/gotoDutyTypeAdd.do", "/gotoDutyTypeAdd.action" })
 	@ResponseBody
-	public ModelAndView gotoPoliceAdd(
-			@RequestParam(value = "organId", required = false) Integer organId,
+	public ModelAndView gotoPoliceAdd( 
 			HttpServletRequest request) throws Exception {
 		try {
 			ModelAndView mv = new ModelAndView(

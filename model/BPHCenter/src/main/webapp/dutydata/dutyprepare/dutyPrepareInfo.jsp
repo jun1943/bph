@@ -1,17 +1,5 @@
 <jsp:directive.page language="java" pageEncoding="UTF-8"/>
-
-
-<script> 
-
-      
-</script>
-
-<script type="text/x-kendo-template" id="dutytemplatetb">
-                <div class="dutytempletetoolbar"> 
-                	<span id="undo" class="k-button" onclick="DutyBaseManage.sureSelectdutyTemp();">确定</span> 
-                </div>
-</script>
-
+ 
 <script id="dutyType-checkbox-template" type="text/x-kendo-template">
            <input id="ckAttireType1" type="checkbox"  value="0">
            <div >#: name #</div>
@@ -46,7 +34,7 @@
 	<button type="button" class="ty-delete-btn"  onclick=DutyItemManage.onDeleteNode('#: item.uid #')></button>
 </script>
 
-<div id="dutyResource" style="width:40%; float:left">
+<div id="dutyResource" style="width:25%; float:left;">
 	<div class="demo-section k-header"> 
         <h4>报备资源</h4> 
         <div id="tabstrip-sprites">
@@ -70,7 +58,7 @@
                 	<input type="search" class="k-textbox" id="policeresName" name="policeresName" style="width:100px"  placeholder="等待输入..." />
                 	<span id="undo" class="k-button" onclick="DutyBaseManage.searchPoliceRescource();">查询</span>  
                 </div>
-        		<div id='policeSourceTV'></div>
+        		<div id='policeSourceTV'  style="height:700px;overflow;auto"></div>
         	</div>
         	<div>
 				<div class="vehicleresourcetoolbar">
@@ -78,7 +66,7 @@
                 	<input type="search" class="k-textbox" id="vehicleresName" name="vehicleresName" style="width:100px"  placeholder="等待输入..." />
                 	<span id="undo" class="k-button" onclick="DutyBaseManage.searchVehicleRescource();">查询</span> 
                 </div>
-        		<div id='vehicleSourceTV'></div>
+        		<div id='vehicleSourceTV' style="height:700px;overflow;auto"></div>
         	</div>
 			<div>
 				<div class="weaponresourcetoolbar">
@@ -86,7 +74,7 @@
                 	<input type="search" class="k-textbox" id="weaponresName" name="weaponresName" style="width:100px"  placeholder="等待输入..." />
                 	<span id="undo" class="k-button" onclick="DutyBaseManage.searchWeaponRescource();">查询</span> 
                 </div>
-        		<div id='weaponSourceTV'></div>
+        		<div id='weaponSourceTV' style="height:700px;overflow;auto"></div>
         	</div>
         	<div>
 				<div class="gpsresourcetoolbar">
@@ -94,7 +82,7 @@
                 	<input type="search" class="k-textbox" id="gpsresName" name="gpsresName" style="width:100px"  placeholder="等待输入..." />
                 	<span id="undo" class="k-button" onclick="DutyBaseManage.searchGpsRescource();">查询</span> 
                 </div>
-        		<div id='gpsSourceTV'></div>
+        		<div id='gpsSourceTV' style="height:700px;overflow;auto"></div>
         	</div>
         </div>
      </div>
@@ -117,18 +105,14 @@
 </div> 
 <div id="dialog">
 </div>
-
-
-<div id="dutyCopyWindow" style="display:none">
-	<div id="windowCpDate">
-		<div class="demo-section k-header" style="width: 300px; text-align: center;">
-      	    <div id="calendar"></div>
-    	</div>
-    </div> 
-</div>
+ 
 
 <div id="dutyTempleteWindow" style="display:none">
 	<div id="windowTemplete">
+		<div class="templeteresourcetoolbar"> 
+            <span id="undosure" class="k-button" onclick="DutyPrepareManage.selectTempleteToLoad();">确定</span>  
+            <span id="undodelete" class="k-button" onclick="DutyPrepareManage.deleteTempleteById();">查询</span>  
+        </div>
 		<div id="Templetegrid"></div>
     </div> 
 </div>

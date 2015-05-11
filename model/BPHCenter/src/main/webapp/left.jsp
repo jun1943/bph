@@ -9,10 +9,11 @@
             <div class="title box">搜索</div>
             <div class="hide" onclick="arrowZoom();"></div>
             <div class="clear">
-            <div class="ty-input">
+            <div class="ty-input mt0">
             	<input id="searchOrganName" value="${requestScope.searchOrganName}" placeholder="等待输入..." class="k-textbox ty-left-search"/>
             </div>
-            <button class="k-button" onClick="queryOrgan()">搜索</button><br><br>
+            <button class="ty-left-search-btn" onClick="queryOrgan()">搜索</button><br><br>
+            </div>
           </div>
         </div>
         <div class="pull-right box">
@@ -21,7 +22,6 @@
         <div class="tree-box clear"><!----机构树---->
         <div id="box">
             <div id="treeview"></div>
-            <div id="treeview2"></div>
 		</div>
         </div><!----机构树结束---->
         <div class="line8 box"></div>
@@ -33,6 +33,11 @@
 			 var currentText;//当前选中的文本
 			 var treeview;
 			 var expandeds="";
+			 var selectNode="";
+			 var barElement;//当前对象
+			 var parentId;
+			 var k=0;
+			 
 			 $(document).ready(function () {
 				 $.ajax({
 						url:"<%=basePath%>web/organx/tree.do",
@@ -67,18 +72,36 @@
 	    						}
 	        		  		}); --%>
 	        		  		test();
+	        		  		selectClass();
 						}
 					});
 			 });
 			
+			 function  selectClass(){
+				 treeView = $("#treeview").data("kendoTreeView")
+				 var firstItem = treeview.element.find(".k-item:first");
+				 
+				 var barDataItem;
+				 selectNode=$("#organId").val();
+				 if(selectNode !=""){
+					 barDataItem = treeView.dataSource.get(selectNode);
+				 }else{
+					 barDataItem =treeView.dataSource.get(parentId);//暂时用1
+				 }
+				 barElement = treeview.findByUid(barDataItem.uid);
+				 $(barElement).find("div .k-in").first().addClass("k-state-selected");
+			 }
 			function test(){
 				 var expandedNodes = [],treeView = $("#treeview").data("kendoTreeView");
 		            getExpanded(treeView.dataSource.view(),expandedNodes);
 		            expandeds=expandedNodes.join(",");
 			 }
-			 
 			 function getExpanded(nodes,expandedNodes) {
 		            for (var i = 0; i < nodes.length; i++) {
+		            	if(k == 0){
+		            		parentId=nodes[0].id;
+		            		k=1;
+		            	}
 		                if(nodes[i].expanded){
 		                	expandedNodes.push(nodes[i].id);
 		                }
@@ -87,7 +110,7 @@
 		                }
 		            }
 		        }
-			 
+			
 			 //查询通过name模糊查询
 		        function queryOrgan(){
 		        	$.ajax({
@@ -134,40 +157,22 @@
 		        }
 			 //单击触发事件
 		 	 function onSelect(e) {
-		 	/* 	 treeView1 = $("#treeview").data("kendoTreeView")
-		 		 currentText=this.text(e.node);
-		 		var json = treeToJson(treeView1.dataSource.view()); */
 		 		//选择节点事件
 		 		var treeview=$('#treeview').data('kendoTreeView');
 		 		//获取选中节点的数据
 		 		var data = treeview.dataItem(e.node);
+		 		//移出样式
+		 		//$(barElement).removeClass("k-state-selected");
+		 		
 		 		$("#organId").val(data.id);
  	    		$("#organPath").val(data.path);
  	    		test();
  	    		$("#expandeds").val(expandeds);
- 	    		//alert(expandeds);
  	    		loadData(1);
 			 }
-		 	 
-		 /* 	function treeToJson(nodes) {
-		 	    return $.map(nodes, function(n, i) {
-		 	    	if(currentText == n.text){
-		 	    		$("#organId").val(n.id);
-		 	    		$("#organPath").val(n.path);
-		 	    		loadData();
-		 	    	}
-		 	        var result = { text: n.text, id: n.id, expanded: n.expanded, checked: n.checked };
-
-		 	        if (n.hasChildren){
-		 	        	 result.items = treeToJson(n.children.view());
-		 	        }
-		 	        return result;
-		 	    });
-		 	} */
 		 // function that gathers IDs of checked nodes
 	        function checkedNodeIds(nodes, checkedNodes) {
 	            for (var i = 0; i < nodes.length; i++) {
-	            	alert("id:"+nodes[i].id+" 展开状态 :"+nodes[i].expanded);
 	                if (nodes[i].checked) {
 	                    checkedNodes.push(nodes[i].id);
 	                }

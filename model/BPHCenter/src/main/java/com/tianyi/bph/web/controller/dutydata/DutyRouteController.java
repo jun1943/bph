@@ -46,13 +46,11 @@ public class DutyRouteController {
 
 		Calendar c = Calendar.getInstance();
 		int years = c.get(Calendar.YEAR);
-		int month = c.get(Calendar.MONTH) + 1;
-		query.setOrganId(organId);
-		query.setPageNo(years);
-		query.setPageSize(month);
+		int month = c.get(Calendar.MONTH) + 1; 
 		mv.addObject("organ", organ);
-		mv.addObject("query", query);
-		mv.addObject("num", "200");
+		mv.addObject("dutyyears", years);
+		mv.addObject("dutymonth", month);
+		mv.addObject("num", "300");
 		return mv;
 	}
 
@@ -86,7 +84,8 @@ public class DutyRouteController {
 		query.setPageSize(month);
 		mv.addObject("organ", organ);
 		mv.addObject("query", query);
-		mv.addObject("num", "200");
+		mv.addObject("dutyDate", ymd);
+		mv.addObject("num", "300");
 		return mv;
 	}
 

@@ -147,8 +147,8 @@ var GpsGroupManage ={
 			success : function(req) {
 				if (req.code == 200) { 
 							 $("body").popjs({"title":"提示","content":"分组信息保存成功","callback":function(){ 
-								window.parent.window.parent.GpsGroupManage.onCloseGorup();
-								window.parent.$("#dialog").tyWindow.onCloseGorup();
+								window.parent.window.parent.GpsgroupManage.onCloseGorup();
+								window.parent.$("#dialog").tyWindow.close();
 							}}); 
 						} else {
 							$("body").popjs({"title":"提示","content":"分组信息保存失败"});

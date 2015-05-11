@@ -13,6 +13,7 @@ public class BaseQuery {
     private int      pageNo;
 
     public BaseQuery() {
+    	super();
     }
 
     public BaseQuery(int pageSize, int pageNo) {

@@ -114,6 +114,14 @@ public class IconController {
 
 			int total = iconsService.loadCount(map);
 			list = iconsService.loadList(map); 
+
+			if(list.size()==0){
+				if(pageStart>1){
+					pageBegin = pageSize * ((pageStart-1) > 0 ? (pageStart - 2) : 0);
+					map.put("pageStart", pageBegin);
+					list = iconsService.loadList(map); 
+				}
+			}
 			return PageReturn.MESSAGE(MessageCode.STATUS_SUCESS,
 					MessageCode.SELECT_SUCCESS, total, list);
 		} catch (Exception ex) {

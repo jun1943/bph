@@ -32,7 +32,10 @@ var VehicleManage = {
 					url : "<%=basePath%>vehicleWeb/getVehicleList.do?sessionId="+sessionId,
 					type : "post",
 					data : {
-						"vehicle_Query" : JSON.stringify(bph_vehicle_query)
+						"vehicle_Query" : JSON.stringify(bph_vehicle_query),
+						"expandeds"		:expandeds,
+						"organId":$("#organId").val(),
+						"organPath":$("#organPath").val()
 					},
 					dataType : "json",
 					success : function(req) {
@@ -47,6 +50,7 @@ var VehicleManage = {
 							},
 							height : 550,
 							sortable : true,
+							resizable: true,
 							selectable : "multiple", 
 							columns:[{
 									title : 'Id',

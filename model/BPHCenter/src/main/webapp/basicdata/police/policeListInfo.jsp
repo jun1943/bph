@@ -29,12 +29,14 @@ var PoliceManage = {
 		bph_police_query.pageStart = pageNo;
 	},
 	loadData : function(pageNo) {
-
 		$.ajax({
 					url : "<%=basePath%>policeWeb/getPoliceList.do?sessionId="+sessionId,
 					type : "post",
 					data : {
-						"police_Query" : JSON.stringify(bph_police_query)
+						"police_Query" : JSON.stringify(bph_police_query),
+						"expandeds"		:expandeds,
+						"organId":$("#organId").val(),
+						"organPath":$("#organPath").val()
 					},
 					dataType : "json",
 					success : function(req) {
@@ -51,6 +53,7 @@ var PoliceManage = {
 													},
 													height : 550,
 													sortable : true,
+													resizable: true,
 													selectable : "multiple", 
 													columns : [
 															{
@@ -98,7 +101,7 @@ var PoliceManage = {
 																field : 'idcardno'
 															},
 															{
-																title : '机构',
+																title : '机构简称',
 																field : 'orgName'
 															},
 															{
@@ -164,7 +167,7 @@ var PoliceManage = {
 		var organId = $("#organId").val();
 		$("#dialog").tyWindow({
 			width : "680px",
-			height : "500px",
+			height : "510px",
 			title : "新增警员信息",
 			position : {
 				top : "100px"
@@ -180,7 +183,7 @@ var PoliceManage = {
 		var organId = $("#organId").val();
 		$("#dialog").tyWindow({
 			width : "680px",
-			height : "500px",
+			height : "510px",
 			title : "编辑警员信息",
 			position : {
 				top : "100px"
@@ -215,8 +218,8 @@ var PoliceManage = {
 	importPolice:function(){
 		var organId = $("#organId").val();
 		$("#dialog").tyWindow({
-			width : "500px",
-			height : "450px",
+			width : "730px",
+			height : "530px",
 			title : "警员信息导入",
 			position : {
 				top : "100px"

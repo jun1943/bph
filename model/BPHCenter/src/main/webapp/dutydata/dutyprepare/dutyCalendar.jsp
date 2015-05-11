@@ -16,9 +16,6 @@
   
 </head>  
   <body>
-  
-<script src="<%=basePath %>JS/extend/moment.min.js" type='text/javascript'></script>
-<script src="<%=basePath %>JS/extend/fullcalendar.min.js" type='text/javascript'></script>	
     <div id="wrapper">
 		<div id='main-nav-bg'></div>
 		<nav class="" id="main-nav">
@@ -42,8 +39,9 @@
 						<div class="row-fluid">
 							<!----信息显示区---->
 							<div class="span8 box">
-								<!----表格---->
-								<%@ include file="dutyCalendarInfo.jsp"%>
+								<!----表格
+								<%@ include file="dutyCalendarInfo.jsp"%>---->
+								<%@ include file="dutyCalendarTest.jsp"%>
 							</div>
 							<!----表格结束---->
 						</div>
@@ -54,5 +52,8 @@
 			</div>
 		</section>
 	</div>
+	<script type="text/javascript" charset="utf-8" src="<%=basePath%>dutydata/common.js"></script>
+	<script type="text/javascript" charset="utf-8" src="<%=basePath%>dutydata/dutyprepare/js/dutycalendar.js"></script>
+	<link href="<%=basePath %>dutydata/dutyprepare/calendarImage/dateStyle.css" media='all' rel='stylesheet' type='text/css' />
   </body>
 </html>

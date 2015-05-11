@@ -147,8 +147,8 @@ var m_policeGroup_Org = {
 				success : function(req) {
 					if (req.code == 200) { 
 							 $("body").popjs({"title":"提示","content":"分组信息保存成功","callback":function(){ 
-								window.parent.window.parent.PoliceGroupManage.onCloseGroup();
-								window.parent.$("#dialog").tyWindow.onCloseGroup();
+								window.parent.window.parent.PolicegroupManage.onCloseGroup();
+								window.parent.$("#dialog").tyWindow.close();
 							}}); 
 						} else {
 							$("body").popjs({"title":"提示","content":"分组信息保存失败"});

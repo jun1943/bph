@@ -185,7 +185,7 @@
 						if (req.code == 200) { 
 							 $("body").popjs({"title":"提示","content":"分组成员信息保存成功","callback":function(){ 
 								window.parent.window.parent.WeaponGroupManage.onCloseMember();
-								window.parent.$("#dialog").tyWindow.onCloseMember();
+								window.parent.$("#dialog").tyWindow.close();
 							}}); 
 						} else {
 							$("body").popjs({"title":"提示","content":"分组成员信息保存失败"});

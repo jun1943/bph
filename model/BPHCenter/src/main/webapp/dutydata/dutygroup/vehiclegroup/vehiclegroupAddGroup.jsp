@@ -140,7 +140,7 @@ var m_vehicleGroup_Org = {
 						if (req.code == 200) { 
 							 $("body").popjs({"title":"提示","content":"分组信息保存成功","callback":function(){ 
 								window.parent.window.parent.VehicleGroupManage.onCloseGorup();
-								window.parent.$("#dialog").tyWindow.onCloseGorup();
+								window.parent.$("#dialog").tyWindow.close();
 							}}); 
 						} else {
 							$("body").popjs({"title":"提示","content":"分组信息保存失败"});

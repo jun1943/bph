@@ -1,5 +1,5 @@
 var sessionId = $("#token").val();
-var ymd = '20150103';
+var ymd ;
 var m_ymd=null;
 var m_xid_max = 0; // duty的treegrid的id,必须确保唯一性
 var m_changestates = "2";
@@ -15,21 +15,22 @@ var m_userNode={};
 var m_target={};
 var m_duty={};
 var m_changestates = "2";
-
-function loadData(pageNo){ 
-	
-} 
-
+ 
 $(function() {
+	
+	ymd = $("#dutyDate").val();
+	
 	m_ymd = YMD.createNew((ymd));
 	
 	m_dutyprepare_Org.id=$("#organId").val();
 	m_dutyprepare_Org.path=$("#organPath").val();
 	
 	DutyPrepareManage.initControl();
-	 $("#calendar").kendoCalendar({
-         change: DutyBaseManage.onSelectDateToCopy
-     });
+	var obj = {};
+	
+	obj.orgId = $("#organId").val();
+	obj.ymd = ymd;
+	DutyPrepareManage.loadDuty(obj,1); 
 });
 //管理窗体及对话框。
 var DutyPrepareManage={
@@ -39,6 +40,7 @@ var DutyPrepareManage={
 			this.initDutyTypeWindow();
 			this.initTemplateWindow();
 			this.initCalendarWindow();
+			this.initTemplateGridList();
 		},
 		initDutyTypeWindow:function(){
 			$("#DutyTypetreeList").kendoTreeList({
@@ -61,6 +63,26 @@ var DutyPrepareManage={
 			$("#DutyTypetreeList").delegate("tbody>tr", "dblclick", this.onSelectDutyType);
 			
 		},
+		initTemplateGridList:function(){
+			$("#Templetegrid").kendoGrid({  
+				sortable : true,
+				resizable: true,
+				selectable : "multiple", 
+				columns : [ {
+					title : 'Id',
+					field : 'id',
+					hidden : true
+				}, {
+					title : '模板名称',
+					field : 'name'
+				} ],
+				selectable: "row",
+				change : function(e) {
+					var tempId = e.sender.selectable.userEvents.currentTarget.cells[0].innerHTML; 
+					//alert(tempId);
+				}
+			}); 
+		},
 		initTemplateWindow:function(){
 			$("#templateWindow").kendoWindow({
                 width: "450px",
@@ -74,23 +96,7 @@ var DutyPrepareManage={
             });
 			
 			$("#cc").kendoCalendar({
-				value: new Date(),
-				change:function(){
-					 var date = this.value();
-					 var y = date.getFullYear();
-					var m = date.getMonth() + 1;
-					var d = date.getDate();
-					var s = y.toString() + (m < 10 ? '0' + m : m)
-								+ (d < 10 ? '0' + d : d);
-					var pars = {
-							orgId : m_dutyprepare_Org.id,
-							ymd : s
-						};
-					DutyPrepareManage.loadDuty(pars,2);
-					var winCal=$("#calendarWindow").data("kendoWindow");
-					winCal.close();
-					//loadDuty(pars, 2);
-				}
+				value: new Date()
 			});
 			
 		},
@@ -156,20 +162,17 @@ var DutyPrepareManage={
 			var name = $('#txtTemplateName').val();
 
 			var myReg = /^[^|"'<>]*$/;
-			if (!myReg.test($.trim(name))) {
-				//$.messager.alert("错误提示", "模板名称含有非法字符！", "error");
+			if (!myReg.test($.trim(name))) { 
 				$("body").popjs({"title":"提示","content":"模板名称含有非法字符"}); 
 				$('#txtTemplateName').focus();
 				return;
 			}
-			if (name.length > 20) {
-				//$.messager.alert("错误提示", "模板名称长度过长，限制长度1-20！", "error");
+			if (name.length > 20) { 
 				$("body").popjs({"title":"提示","content":"模板名称长度过长，限制长度1-20！"}); 
 				$('#txtTemplateName').focus();
 				return;
 			}
-			if (name == null || name.lenght == 0 || name == "" || name == undefined) {
-				//$.messager.alert('提示', "请输入模板名称!", "warning");
+			if (name == null || name.lenght == 0 || name == "" || name == undefined) { 
 				$("body").popjs({"title":"提示","content":"请输入模板名称"}); 
 				return;
 			} else {
@@ -209,10 +212,9 @@ var DutyPrepareManage={
 						
 						DutyItemManage.reCalcDuty(duty.items);
 						
-						m_duty = duty;
-						//$('#tdDuty').treegrid('loadData', duty.items);
+						m_duty = duty; 
 					} else {
-						alert("获取报备明细数据信息失败");
+					$("body").popjs({"title":"提示","content":"获取报备明细数据信息失败!"});  
 					}
 				}
 			});
@@ -221,6 +223,7 @@ var DutyPrepareManage={
 			var duty = {};
 			duty.id = m_duty.id;
 			duty.orgId = m_dutyprepare_Org.id;
+			duty.ymd = ymd;
 			duty.name = name;
 			duty.isTemplate = isTemplate;
 			if (isTemplate) {
@@ -243,19 +246,19 @@ var DutyPrepareManage={
 				async : false,
 				success : function(req) {
 					if (req.code == 200) {// 成功填充数据
-						m_duty.id = req.data;
-
-						//$("#divMember").unmask();
+						if(duty.isTemplate){
+							m_duty.id = 0 ;
+							$('#txtTemplateName').val("");
+						}else{ 
+							m_duty.id = req.data;
+						}
+ 
 						$("body").popjs({"title":"提示","content":"保存成功!"}); 
-					} else {
-						//$("#divMember").unmask();
-						//$.messager.alert('提示', "保存失败!", "info");
+					} else { 
 						$("body").popjs({"title":"提示","content":"保存失败!"}); 
 					}
 				},
-				error : function(a) {
-					//$.messager.alert('提示', "保存失败!", "info");
-					//$("#divMember").unmask();
+				error : function(a) {  
 				}
 			});
 
@@ -272,6 +275,63 @@ var DutyPrepareManage={
 					DutyItemManage.reCalcDuty(items);
 			}});	
 		},
+		selectTempleteToLoad:function(){
+			var kGrid = $("#Templetegrid").data("kendoGrid");
+			var row = kGrid.dataItem(kGrid.select());
+			if (row != null) {
+				var tempDate = row.ymd; 
+				var orgId = row.orgId;
+				var obj = {}; 
+				obj.orgId = orgId;
+				obj.ymd = tempDate;
+				DutyPrepareManage.loadDuty(obj,1);
+			}else{
+				$("body").popjs({"title":"提示","content":"请选择要操作的数据"}); 
+			}
+		},
+		deleteTempleteById:function(){
+			var kGrid = $("#Templetegrid").data("kendoGrid");
+			var row = kGrid.dataItem(kGrid.select());
+			if (row != null) {
+				$("body").tyWindow({"content":"确定要删除名称为 "+row.name+" 的模板?","center":true,"ok":true,"no":true,"okCallback":function(){ 
+						$.ajax({
+							url : "/BPHCenter/dutyWeb/deleteDutyTemplateAction.do?sessionId="+sessionId,
+							type : "POST",
+							dataType : "json",
+							data : {
+								"temId" : row.Id
+							},
+							success : function(req) {
+								if (req.code==200) {// 成功填充数据
+									DutyBaseManage.loaddutyTemplete();
+								} else {
+									$("body").popjs({"title":"提示","content":"删除模板失败"}); 
+								}
+							}
+						});
+					}
+				});
+			}else{
+				$("body").popjs({"title":"提示","content":"请选择要操作的数据"}); 
+			}
+		},
+		onCopyDuty:function(){ 
+			var calendar = $("#cc").data("kendoCalendar"); 
+				 var date = calendar.value();
+				 var y = date.getFullYear();
+				var m = date.getMonth() + 1;
+				var d = date.getDate();
+				var s = y.toString() + (m < 10 ? '0' + m : m)
+							+ (d < 10 ? '0' + d : d);
+				var pars = {
+						orgId : m_dutyprepare_Org.id,
+						ymd : s
+					};
+				DutyPrepareManage.loadDuty(pars,2);
+				var winCal=$("#calendarWindow").data("kendoWindow");
+				winCal.close();
+				//loadDuty(pars, 2); 
+		}, 
 };
 //管理基础资料
 var DutyBaseManage = {
@@ -837,96 +897,37 @@ var DutyBaseManage = {
 		DutyBaseManage.bph_gps_query.gpsname = $("#gpsresName").val();
 		DutyBaseManage.bph_gps_query.typeId = "";
 		DutyBaseManage.bph_gps_query.groupId = "";  
-	},
-	getProperty:function(data){
-		if (data == null || data.length == 0)
-			return "";
-		var rs = "";
-		for (var item in data) 
-			if (data[item].name != null){
-				rs += data[item].name + ";"
-			}
-		return rs;
-	},
-	contactName:function(value){
-		var showValue = "";
-		switch (parseInt(value)) {
-			case 1:
-				showValue = '社区';break;
-			case 2:
-				showValue = '巡区';break;
-			case 3:
-				showValue = '卡点';break;
-			default:
-				showValue = '';
-		}
-		return showValue;
-	},
-	ondTypeWindowClose:function(){
-		alert("勤务类型选择");
-	},
+	}, 
 	selectDutyTemplete:function(){
-		 $("#Templetegrid").kendoGrid({
-                        dataSource: {
-                            data: null,
-                            schema: {
-                                model: {
-                                    fields: {
-                                        ProductName: { type: "string" },
-                                        UnitPrice: { type: "number" },
-                                        UnitsInStock: { type: "number" },
-                                        Discontinued: { type: "boolean" }
-                                    }
-                                }
-                            },
-                            pageSize: 20
-                        },
-                        toolbar: kendo.template($("#dutytemplatetb").html()),
-                        height: 250,
-                        scrollable: true,
-                        sortable: true,
-                        filterable: true,
-                        pageable: {
-                            input: true,
-                            numeric: false
-                        },
-                        columns: [
-                            "ProductName", 
-                            "UnitPrice",
-                            "UnitsInStock",
-                            "Discontinued"
-                        ] 
+		DutyBaseManage.loaddutyTemplete();
+		var win =$('#windowTemplete');
+		win.kendoWindow({
+                        width: "450px",
+                        title: "备勤模板"
                     });
-		  var windowTemplete = $("#windowTemplete");
-		  if (!windowTemplete.data("kendoWindow")) {
-                        windowTemplete.kendoWindow({
-                            width: "400px",
-                            title: "报备模板选择",
-                            actions: [ 
-                                "Close"
-                            ]
-                        });
-                    } 
+		win.data("kendoWindow").open(); 
 	},
-	sureSelectdutyTemp:function(){
-		alert("选择报备模板成功，执行treelist追加列表");
-	},
-	copyOfDuty:function(){
-		  var windowCpDate = $("#windowCpDate");
-		  if (!windowCpDate.data("kendoWindow")) {
-                        windowCpDate.kendoWindow({
-                            width: "400px",
-                            title: "报备复制",
-                            actions: [ 
-                                "Close"
-                            ]
-                        });
-                    }
-	},
-	onSelectDateToCopy:function(){
-		var s  = kendo.toString(this.value(), 'd');
-		alert(s);
-	},
+	loaddutyTemplete:function(){
+		$.ajax({
+			url : "/BPHCenter/dutyWeb/loadTemplateByOrgId.do?sessionId="+sessionId+"&orgId="+m_dutyprepare_Org.id,
+			type : "POST",
+			dataType : "json",
+			async : false,
+			success : function(req) {
+				if(req.code == 200){
+					if(req.data != null){
+						var udata = req.data;
+						var dtsource = new kendo.data.DataSource({
+							  data: udata
+							});
+						var dutyTempleteList=$("#Templetegrid").data("kendoGrid");
+						
+						dutyTempleteList.setDataSource(dtsource);
+					} 
+				}
+			}
+		});
+	}, 
 	exportDuty:function(){
 	
 	},

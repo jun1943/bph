@@ -33,7 +33,7 @@ $(function() {
 				}).mouseout(function(){
 					txt.css("background-position","-147px -757px");
 				});
-				
+				window.external.ChangeScreenModel("标准模式");
 			}else if(lump == 2){
 				icon.animate({"left":"43px"},1000);
 				txt.css("background-position","-17px -767px");
@@ -42,7 +42,7 @@ $(function() {
 				}).mouseout(function(){
 					txt.css("background-position","-147px -793px");
 				});
-				
+				window.external.ChangeScreenModel("模块全屏");
 			}else if(lump == 3){
 				icon.animate({"left":"78px"},1000);
 				txt.css("background-position","-18px -803px");
@@ -51,7 +51,7 @@ $(function() {
 				}).mouseout(function(){
 					txt.css("background-position","-147px -828px");
 				});
-				
+				window.external.ChangeScreenModel("内容全屏");
 			}
 		});
 	});

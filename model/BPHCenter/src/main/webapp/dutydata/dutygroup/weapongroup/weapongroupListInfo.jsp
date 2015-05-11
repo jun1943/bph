@@ -18,11 +18,11 @@ var m_weaponGroup_Query = {};
 var WeapongroupManage = { 
 	pageNo:1,
 	packageGroupData:function(pageNo){
-		m_weaponGroup_Query.orgId =1;// $("#organId").val();
+		m_weaponGroup_Query.orgId = $("#organId").val();
 		m_weaponGroup_Query.orgPath = $("#organPath").val();
 		m_weaponGroup_Query.orgCode = $("#organPath").val();
 		m_weaponGroup_Query.page = pageNo;
-		m_weaponGroup_Query.pageSize = 10; 
+		m_weaponGroup_Query.pageSize = 100; 
 	},
 	weaponGroupDataSource:[],
 	loadGroupData : function(pageNo) {
@@ -39,7 +39,7 @@ var WeapongroupManage = {
 					WeapongroupManage.weaponGroupDataSource = new kendo.data.DataSource({
 						data: rows,
 						batch: true,
-						pageSize: 20
+						pageSize: 10
 					});
 					
 					$("#dtWeaponGroup").kendoGrid({
@@ -53,14 +53,10 @@ var WeapongroupManage = {
 							hidden : true
 						}, {
 							title : '组名称',
-							field : 'name',
-							align : 'left',
-							width : 150
+							field : 'name'
 						}, {
 							title : '共享类型',
-							field : 'shareTypeDesc',
-							align : 'left',
-							width : 200
+							field : 'shareTypeDesc'
 						} ],
 						selectable: "row",
 						change : function(e) {
@@ -82,14 +78,10 @@ var WeapongroupManage = {
 							hidden : true
 						}, {
 							title : '组名称',
-							field : 'name',
-							align : 'left',
-							width : 150
+							field : 'name'
 						}, {
 							title : '共享类型',
-							field : 'shareTypeDesc',
-							align : 'left',
-							width : 200
+							field : 'shareTypeDesc'
 						} ],
 						selectable: "row",
 						change : function(e) {
@@ -105,7 +97,7 @@ var WeapongroupManage = {
 	},  
 	createGroup:function(){
 		var organId = $("#organId").val();
-		$("#dialog").kendoWindow({
+		$("#dialog").tyWindow({
 			width : "680px",
 			height : "500px",
 			title : "新建武器分组信息",
@@ -120,7 +112,7 @@ var WeapongroupManage = {
 	},
 	editGroup:function(){
 		var organId = $("#organId").val();
-		$("#dialog").kendoWindow({
+		$("#dialog").tyWindow({
 			width : "680px",
 			height : "500px",
 			title : "编辑武器分组信息",
@@ -150,7 +142,7 @@ var WeapongroupManage = {
 					success : function(req) {
 						if (req.code == 200) { 
 							$("body").popjs({"title":"提示","content":"删除成功"}); 
-							WeaponGroupManage.onCloseGorup()
+							WeapongroupManage.onCloseGorup()
 							$("#dtGroupMember").empty();
 						} else {
 							$("body").popjs({"title":"提示","content":"删除分组数据失败"}); 
@@ -228,7 +220,7 @@ var WeapongroupManage = {
 			var row = kGrid.dataItem(kGrid.select());
 			if (row != null) {
 			var groupId = row.id;
-		$("#dialog").kendoWindow({
+		$("#dialog").tyWindow({
 			width : "680px",
 			height : "500px",
 			title : "分组成员信息",

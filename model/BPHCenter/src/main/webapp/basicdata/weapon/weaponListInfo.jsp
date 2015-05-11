@@ -33,7 +33,10 @@ var WeaponManage= {
 					url : "<%=basePath%>weaponWeb/getWeaponList.do?sessionId="+sessionId,
 					type : "post",
 					data : {
-						"weapon_Query" : JSON.stringify(bph_weapon_query)
+						"weapon_Query" : JSON.stringify(bph_weapon_query),
+						"expandeds"		:expandeds,
+						"organId":$("#organId").val(),
+						"organPath":$("#organPath").val()
 					},
 					dataType : "json",
 					success : function(req) {

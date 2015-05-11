@@ -19,11 +19,11 @@ var m_gpsGroup_Query = {};
 var GpsgroupManage = { 
 	pageNo:1,
 	packageGroupData:function(pageNo){
-		m_gpsGroup_Query.orgId =1;// $("#organId").val();
+		m_gpsGroup_Query.orgId = $("#organId").val();
 		m_gpsGroup_Query.orgPath = $("#organPath").val();
 		m_gpsGroup_Query.orgCode = $("#organCode").val();
 		m_gpsGroup_Query.page = pageNo;
-		m_gpsGroup_Query.pageSize = 10; 
+		m_gpsGroup_Query.pageSize = 100; 
 	},
 	gpsGroupDataSource:[],
 	loadGroupData : function(pageNo) {
@@ -41,7 +41,7 @@ var GpsgroupManage = {
 				GpsgroupManage.gpsGroupDataSource = new kendo.data.DataSource({
 					data: rows,
 					batch: true,
-					pageSize: 20
+					pageSize: 10
 				});
 				
 				$("#dtGpsGroup").kendoGrid({
@@ -50,19 +50,13 @@ var GpsgroupManage = {
 					columns : [ {
 						title : 'Id',
 						field : 'id',
-						align : 'left',
-						width : 10,
 						hidden : true
 					}, {
 						title : '组名称',
-						field : 'name',
-						align : 'left',
-						width : 150
+						field : 'name'
 					}, {
 						title : '共享类型',
-						field : 'shareTypeDesc',
-						align : 'left',
-						width : 200
+						field : 'shareTypeDesc'
 					} ],
 					selectable: "row",
 					change : function(e) {
@@ -78,19 +72,13 @@ var GpsgroupManage = {
 					columns : [ {
 						title : 'Id',
 						field : 'id',
-						align : 'left',
-						width : 10,
 						hidden : true
 					}, {
 						title : '组名称',
-						field : 'name',
-						align : 'left',
-						width : 150
+						field : 'name'
 					}, {
 						title : '共享类型',
-						field : 'shareTypeDesc',
-						align : 'left',
-						width : 200
+						field : 'shareTypeDesc'
 					} ],
 					selectable: "row",
 					change : function(e) {
@@ -106,7 +94,7 @@ var GpsgroupManage = {
 	},  
 	createGroup:function(){
 		var organId = $("#organId").val();
-		$("#dialog").kendoWindow({
+		$("#dialog").tyWindow({
 			width : "680px",
 			height : "500px",
 			title : "新建定位设备分组",
@@ -122,7 +110,7 @@ var GpsgroupManage = {
 	},
 	editGroup:function(){
 		var organId = $("#organId").val();
-		$("#dialog").kendoWindow({
+		$("#dialog").tyWindow({
 			width : "680px",
 			height : "500px",
 			title : "编辑定位设备信息",
@@ -152,7 +140,7 @@ var GpsgroupManage = {
 					success : function(req) {
 						if (req.code == 200) { 
 							$("body").popjs({"title":"提示","content":"删除成功"}); 
-							GpsGroupManage.onCloseGorup()
+							GpsgroupManage.onCloseGorup()
 							$("#dtGroupMember").empty();
 						} else {
 							$("body").popjs({"title":"提示","content":"删除分组数据失败"}); 
@@ -207,7 +195,7 @@ var GpsgroupManage = {
 			var row = kGrid.dataItem(kGrid.select());
 			if (row != null) {
 			var groupId = row.id;
-		$("#dialog").kendoWindow({
+		$("#dialog").tyWindow({
 			width : "680px",
 			height : "500px",
 			title : "分组成员管理",

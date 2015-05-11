@@ -74,23 +74,29 @@ public class ExcelOutputController {
 			String serverPath = getClass().getResource("/").getFile()
 					.toString();
 			serverPath = serverPath.substring(0, (serverPath.length() - 16));
-			String filepath = createPoliceExcel(list, serverPath);
+			String filepath ="0";
+			if(list.size()>0){
+				filepath = createPoliceExcel(list, serverPath);
+			}
 
 			String retMsg = "";
 			int retCode = 0;
 			if (filepath.equals("1")) {
-				retMsg = "文件写入磁盘出错";
-				retCode = MessageCode.STATUS_FAIL;
-			} else if (filepath.equals("1")) {
 				retMsg = "文件创建出错";
 				retCode = MessageCode.STATUS_FAIL;
-			} else {
+			} else if (filepath.equals("2")){
+				retMsg = "创建Excel组件出错";
+				retCode = MessageCode.STATUS_FAIL;
+			}else if(filepath.equals("0")){
+				retMsg = "无查询结果数据，导出失败";
+				retCode = MessageCode.STATUS_FAIL;
+			}else{
 				retMsg = filepath;
 				retCode = MessageCode.STATUS_SUCESS;
 			}
 			return ReturnResult.MESSAGE(retCode, retMsg, 0, null);
 		} catch (Exception ex) {
-			return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL, "获取警员数据出错", 0,
+			return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL, "获取警员导出数据出错", 0,
 					null);
 		}
 	}
@@ -120,24 +126,30 @@ public class ExcelOutputController {
 			list = vehicleService.loadVMList(map);
 			String serverPath = getClass().getResource("/").getFile()
 					.toString();
-			serverPath = serverPath.substring(0, (serverPath.length() - 16));
-			String filepath = createVehicleExcel(list, serverPath);
+			serverPath = serverPath.substring(0, (serverPath.length() - 16)); 
+			String filepath ="0";
+			if(list.size()>0){
+				filepath = createVehicleExcel(list, serverPath);
+			}
 
 			String retMsg = "";
 			int retCode = 0;
 			if (filepath.equals("1")) {
-				retMsg = "文件写入磁盘出错";
-				retCode = MessageCode.STATUS_FAIL;
-			} else if (filepath.equals("1")) {
 				retMsg = "文件创建出错";
 				retCode = MessageCode.STATUS_FAIL;
-			} else {
+			} else if (filepath.equals("2")){
+				retMsg = "创建Excel组件出错";
+				retCode = MessageCode.STATUS_FAIL;
+			}else if(filepath.equals("0")){
+				retMsg = "无查询结果数据，导出失败";
+				retCode = MessageCode.STATUS_FAIL;
+			}else{
 				retMsg = filepath;
 				retCode = MessageCode.STATUS_SUCESS;
 			}
 			return ReturnResult.MESSAGE(retCode, retMsg, 0, null);
 		} catch (Exception ex) {
-			return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL, "获取警员数据出错", 0,
+			return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL, "获取车辆导出数据出错", 0,
 					null);
 		}
 	}
@@ -167,18 +179,24 @@ public class ExcelOutputController {
 			list = gpsService.loadVMList(map);
 			String serverPath = getClass().getResource("/").getFile()
 					.toString();
-			serverPath = serverPath.substring(0, (serverPath.length() - 16));
-			String filepath = createGpsExcel(list, serverPath);
+			serverPath = serverPath.substring(0, (serverPath.length() - 16)); 
+			String filepath ="0";
+			if(list.size()>0){
+				filepath = createGpsExcel(list, serverPath);
+			}
 
 			String retMsg = "";
 			int retCode = 0;
 			if (filepath.equals("1")) {
-				retMsg = "文件写入磁盘出错";
-				retCode = MessageCode.STATUS_FAIL;
-			} else if (filepath.equals("1")) {
 				retMsg = "文件创建出错";
 				retCode = MessageCode.STATUS_FAIL;
-			} else {
+			} else if (filepath.equals("2")){
+				retMsg = "创建Excel组件出错";
+				retCode = MessageCode.STATUS_FAIL;
+			}else if(filepath.equals("0")){
+				retMsg = "无查询结果数据，导出失败";
+				retCode = MessageCode.STATUS_FAIL;
+			}else{
 				retMsg = filepath;
 				retCode = MessageCode.STATUS_SUCESS;
 			}
@@ -213,18 +231,24 @@ public class ExcelOutputController {
 
 			String serverPath = getClass().getResource("/").getFile()
 					.toString();
-			serverPath = serverPath.substring(0, (serverPath.length() - 16));
-			String filepath = createWeaponExcel(list, serverPath);
+			serverPath = serverPath.substring(0, (serverPath.length() - 16)); 
+			String filepath ="0";
+			if(list.size()>0){
+				filepath = createWeaponExcel(list, serverPath);
+			}
 
 			String retMsg = "";
 			int retCode = 0;
 			if (filepath.equals("1")) {
-				retMsg = "文件写入磁盘出错";
-				retCode = MessageCode.STATUS_FAIL;
-			} else if (filepath.equals("1")) {
 				retMsg = "文件创建出错";
 				retCode = MessageCode.STATUS_FAIL;
-			} else {
+			} else if (filepath.equals("2")){
+				retMsg = "创建Excel组件出错";
+				retCode = MessageCode.STATUS_FAIL;
+			}else if(filepath.equals("0")){
+				retMsg = "无查询结果数据，导出失败";
+				retCode = MessageCode.STATUS_FAIL;
+			}else{
 				retMsg = filepath;
 				retCode = MessageCode.STATUS_SUCESS;
 			}

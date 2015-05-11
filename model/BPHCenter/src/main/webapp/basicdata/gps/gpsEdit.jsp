@@ -122,28 +122,6 @@ var GpsEditManage= {
 				return;
 			}
 			 
-			var pnumber = $.trim($("#gpsNumber").val()); 
-			if(pnumber.length>0){
-				if (pnumber.length > 20) {
-					$("body").popjs({"title":"提示","content":"定位设备编号长度出错，限制长度为0--20！","callback":function(){
-								$("#gpsNumber").focus();
-							}});  
-					return;
-				}
-				GpsEditManage.isExistGps(pnumber, gId,1);
-				if (!isExist) { 
-					$("body").popjs({"title":"提示","content":"该设备编号在"+bph_Exist_OrgName+"机构下已经存在，请确认之后添加","callback":function(){
-								$("#gpsNumber").focus();
-							}});  
-					return;
-				}
-			}else{ 
-					$("body").popjs({"title":"提示","content":"请录入定位设备编号！","callback":function(){
-								$("#gpsNumber").focus();
-							}});  
-				return;
-			}
-			bph_gpsEdit_pkg.number= pnumber;
 			var gname= $.trim($("#gpsName").val());
 			if(gname.length>0){
 				if (gname.length > 20) { 
@@ -161,12 +139,64 @@ var GpsEditManage= {
 			bph_gpsEdit_pkg.gpsName = gname; 
 			
 			
+			var pnumber = $.trim($("#gpsNumber").val()); 
+			if(pnumber.length>0){
+				if (pnumber.length > 20) {
+					$("body").popjs({"title":"提示","content":"定位设备编号长度出错，限制长度为0--20！","callback":function(){
+								$("#gpsNumber").focus();
+							}});  
+					return;
+				}
+				//GpsEditManage.isExistGps(pnumber, gId,1);
+				//if (!isExist) { 
+				//	$("body").popjs({"title":"提示","content":"该设备编号在"+bph_Exist_OrgName+"机构下已经存在，请确认之后添加","callback":function(){
+				//				$("#gpsNumber").focus();
+				//			}});  
+				//	return;
+				//}
+			}else{ 
+					$("body").popjs({"title":"提示","content":"请录入定位设备编号！","callback":function(){
+								$("#gpsNumber").focus();
+							}});  
+				return;
+			}
+			bph_gpsEdit_pkg.number= pnumber;
 			GpsEditManage.isComplete = true;
 		},
 		saveGpsNotOut:function(){ 
 			parent.GpsManage.onClose();
 		},
 
+			// 判断警员是否存在
+			isExistNumber:function() { 
+			var pnumber = $.trim($("#gpsNumber").val()); 
+			var gId = $("#gpsId").val();
+			
+			if(pnumber.length>0){
+				$.ajax({
+					url : "<%=basePath%>gpsWeb/isExistGps.do?sessionId="+sessionId,
+					type : "POST",
+					dataType : "json",
+					async : false,
+					data : {
+						"param" : pnumber,
+						"type"  : 1,
+						"id"    : gId
+					},
+					success : function(req) {
+					if (req.code!=200) {  
+						bph_Exist_OrgName = req.description; 
+						$("body").popjs({"title":"提示","content":"该定位设备编号在"+bph_Exist_OrgName+"机构下已存在，请确认后添加","callback":function(){
+								$("#gpsNumber").focus(); 
+								return;
+							}});   
+						return; 
+						
+					}
+					}
+				});
+				}
+			},
 		// 判断警员是否存在
 		isExistGps:function(param,gid,type) {
 			isExist = false;
@@ -193,7 +223,7 @@ var GpsEditManage= {
 </script>
 </head>
 
-<body>
+<body class="ty-body">
 	<div id="vertical">
 		<div id="horizontal">
 			<div class="pane-content">
@@ -210,8 +240,8 @@ var GpsEditManage= {
 									<li style="padding:5px;"><span class="ty-input-warn">*</span><label for="gpsName" class="fl mr5">GPS名称:</label><input type="text"
 										class="k-textbox" name="gpsName" id="gpsName"  value="${gps.gpsName}" /></li>
 									<li style="padding:5px;"><span class="ty-input-warn">*</span><label for="gpsNumber" class="fl mr5">GPS编号:</label><input type="text"
-										class="k-textbox" name="gpsNumber" id="gpsNumber" value="${gps.number}" /></li>
-									<li style="padding:5px;"><label for="gpsIcons" class="fl mr5">GPS图标:</label><input id="gpsIcons"
+										class="k-textbox" name="gpsNumber" id="gpsNumber" value="${gps.number}" onblur="GpsEditManage.isExistNumber()" /></li>
+									<li style="padding:5px;"><span class="ty-input-warn"></span><label for="gpsIcons" class="fl mr5">GPS图标:</label><input id="gpsIcons"
 										placeholder="请选择GPS图标..." value="${gps.iconId}"  /><input type="hidden"
 										id="txtgpsiconUrl" value="${gps.iconUrl}" /></li>
 								</ul>
@@ -221,8 +251,8 @@ var GpsEditManage= {
 					 		</td>
 					 	</tr>
 					 </table>
-					<p style="padding:5px;">
-						<span class="k-button"  onclick="GpsEditManage.saveGpsWithOut()">保存</span>
+					<p class="ty-input-row">
+						<button class="ty-button"  onclick="GpsEditManage.saveGpsWithOut()">保存</button>
 					</p>
 
 

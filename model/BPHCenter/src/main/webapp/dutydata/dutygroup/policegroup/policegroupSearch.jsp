@@ -53,7 +53,7 @@ $(document).ready(function() {
 		<div class="ty-decorate1"></div> 
                    <span id="btncreateGroup" class="k-button"  onclick="PolicegroupManage.createGroup()">创建分组</span>
                    <span id="btneditGroup" class="k-button"  onclick="PolicegroupManage.editGroup()">修改分组</span> 
-                   <span id="btndeleteGroup" class="k-button"  onclick="PolicegroupManage.deleteGroup)">删除分组</span>
+                   <span id="btndeleteGroup" class="k-button"  onclick="PolicegroupManage.deleteGroup()">删除分组</span>
                    <span id="btnaddMember" class="k-button"  onclick="PolicegroupManage.addMember()">添加成员</span> 
                    <span id="btndeleteMember" class="k-button"  onclick="PolicegroupManage.deleteMember()">删除成员</span> 
                    <span id="btnclearUpMember" class="k-button"  onclick="PolicegroupManage.clearUpMember()">清空成员</span> 

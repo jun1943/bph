@@ -18,11 +18,11 @@ var m_policeGroup_Query = {};
 var PolicegroupManage = { 
 	pageNo:1,
 	packageGroupData:function(pageNo){
-		m_policeGroup_Query.orgId =1;// $("#organId").val();
+		m_policeGroup_Query.orgId = $("#organId").val();
 		m_policeGroup_Query.orgPath = $("#organPath").val();
 		m_policeGroup_Query.orgCode = $("#organPath").val();
 		m_policeGroup_Query.page = pageNo;
-		m_policeGroup_Query.pageSize = 10; 
+		m_policeGroup_Query.pageSize = 100; 
 	},
 	policeGroupDataSource:[],
 	loadGroupData : function(pageNo) {
@@ -41,7 +41,7 @@ var PolicegroupManage = {
 					PolicegroupManage.policeGroupDataSource = new kendo.data.DataSource({
 							data: rows,
 							batch: true,
-							pageSize: 20
+							pageSize: 10
 						}); 
 						$("#dtPoliceGroup").kendoGrid({
 					dataSource: PolicegroupManage.policeGroupDataSource,
@@ -54,14 +54,10 @@ var PolicegroupManage = {
 						hidden : true
 					}, {
 						title : '组名称',
-						field : 'name',
-						align : 'left',
-						width : 150
+						field : 'name'
 					}, {
 						title : '共享类型',
-						field : 'shareTypeDesc',
-						align : 'left',
-						width : 200
+						field : 'shareTypeDesc'
 					} ],
 					selectable: "row",
 					change : function(e) {
@@ -82,14 +78,10 @@ var PolicegroupManage = {
 						hidden : true
 					}, {
 						title : '组名称',
-						field : 'name',
-						align : 'left',
-						width : 150
+						field : 'name'
 					}, {
 						title : '共享类型',
-						field : 'shareTypeDesc',
-						align : 'left',
-						width : 200
+						field : 'shareTypeDesc'
 					} ],
 					selectable: "row",
 					change : function(e) {
@@ -106,7 +98,7 @@ var PolicegroupManage = {
 	},  
 	createGroup:function(){
 		var organId = $("#organId").val();
-		$("#dialog").kendoWindow({
+		$("#dialog").tyWindow({
 			width : "680px",
 			height : "500px",
 			title : "新建警员分组",
@@ -121,7 +113,7 @@ var PolicegroupManage = {
 	},
 	editGroup:function(){
 		var organId = $("#organId").val();
-		$("#dialog").kendoWindow({
+		$("#dialog").tyWindow({
 			width : "680px",
 			height : "500px",
 			title : "警员信息",
@@ -151,7 +143,7 @@ var PolicegroupManage = {
 					success : function(req) {
 						if (req.code == 200) { 
 							$("body").popjs({"title":"提示","content":"删除成功"}); 
-							PoliceGroupManage.onCloseGroup()
+							PolicegroupManage.onCloseGroup();
 							$("#dtGroupMember").empty();
 						} else {
 							$("body").popjs({"title":"提示","content":"删除分组数据失败"}); 
@@ -206,7 +198,7 @@ var PolicegroupManage = {
 			var row = kGrid.dataItem(kGrid.select());
 			if (row != null) {
 			var groupId = row.id;
-		$("#dialog").kendoWindow({
+		$("#dialog").tyWindow({
 			width : "680px",
 			height : "500px",
 			title : "警员分组成员信息",

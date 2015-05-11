@@ -126,7 +126,7 @@ var DutyTyepManage = {
 			m_dutyTypeObj.armamentType = row.armamentType;
 			m_dutyTypeObj.isUsed = row.isUsed;
 			m_dutyTypeObj.assoTaskType = row.assoTaskType;  
-			$("#dialog").kendoWindow({
+			$("#dialog").tyWindow({
 			width : "680px",
 			height : "500px",
 			title : "编辑勤务类型",
@@ -184,7 +184,7 @@ var DutyTyepManage = {
 			m_parentNode_pkg.parentName = "";
 			m_parentNode_pkg.parentFullPath = ""; 
 			m_parentNode_pkg.parentId = 0;  
-		$("#dialog").kendoWindow({
+		$("#dialog").tyWindow({
 			width : "680px",
 			height : "500px",
 			title : "新建根节点",
@@ -205,7 +205,7 @@ var DutyTyepManage = {
 			m_parentNode_pkg.parentName = row.name;
 			m_parentNode_pkg.parentFullPath = row.fullpath; 
 			m_parentNode_pkg.parentId = row.id; 
-		$("#dialog").kendoWindow({
+		$("#dialog").tyWindow({
 			width : "680px",
 			height : "500px",
 			title : "新建子节点",

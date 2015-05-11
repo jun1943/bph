@@ -18,11 +18,11 @@ var m_vehicleGroup_Query = {};
 var VehicleGroupManage = { 
 	pageNo:1,
 	packageGroupData:function(pageNo){
-		m_vehicleGroup_Query.orgId =1;// $("#organId").val();
+		m_vehicleGroup_Query.orgId = $("#organId").val();
 		m_vehicleGroup_Query.orgPath = $("#organPath").val();
 		m_vehicleGroup_Query.orgCode = $("#organPath").val();
 		m_vehicleGroup_Query.page = pageNo;
-		m_vehicleGroup_Query.pageSize = 10; 
+		m_vehicleGroup_Query.pageSize = 100; 
 	},
 	vehicleGroupDataSource:[],
 	loadGroupData : function(pageNo) {
@@ -39,7 +39,7 @@ var VehicleGroupManage = {
 								VehicleGroupManage.vehicleGroupDataSource = new kendo.data.DataSource({
 									data : rows,
 									batch : true,
-									pageSize : 20
+									pageSize : 10
 								});
 
 								$("#dtVehicleGroup")
@@ -57,15 +57,11 @@ var VehicleGroupManage = {
 															},
 															{
 																title : '组名称',
-																field : 'name',
-																align : 'left',
-																width : 150
+																field : 'name'
 															},
 															{
 																title : '共享类型',
-																field : 'shareTypeDesc',
-																align : 'left',
-																width : 200
+																field : 'shareTypeDesc'
 															} ],
 													selectable : "row",
 													change : function(e) {
@@ -91,15 +87,11 @@ var VehicleGroupManage = {
 															},
 															{
 																title : '组名称',
-																field : 'name',
-																align : 'left',
-																width : 150
+																field : 'name'
 															},
 															{
 																title : '共享类型',
-																field : 'shareTypeDesc',
-																align : 'left',
-																width : 200
+																field : 'shareTypeDesc'
 															} ],
 													selectable : "row",
 													change : function(e) {
@@ -114,7 +106,7 @@ var VehicleGroupManage = {
 	},  
 	createGroup:function(){
 		var organId = $("#organId").val();
-		$("#dialog").kendoWindow({
+		$("#dialog").tyWindow({
 			width : "680px",
 			height : "500px",
 			title : "车辆分组信息",
@@ -130,7 +122,7 @@ var VehicleGroupManage = {
 	editGroup:function(){
 		var organId = $("#organId").val();
 		if(m_vehiclegroup_Id!=undefined){
-		$("#dialog").kendoWindow({
+		$("#dialog").tyWindow({
 			width : "680px",
 			height : "500px",
 			title : "车辆分组信息",
@@ -219,7 +211,7 @@ var VehicleGroupManage = {
 			var row = kGrid.dataItem(kGrid.select());
 			if (row != null) {
 			var groupId = row.id;
-		$("#dialog").kendoWindow({
+		$("#dialog").tyWindow({
 			width : "680px",
 			height : "500px",
 			title : "分组成员信息",
