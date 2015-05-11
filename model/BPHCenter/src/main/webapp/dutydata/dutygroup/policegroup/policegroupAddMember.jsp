@@ -183,7 +183,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 					success : function(req) {
 						if (req.code == 200) { 
 							 $("body").popjs({"title":"提示","content":"分组成员信息保存成功","callback":function(){ 
-								window.parent.window.parent.PoliceGroupManage.onCloseMember();
+								window.parent.window.parent.PolicegroupManage.onCloseMember();
 								window.parent.$("#dialog").tyWindow.close();
 							}}); 
 						} else {

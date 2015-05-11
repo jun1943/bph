@@ -130,7 +130,8 @@ var m_policeGroup_Org = {
 			pg.shareType = $('input:radio[name="shareType"]:checked').val();
 
 			if(pg.shareType ==0||pg.shareType=="0"){
-				pg.shareOrgIds = [];
+					var shOrgId =  m_policeGroup_Org.id;
+					pg.shareOrgIds.push(shOrgId);
 			}else{
  				var selectIds ="";
  				var  selectNode = $("#treeOrg").data("kendoTreeView");

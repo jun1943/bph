@@ -127,7 +127,8 @@ var WeaponGroupManage ={
 		pg.shareType = $('input:radio[name="shareType"]:checked').val();
 		
 			if(pg.shareType ==0||pg.shareType=="0"){
-				pg.shareOrgIds = [];
+					var shOrgId =  m_weaponGroup_Org.id;
+					pg.shareOrgIds.push(shOrgId);
 			}else{
  				var selectIds ="";
  				var  selectNode = $("#treeOrg").data("kendoTreeView");
@@ -154,7 +155,7 @@ var WeaponGroupManage ={
 			success : function(req) {
 				if (req.code == 200) { 
 							 $("body").popjs({"title":"提示","content":"分组信息保存成功","callback":function(){ 
-								window.parent.window.parent.WeaponGroupManage.onCloseGorup();
+								window.parent.window.parent.WeapongroupManage.onCloseGorup();
 								window.parent.$("#dialog").tyWindow.close();
 							}}); 
 						} else {

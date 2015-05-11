@@ -3,9 +3,9 @@ var ymd ;
 var m_ymd=null;
 var m_xid_max = 0; // duty的treegrid的id,必须确保唯一性
 var m_changestates = "2";
+var isFirstLoad = true;
 //var bph_dutyPrepare_OrgId = $("#organId").val();
-var m_dutyprepare_Org={};
-
+var m_dutyprepare_Org={}; 
 var m_policesourceData=null;
 var m_vehicleSourceData=null;
 var m_weaponSourceData=null;
@@ -13,8 +13,7 @@ var m_gpsSourceData =null;
 var m_shift={};
 var m_userNode={};
 var m_target={};
-var m_duty={};
-var m_changestates = "2";
+var m_duty={}; 
  
 $(function() {
 	
@@ -30,7 +29,7 @@ $(function() {
 	
 	obj.orgId = $("#organId").val();
 	obj.ymd = ymd;
-	DutyPrepareManage.loadDuty(obj,1); 
+	DutyPrepareManage.loadDuty(obj,0); 
 });
 //管理窗体及对话框。
 var DutyPrepareManage={
@@ -57,8 +56,7 @@ var DutyPrepareManage={
 					width : 80
 				}],
 				scrollable: true,
-				selectable: "row",
-				height:300
+				selectable: "row" 
 			});
 			$("#DutyTypetreeList").delegate("tbody>tr", "dblclick", this.onSelectDutyType);
 			
@@ -132,7 +130,7 @@ var DutyPrepareManage={
 			});
 			var win =$('#windowDutyType');
 			win.kendoWindow({
-	                        width: "450px",
+	                        width: "600px",
 	                        title: "备勤类型"
 	                    });
 			win.data("kendoWindow").open();
@@ -195,18 +193,20 @@ var DutyPrepareManage={
 						m_targetPoint = req.data;
 						if (duty == null) {
 							duty = {};
-							duty.id = 0;
+							duty.id = duty.id;
 							duty.ymd = m_ymd.ymd;
 							duty.orgId = m_dutyprepare_Org.id;
 							duty.items = [];
 						}
-						switch (type) {
+						switch (type) { 
 						case 1:
 							DutyItemManage.clearId(duty);
 							duty.isTemplate = false;
+							duty.id = 0;
 							break;
 						case 2:
 							DutyItemManage.clearId(duty);
+							duty.id = 0;
 							break;
 						}
 						
@@ -329,9 +329,22 @@ var DutyPrepareManage={
 					};
 				DutyPrepareManage.loadDuty(pars,2);
 				var winCal=$("#calendarWindow").data("kendoWindow");
-				winCal.close();
-				//loadDuty(pars, 2); 
+				winCal.close(); 
 		}, 
+		returnBackToCalendar:function(){ 
+			if(m_changestates == "0"){
+				$("body").tyWindow({"content":"当前报备信息尚未保存，是否返回报备月程页面?","center":true,"ok":true,"no":true,"okCallback":function(){ 
+						DutyPrepareManage.returnBackToCalendarAction();
+					}
+				});
+			}else{
+				DutyPrepareManage.returnBackToCalendarAction();
+			} 
+		},
+		returnBackToCalendarAction:function(){
+			var date = ymd.substring(0,4)+"-"+ymd.substring(4,6)+"-"+ymd.substring(6,8);
+			window.location.href="/BPHCenter/dutyRouteWeb/gotoDutyCalendar.action?sessionId="+sessionId+"&orgId="+m_dutyprepare_Org.id+"&date="+date;
+		}
 };
 //管理基础资料
 var DutyBaseManage = {
@@ -462,7 +475,7 @@ var DutyBaseManage = {
 									hidden: true
 								},{
 									title : '组名称', 
-									template: "<input type='checkbox' id='ty_ck_#: id #' value='#: id #' /> #: name # "
+									template: "<input type='checkbox' id='gp_ck_#: id #' value='#: id #' /> #: name # "
 								}] 
                     });
                      $("#polTypegrid").kendoGrid({
@@ -495,7 +508,16 @@ var DutyBaseManage = {
 		DutyBaseManage.bph_police_query.orgId = $("#organId").val();
 		DutyBaseManage.bph_police_query.orgCode = $("#organCode").val();
 		DutyBaseManage.bph_police_query.orgPath = $("#organPath").val();
-		DutyBaseManage.bph_police_query.name = $("#policeresName").val();
+		var policeresname =  $.trim($("#policeresName").val());
+		if(policeresname.length>0){
+			var myReg = /^[^|"'<>]*$/;
+			if (!myReg.test(policeresname)) {
+						$("body").popjs({"title":"提示","content":"过滤条件名称包含特殊字符，请重新输入"}); 
+						$("#policeresName").focus();
+						return;
+			} 
+		}
+		DutyBaseManage.bph_police_query.name = policeresname;
 
 		var pol_groupId ="";
 		var pol_typeId = "";
@@ -571,7 +593,16 @@ var DutyBaseManage = {
 		DutyBaseManage.bph_vehicle_query.orgId = $("#organId").val();
 		DutyBaseManage.bph_vehicle_query.orgCode = $("#organCode").val();
 		DutyBaseManage.bph_vehicle_query.orgPath = $("#organPath").val();
-		DutyBaseManage.bph_vehicle_query.number = "";//$("#vehicleresName").val();
+		var vehicleresName =  $.trim($("#vehicleresName").val());
+		if(vehicleresName.length>0){
+			var myReg = /^[^|"'<>]*$/;
+			if (!myReg.test(vehicleresName)) {
+						$("body").popjs({"title":"提示","content":"过滤条件名称包含特殊字符，请重新输入"}); 
+						$("#vehicleresName").focus();
+						return;
+			} 
+		}
+		DutyBaseManage.bph_vehicle_query.number = vehicleresName; 
 		DutyBaseManage.bph_vehicle_query.typeId = "";
 		DutyBaseManage.bph_vehicle_query.groupId = ""; 
 	 
@@ -619,12 +650,13 @@ var DutyBaseManage = {
 			}
 		}); 
 	}, 
-	vehGroupResData:null,
-	vehTypeResData:null,
-	selectVelResCondition:function(){
+	vehGroupResData:[],
+	vehTypeResData:[],
+	loadVelResCondition:function(){
 		$.ajax({
 			url : "/BPHCenter/dutyResourceWeb/getVehicleGrouplist.do?sessionId="+sessionId,
 					type : "post",
+					async:false,
 					data : {
 						"orgId" : m_dutyprepare_Org.id
 					},
@@ -642,6 +674,7 @@ var DutyBaseManage = {
 		$.ajax({
 			url : "/BPHCenter/dutyResourceWeb/getvehicleTypelist.do?sessionId="+sessionId,
 					type : "post", 
+					async:false,
 					dataType : "json",
 					success:function(req){
 						if(req.code==200){
@@ -652,7 +685,10 @@ var DutyBaseManage = {
 							$("body").popjs({"title":"提示","content":"获取警员类型查询条件失败"}); 
 						}
 					} 
-		}); 
+		});
+	},
+	selectVehResCondition:function(){
+		DutyBaseManage.loadVelResCondition();
 		 			 $("#vehGroupgrid").kendoGrid({
                  		 dataSource: {
                             data: DutyBaseManage.vehGroupResData
@@ -665,7 +701,7 @@ var DutyBaseManage = {
 									hidden: true
 								},{
 									title : '组名称',
-									field : 'name'
+									template: "<input type='checkbox' id='gp_ck_#: id #' value='#: id #' /> #: name # "
 								}] 
                     });
                      $("#vehTypegrid").kendoGrid({
@@ -680,34 +716,117 @@ var DutyBaseManage = {
 									hidden: true
 								},{
 									title : '类型名称',
-									field : 'name'
+									template: "<input type='checkbox' id='ty_ck_#: id #' value='#: id #' /> #: name #  "
 								}]
                     });
-		  var vehResConWindow = $("#vehResConWindow");
-		  if (!vehResConWindow.data("kendoWindow")) {
-                        vehResConWindow.kendoWindow({
-                            width: "400px",
-                            title: "车辆资源过滤条件",
-                            actions: [ 
-                                "Close"
-                            ]
-                        });
-                    }  
+                     var win =$('#vehResConWindow');
+         			win.kendoWindow({
+         	                        width: "450px",
+         	                        title: "车辆分组过滤条件"
+         	                    });
+         			win.data("kendoWindow").open();     
 	},
-	searchVehicleRescource:function(){
+	searchVehicleResWithOutList:function(){ 
+		DutyBaseManage.initVehicleResource();
+	},
+	searchVehicleResWithList:function(){
 		DutyBaseManage.bph_vehicle_query.orgId = $("#organId").val();
 		DutyBaseManage.bph_vehicle_query.orgCode = $("#organCode").val();
 		DutyBaseManage.bph_vehicle_query.orgPath = $("#organPath").val();
-		DutyBaseManage.bph_vehicle_query.number = $("#vehicleresName").val();
-		DutyBaseManage.bph_vehicle_query.typeId = "";
-		DutyBaseManage.bph_vehicle_query.groupId = ""; 
-	},
+		var vehicleresName =  $.trim($("#vehicleresName").val());
+		if(vehicleresName.length>0){
+			var myReg = /^[^|"'<>]*$/;
+			if (!myReg.test(vehicleresName)) {
+						$("body").popjs({"title":"提示","content":"过滤条件名称包含特殊字符，请重新输入"}); 
+						$("#vehicleresName").focus();
+						return;
+			} 
+		}
+		DutyBaseManage.bph_vehicle_query.number = vehicleresName;  
+		
+		var veh_groupId = "";
+		var veh_typeId = "";
+		var g=$("#vehGroupgrid input:checkbox:checked").length;
+		if(g>0){ 
+			var groupObj = $("#vehGroupgrid input:checkbox:checked");
+			$.each(groupObj, function(index, gobj){
+				veh_groupId +=gobj.value+",";
+			});
+			if(veh_groupId.length>0){
+				veh_groupId = veh_groupId.substring(0,veh_groupId.length-1);
+			}
+		}
+		var t = $("#vehTypegrid input:checkbox:checked").length;
+		if(t>0){ 
+			var typeObj = $("#vehTypegrid input:checkbox:checked");
+			$.each(typeObj, function(index, tobj){
+				if(tobj.value!="-1"){
+					veh_typeId +=tobj.value+",";
+				}
+			});
+			if(veh_typeId.length>0){
+				veh_typeId = veh_typeId.substring(0,veh_typeId.length-1);
+			}
+		}
+		DutyBaseManage.bph_vehicle_query.typeId = veh_typeId;
+		DutyBaseManage.bph_vehicle_query.groupId =veh_groupId; 
+		$("#vehicleSourceTV").empty();
+		
+		$("#vehicleSourceTV").kendoTreeView({
+			//toolbar: kendo.template($("#polContemplate").html()),
+			dragAndDrop: true,
+			drop:function(e){
+				var point=e.dropPosition;
+				var sRow=$("#vehicleSourceTV").data("kendoTreeView").dataItem(e.sourceNode);
+				var tRow=$("#dutyItemTV").data("kendoTreeView").dataItem(e.destinationNode );
+				
+				if(tRow==null || sRow == null){
+					e.setValid(false);
+				}
+				
+				if(DutyItemManage.checkDrop(tRow,sRow,point)){
+					DutyItemManage.doDrop(tRow, sRow, point);
+				}else{
+					e.setValid(false);
+				}
+			},
+			dragend:DutyItemManage.doDragEnd,
+			template: kendo.template($("#vehicleSource-template").html()),
+			dataTextField:["name","number"]
+			});
+		
+		$.ajax({
+			url : "/BPHCenter/dutyResourceWeb/getVehicleSource.do?sessionId="+sessionId,
+			type : "POST",
+			dataType : "json",
+			data : {
+						"vehicle_Query" : JSON.stringify(DutyBaseManage.bph_vehicle_query)
+					},
+			success : function(req) {
+				if(req.code == 200){
+					if(req.data != null){
+						m_vehicleSourceData = req.data;
+						$("#vehicleSourceTV").data("kendoTreeView").setDataSource(req.data);
+					} 
+				}
+			}
+		}); 
+	}, 
 	bph_weapon_query:{},
 	packageWepQuery:function(){
 		DutyBaseManage.bph_weapon_query.orgId = $("#organId").val();
 		DutyBaseManage.bph_weapon_query.orgCode = $("#organCode").val();
 		DutyBaseManage.bph_weapon_query.orgPath = $("#organPath").val();
-		DutyBaseManage.bph_weapon_query.number = "";//$("#weaponresName").val();
+		var weaponresName =  $.trim($("#weaponresName").val());
+		if(weaponresName.length>0){
+			var myReg = /^[^|"'<>]*$/;
+			if (!myReg.test(weaponresName)) {
+						$("body").popjs({"title":"提示","content":"过滤条件名称包含特殊字符，请重新输入"}); 
+						$("#weaponresName").focus();
+						return;
+			} 
+		}
+		DutyBaseManage.bph_weapon_query.number = weaponresName;  
 		DutyBaseManage.bph_weapon_query.typeId = "";
 		DutyBaseManage.bph_weapon_query.groupId = "";  
 	},
@@ -755,12 +874,13 @@ var DutyBaseManage = {
 			}
 		}); 
 	},
-	wepGroupResData:null,
-	wepTypeResData:null,
-	selectWepResCondition:function(){
+	wepGroupResData:[],
+	wepTypeResData:[],
+	loadWepResCondition:function(){
 		$.ajax({
 			url : "/BPHCenter/dutyResourceWeb/getWeaponGrouplist.do?sessionId="+sessionId,
 					type : "post",
+					async:false,
 					data : {
 						"orgId" : m_dutyprepare_Org.id
 					},
@@ -771,7 +891,7 @@ var DutyBaseManage = {
 								DutyBaseManage.wepGroupResData = req.data;
 							}
 						}else{
-							$("body").popjs({"title":"提示","content":"获取警员分组查询条件失败"}); 
+							$("body").popjs({"title":"提示","content":"获取武器分组查询条件失败"}); 
 						}
 					} 
 		});
@@ -779,6 +899,7 @@ var DutyBaseManage = {
 			url : "/BPHCenter/dutyResourceWeb/getWeaponTypelist.do?sessionId="+sessionId,
 					type : "post", 
 					dataType : "json",
+					async:false,
 					success:function(req){
 						if(req.code==200){
 							if(req.data!=null){
@@ -789,6 +910,9 @@ var DutyBaseManage = {
 						}
 					} 
 		}); 
+	},
+	selectWepResCondition:function(){
+		DutyBaseManage.loadWepResCondition();
 		 $("#wepGroupgrid").kendoGrid({ 
                         dataSource: {
                             data: DutyBaseManage.wepGroupResData
@@ -801,7 +925,7 @@ var DutyBaseManage = {
 									hidden: true
 								},{
 									title : '组名称',
-									field : 'name'
+									template: "<input type='checkbox' id='gp_ck_#: id #' value='#: id #' /> #: name #  "
 								}] 
                     });
                      $("#wepTypegrid").kendoGrid({
@@ -815,35 +939,119 @@ var DutyBaseManage = {
 									field : 'id',
 									hidden: true
 								},{
-									title : '类型名称',
-									field : 'name'
+									title : '类型名称', 
+									template: "<input type='checkbox' id='ty_ck_#: id #' value='#: id #' /> #: name #  "
 								}]
                     });
-		  var wepResConWindow = $("#wepResConWindow");
-		  if (!wepResConWindow.data("kendoWindow")) {
-                        wepResConWindow.kendoWindow({
-                            width: "400px",
-                            title: "车辆资源过滤条件",
-                            actions: [ 
-                                "Close"
-                            ]
-                        });
-                    }  
+              var win =$('#wepResConWindow');
+         			win.kendoWindow({
+         	                        width: "450px",
+         	                        title: "武器分组过滤条件"
+         	                    });
+         			win.data("kendoWindow").open();  
 	},
-	searchWeaponRescource:function(){
+	searchWeaponResWithOutList:function(){
+		DutyBaseManage.initWeaponResource();　
+	},
+	searchWeaponResWithList:function(){　
 		DutyBaseManage.bph_weapon_query.orgId = $("#organId").val();
 		DutyBaseManage.bph_weapon_query.orgCode = $("#organCode").val();
 		DutyBaseManage.bph_weapon_query.orgPath = $("#organPath").val();
-		DutyBaseManage.bph_weapon_query.number = $("#weaponresName").val();
-		DutyBaseManage.bph_weapon_query.typeId = "";
-		DutyBaseManage.bph_weapon_query.groupId = "";  
+		var weaponresName =  $.trim($("#weaponresName").val());
+		if(weaponresName.length>0){
+			var myReg = /^[^|"'<>]*$/;
+			if (!myReg.test(weaponresName)) {
+						$("body").popjs({"title":"提示","content":"过滤条件名称包含特殊字符，请重新输入"}); 
+						$("#weaponresName").focus();
+						return;
+			} 
+		}
+		DutyBaseManage.bph_weapon_query.number = weaponresName;    
+		
+		var wep_groupId = "";
+		var wep_typeId = "";
+		var g=$("#wepGroupgrid input:checkbox:checked").length;
+		if(g>0){ 
+			var groupObj = $("#wepGroupgrid input:checkbox:checked");
+			$.each(groupObj, function(index, gobj){
+				wep_groupId +=gobj.value+",";
+			});
+			if(wep_groupId.length>0){
+				wep_groupId = wep_groupId.substring(0,wep_groupId.length-1);
+			}
+		}
+		var t = $("#wepTypegrid input:checkbox:checked").length;
+		if(t>0){ 
+			var typeObj = $("#wepTypegrid input:checkbox:checked");
+			$.each(typeObj, function(index, tobj){
+				if(tobj.value!="-1"){
+					wep_typeId +=tobj.value+",";
+				}
+			});
+			if(wep_typeId.length>0){
+				wep_typeId = wep_typeId.substring(0,wep_typeId.length-1);
+			}
+		}
+		DutyBaseManage.bph_weapon_query.typeId = wep_typeId; 
+		DutyBaseManage.bph_weapon_query.groupId = wep_groupId;
+		$("#weaponSourceTV").empty();
+		$("#weaponSourceTV").kendoTreeView({
+			//toolbar: kendo.template($("#polContemplate").html()),
+			dragAndDrop: true,
+			drop:function(e){
+				var point=e.dropPosition;
+				var sRow=$("#weaponSourceTV").data("kendoTreeView").dataItem(e.sourceNode);
+				var tRow=$("#dutyItemTV").data("kendoTreeView").dataItem(e.destinationNode );
+				
+				if(tRow==null || sRow == null){
+					e.setValid(false);
+				}
+				
+				if(DutyItemManage.checkDrop(tRow,sRow,point)){
+					DutyItemManage.doDrop(tRow, sRow, point);
+				}else{
+					e.setValid(false);
+				}
+			},
+			dragend:DutyItemManage.doDragEnd,
+			template: kendo.template($("#weaponSource-template").html()),
+			dataTextField:["typeName","number"]
+		});
+		
+		$.ajax({
+			url : "/BPHCenter/dutyResourceWeb/getWeaponSource.do?sessionId="+sessionId,
+			type : "POST",
+			dataType : "json",
+			dataType : "json",
+			data : {
+						"weapon_Query" : JSON.stringify(DutyBaseManage.bph_weapon_query)
+					},
+			success : function(req) {
+				if(req.code == 200){
+					if(req.data != null){
+						m_weaponSourceData = req.data;
+						$("#weaponSourceTV").data("kendoTreeView").setDataSource(req.data);
+					} 
+				}
+			}
+		}); 
+		
 	},
 	bph_gps_query:{},
 	packageGpsQuery:function(){
 		DutyBaseManage.bph_gps_query.orgId = $("#organId").val();
 		DutyBaseManage.bph_gps_query.orgCode = $("#organCode").val();
 		DutyBaseManage.bph_gps_query.orgPath = $("#organPath").val();
-		DutyBaseManage.bph_gps_query.gpsname = "";//$("#gpsresName").val();
+		var gpsresName =  $.trim($("#gpsresName").val());
+		if(gpsresName.length>0){
+			var myReg = /^[^|"'<>]*$/;
+			if (!myReg.test(gpsresName)) {
+						$("body").popjs({"title":"提示","content":"过滤条件名称包含特殊字符，请重新输入"}); 
+						$("#gpsresName").focus();
+						return;
+			} 
+		}
+		DutyBaseManage.bph_gps_query.gpsname = gpsresName;   
 		DutyBaseManage.bph_gps_query.typeId = "";
 		DutyBaseManage.bph_gps_query.groupId = "";  
 	},
@@ -895,12 +1103,13 @@ var DutyBaseManage = {
 			}
 		}); 
 	},
-	gpsGroupResData:null,
-	gpsTypeResData:null,
-	selectGpsResCondition:function(){
+	gpsGroupResData:[],
+	gpsTypeResData:[],
+	loadGpsResCondition:function(){ 
 		$.ajax({
 			url : "/BPHCenter/dutyResourceWeb/getGpsGrouplist.do?sessionId="+sessionId,
 					type : "post",
+					async:false,
 					data : {
 						"orgId" : m_dutyprepare_Org.id
 					},
@@ -911,7 +1120,7 @@ var DutyBaseManage = {
 								DutyBaseManage.gpsGroupResData = req.data;
 							}
 						}else{
-							$("body").popjs({"title":"提示","content":"获取警员分组查询条件失败"}); 
+							$("body").popjs({"title":"提示","content":"获取定位设备分组查询条件失败"}); 
 						}
 					} 
 		});
@@ -919,16 +1128,20 @@ var DutyBaseManage = {
 			url : "/BPHCenter/dutyResourceWeb/getGpsTypelist.do?sessionId="+sessionId,
 					type : "post", 
 					dataType : "json",
+					async:false,
 					success:function(req){
 						if(req.code==200){
 							if(req.data!=null){
 								DutyBaseManage.gpsTypeResData = req.data;
 							}
 						}else{
-							$("body").popjs({"title":"提示","content":"获取警员类型查询条件失败"}); 
+							$("body").popjs({"title":"提示","content":"获取定位设备类型查询条件失败"}); 
 						}
 					} 
 		}); 
+	},
+	selectGpsResCondition:function(){
+		DutyBaseManage.loadGpsResCondition(); 
 		  $("#gpsGroupgrid").kendoGrid({
                         dataSource: {
                             data: DutyBaseManage.gpsGroupResData
@@ -941,7 +1154,7 @@ var DutyBaseManage = {
 									hidden: true
 								},{
 									title : '组名称',
-									field : 'name'
+									template: "<input type='checkbox' id='gp_ck_#: id #' value='#: id #' /> #: name #  "
 								}] 
                     });
                      $("#gpsTypegrid").kendoGrid({
@@ -956,27 +1169,102 @@ var DutyBaseManage = {
 									hidden: true
 								},{
 									title : '类型名称',
-									field : 'name'
+									template: "<input type='checkbox' id='ty_ck_#: id #' value='#: id #' /> #: name #  "
 								}]
                     });
-		  var gpsResConWindow = $("#gpsResConWindow");
-		  if (!gpsResConWindow.data("kendoWindow")) {
-                        gpsResConWindow.kendoWindow({
-                            width: "400px",
-                            title: "定位设备资源过滤条件",
-                            actions: [ 
-                                "Close"
-                            ]
-                        });
-                    }
+              var win =$('#gpsResConWindow');
+         			win.kendoWindow({
+         	                        width: "450px",
+         	                        title: "武器分组过滤条件"
+         	                    });
+         			win.data("kendoWindow").open();   
 	},
-	searchGpsRescource:function(){ 
+	searchGpsResWithOutList:function(){
+		DutyBaseManage.initGpsResource();
+	},
+	searchGpsResWithList:function(){ 
 		DutyBaseManage.bph_gps_query.orgId = $("#organId").val();
 		DutyBaseManage.bph_gps_query.orgCode = $("#organCode").val();
 		DutyBaseManage.bph_gps_query.orgPath = $("#organPath").val();
-		DutyBaseManage.bph_gps_query.gpsname = $("#gpsresName").val();
-		DutyBaseManage.bph_gps_query.typeId = "";
-		DutyBaseManage.bph_gps_query.groupId = "";  
+		var gpsresName =  $.trim($("#gpsresName").val());
+		if(gpsresName.length>0){
+			var myReg = /^[^|"'<>]*$/;
+			if (!myReg.test(gpsresName)) {
+						$("body").popjs({"title":"提示","content":"过滤条件名称包含特殊字符，请重新输入"}); 
+						$("#gpsresName").focus();
+						return;
+			} 
+		}
+		DutyBaseManage.bph_gps_query.gpsname = gpsresName;    
+		
+		var gps_groupId = "";
+		var gps_typeId = "";
+		var g=$("#gpsGroupgrid input:checkbox:checked").length;
+		if(g>0){ 
+			var groupObj = $("#gpsGroupgrid input:checkbox:checked");
+			$.each(groupObj, function(index, gobj){
+				gps_groupId +=gobj.value+",";
+			});
+			if(gps_groupId.length>0){
+				gps_groupId = gps_groupId.substring(0,gps_groupId.length-1);
+			}
+		}
+		var t = $("#gpsTypegrid input:checkbox:checked").length;
+		if(t>0){ 
+			var typeObj = $("#gpsTypegrid input:checkbox:checked");
+			$.each(typeObj, function(index, tobj){
+				if(tobj.value!="-1"){
+					gps_typeId +=tobj.value+",";
+				}
+			});
+			if(gps_typeId.length>0){
+				gps_typeId = gps_typeId.substring(0,gps_typeId.length-1);
+			}
+		}
+		DutyBaseManage.bph_gps_query.typeId = gps_typeId; 
+		DutyBaseManage.bph_gps_query.groupId = gps_groupId;
+		$("#gpsSourceTV").empty();
+		$("#gpsSourceTV").kendoTreeView({
+			//toolbar: kendo.template($("#polContemplate").html()),
+			dragAndDrop: true,
+			drop:function(e){
+				var point=e.dropPosition;
+				var sRow=$("#gpsSourceTV").data("kendoTreeView").dataItem(e.sourceNode);
+				var tRow=$("#dutyItemTV").data("kendoTreeView").dataItem(e.destinationNode );
+				
+				if(tRow==null || sRow == null){
+					e.setValid(false);
+				}
+				
+				if(DutyItemManage.checkDrop(tRow,sRow,point)){
+					DutyItemManage.doDrop(tRow, sRow, point);
+				}else{
+					e.setValid(false);
+				}
+			},
+			dragend:DutyItemManage.doDragEnd,
+			template: kendo.template($("#gpsSource-template").html()),
+			dataTextField:["typeName","number"]
+		});
+		
+		$.ajax({
+			url : "/BPHCenter/dutyResourceWeb/getGpsSource.do?sessionId="+sessionId,
+			type : "POST",
+			dataType : "json",
+			data : {
+						"gps_Query" : JSON.stringify(DutyBaseManage.bph_gps_query)
+					},
+			success : function(req) {
+				if(req.code==200){
+					if(req.data!=null){
+						m_gpsSourceData = req.data;
+						$("#gpsSourceTV").data("kendoTreeView").setDataSource(req.data);
+					}
+				}else{
+					$("body").popjs({"title":"提示","content":"获取定位设备失败"}); 
+				}
+			}
+		}); 
 	}, 
 	selectDutyTemplete:function(){
 		DutyBaseManage.loaddutyTemplete();
@@ -1049,7 +1337,7 @@ var DutyItemManage={
 		},
 		initTaskWindow:function(){
 			$("#taskGrid").kendoGrid(	{
-				height : 550,
+				height : 250,
 				sortable : true,
 				selectable : "multiple", 
 				columns : [{
@@ -1376,8 +1664,11 @@ var DutyItemManage={
 			item_new=DutyItemManage.rebuildItems(item_old);
 			
 			DutyItemManage.reloadItems(item_new);
+			if(!isFirstLoad){ 
+				m_changestates = "0";
+			}
+			isFirstLoad = false;
 			
-			m_changestates = "0";
 		},
 		reloadItems:function(items){
 			var ds = new kendo.data.HierarchicalDataSource({
@@ -1621,14 +1912,17 @@ var DutyItemManage={
 					var taskType = dutyTypeRow.taskType;
 
 					if (taskType > 0) {
-						DutyItemManage.loadTaskTarget(taskType);
-						$('#lblPoliceInfo').text(row.name + " 关联任务");
+						//DutyItemManage.loadTaskTarget(taskType);
+						$('#lblPoliceInfo').text("警员："+row.name + " 的关联任务");
 						
-						m_target = row;
-						//setCheckBoxOfTarget(row);
-						//$('#taskWindow').window('open');
-						var winTask= $("#taskWindow").data("kendoWindow");
-						winTask.open();
+						m_target = row; 
+						 var winTask =$('#taskWindow');
+						 winTask.kendoWindow({
+					                        width: "450px",
+					                        height: "400px",
+					                        title: "警员关联任务"
+					                    });
+						 winTask.data("kendoWindow").open();  
 					} else {
 						$("body").popjs({"title":"提示","content":"当前勤务类型没有关联任务!"}); 
 					}
@@ -1646,7 +1940,7 @@ var DutyItemManage={
 			};
 
 			$.ajax({
-				url:"/BPHCenter/dutyWeb/loadTaskTargetByOrg.do",
+				url:"/BPHCenter/dutyWeb/loadTaskTargetByOrg.do?sessionId="+sessionId,
 				type : "POST",
 				dataType : "json",
 				data : pars,
@@ -1669,7 +1963,7 @@ var DutyItemManage={
 							case 1:
 								$("#taskGrid").kendoGrid(	{
 									dataSource:ds,
-									height : 450,
+									height : 250,
 									sortable : true,
 									selectable : "multiple", 
 									columns : [{
@@ -1686,7 +1980,7 @@ var DutyItemManage={
 								break;
 							case 2:
 								$("#taskGrid").kendoGrid(	{
-									height : 550,
+									height : 250,
 									sortable : true,
 									selectable : "multiple", 
 									columns : [{
@@ -1710,7 +2004,7 @@ var DutyItemManage={
 							case 3:
 								$("#taskGrid").kendoGrid(	{
 									dataSource:ds,
-									height : 450,
+									height : 250,
 									sortable : true,
 									selectable : "multiple", 
 									columns : [{

@@ -132,13 +132,14 @@ var m_gpsGroup_Org = {
 
 			pg.shareType = $('input:radio[name="shareType"]:checked').val();
 			
-			if(pg.shareType ==0||pg.shareType=="0"){
-				pg.shareOrgIds = [];
+			if(pg.shareType ==0||pg.shareType=="0"){ 
+					var shOrgId =  m_gpsGroup_Org.id;
+					pg.shareOrgIds.push(shOrgId);
 			}else{
  				var selectIds ="";
  				var  selectNode = $("#treeOrg").data("kendoTreeView");
  				var checkedNodes = [];
- 				PoliceGroupManage.checkedNodeIds(selectNode.dataSource.view(),
+ 				GpsGroupManage.checkedNodeIds(selectNode.dataSource.view(),
 						checkedNodes);
 				if (checkedNodes.length > 0) {
 					selectIds = checkedNodes.join(","); 
@@ -211,7 +212,7 @@ var m_gpsGroup_Org = {
 
 <body>
 	<!-- <div id="vertical" style="overflow-x:hidden;"> -->
-	<div id="winPG" style="width:560px;height:320px;" title="警员分组管理">
+	<div id="winPG" style="width:560px;height:320px;" title="定位设备分组管理">
 			<div style="float:left;width:250px;margin-top:10px;">
 				<!-- 左开始 -->
 				<div class="demo-section k-header"> 
@@ -220,7 +221,7 @@ var m_gpsGroup_Org = {
 					<ul>
 						<li class="ty-input"><label>组名称:</label><input
 							type="text" class="k-textbox" name="txtGpsGroupName"   onblur="GpsGroupManage.isExistGroup();"
-							id="txtGpsGroupName" /></li>
+							id="txtGpsGroupName" value="${gpsgroup.name}" /></li>
 						<li class="ty-input"><label>共享类型:</label>
 							<label><input id="radio_unshared" type="radio" name="shareType" value="0"
 							onclick="GpsGroupManage.changeShareType()" />不共享</label>

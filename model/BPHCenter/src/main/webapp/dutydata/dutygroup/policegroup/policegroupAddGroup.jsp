@@ -130,7 +130,9 @@ var m_policeGroup_Org = {
 				}
 				var s = m_checkedNodes_id;
 				if(pg.shareType ==0||pg.shareType=="0"){
-					pg.shareOrgIds = [];
+					
+					var shOrgId =  m_policeGroup_Org.id;
+					pg.shareOrgIds.push(shOrgId);
 				}else{
 					if (m_checkedNodes_id.length > 0) {
 						pg.shareOrgIds = m_checkedNodes_id.split(",");
