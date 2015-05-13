@@ -1478,7 +1478,15 @@ var DutyItemManage={
 		addDutyTypeRow :function(value){
 			var duty = {};
 			duty.maxPolice = value.maxPolice;
-			duty.taskType = value.assoTaskType;
+			if(value.assoTaskType == "巡区"){
+				duty.taskType = 1;
+			}else if(value.assoTaskType == "社区"){ 
+				duty.taskType = 2;
+			}else if(value.assoTaskType == "卡点"){
+				duty.taskType = 3;
+			}else{
+				duty.taskType = value.assoTaskType;
+			} 
 			duty.targets = [];
 			duty.expanded =true;
 			
@@ -1974,12 +1982,11 @@ var DutyItemManage={
 									sortable : true,
 									selectable : "multiple", 
 									columns : [{
-											title : "名称",
-											template: "<input type='checkbox' id='area_ck_#: targetId #' value='#: targetId #' /> #: areaName #  "
+											title : "社区名称",
+											template: "<input type='checkbox' id='tk_ck_#: targetId #' value='#: targetId #' /> #: areaName #  "
 									 
 											 
-										} ],
-									editable: true
+										} ]
 								}); 
 								break;
 							case 1:
@@ -1991,7 +1998,7 @@ var DutyItemManage={
 											title : "名称", 
 											field: "areaName"
 										},{
-											title:"点位名称",
+											title:"必达点",
 											field : "name"
 										},{
 											title : "经过次数",
@@ -2009,14 +2016,20 @@ var DutyItemManage={
 									sortable : true,
 									selectable : "multiple", 
 									columns : [{
-											title : "名称",
-											template: "<input type='checkbox' id='area_ck_#: targetId #' value='#: targetId #' /> #: areaName #  "
+											title : "点位名称",
+											template: "<input type='checkbox' id='tk_ck_#: targetId #' value='#: targetId #' /> #: areaName #  "
 												  
-										}],
-									editable: true
+										}]
 								}); 
 								break;
 							}
+							
+							$.each(req.data,function(index,dobj){
+								if(dobj.isSelected){
+									$("#tk_ck_"+dobj.targetId).attr("checked","checked");
+								}
+								
+							});
 							
 						}
 					}else{

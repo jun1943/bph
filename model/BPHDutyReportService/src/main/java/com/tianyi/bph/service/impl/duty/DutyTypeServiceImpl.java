@@ -68,7 +68,7 @@ public class DutyTypeServiceImpl implements DutyTypeService {
 		//
 		target.setId(vm.getId());
 		target.setName(vm.getName());
-		target.setParentId(vm.getParentId());
+		target.setParentId(vm.getParentId() == null ? 0 : vm.getParentId());
 		target.setFullpath(parent.getFullpath() == null ? target.getName()
 				: parent.getFullpath() + "." + target.getName());
 		target.setLevel(parent.getLevel() + 1);
