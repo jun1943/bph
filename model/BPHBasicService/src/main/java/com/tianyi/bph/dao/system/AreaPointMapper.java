@@ -30,4 +30,7 @@ public interface AreaPointMapper {
 	int updateByPrimaryKeySelective(AreaPoint record);
 
 	int updateByPrimaryKey(AreaPoint record);
+
+	int checkAreaPointName(@Param("areaId") Integer areaId,
+			@Param("pointName") String pointName);
 }

@@ -207,9 +207,10 @@
 				<ul>
 					<li>
 						<label id="lblPoliceInfo"></label>
+						<input type="hidden" id="pol_taskType" />
 					</li>
 					<li>
-						<div id="taskBox">
+						<div id="taskBox" style="height:400px;overflow:auto">
 							<div id="taskGrid"></div>
 						</div>
 					</li>

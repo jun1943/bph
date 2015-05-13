@@ -319,7 +319,7 @@ var vehicleAddManage= {
 						<li class="ty-input"><span class="ty-input-warn"></span><label class="ty-input-label" for="vehicleIntercomPerson">　个呼号:</label><input type="text"
 							class="k-textbox" name="vehicleIntercomPerson" id="vehicleIntercomPerson" /></li>
 						<li class="ty-input"><span class="ty-input-warn"></span><label class="ty-input-label" for="vehicleGpsName">GPS设备: </label><input
-							id="vehicleGpsName"  style="width:300px" placeholder="请选择gps名称..." /></li>
+							id="vehicleGpsName"  style="width:199px" placeholder="请选择gps名称..." /></li>
 					</ul>
 					<p class="ty-input-row">
 						<!--<span class="k-button"  onclick="vehicleAddManage.saveVehicleNotOut()">保存并继续</span>-->

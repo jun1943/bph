@@ -1,6 +1,9 @@
 package com.tianyi.bph.rest.action.system;
 
 import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,11 +12,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.tianyi.bph.BaseLogController;
 import com.tianyi.bph.common.JsonUtils;
 import com.tianyi.bph.common.Pager;
 import com.tianyi.bph.domain.system.PatrolArea;
 import com.tianyi.bph.query.system.PatrolAreaQuery;
 import com.tianyi.bph.service.system.PatrolAreaService;
+import com.tianyi.bph.web.controller.BaseController;
 import com.tianyi.bph.common.ReturnResult;
 
 /**
@@ -24,7 +29,7 @@ import com.tianyi.bph.common.ReturnResult;
  */
 @Controller
 @RequestMapping("/patrolArea")
-public class PatrolAreaAction {
+public class PatrolAreaAction extends BaseLogController{
 
 	static final Logger log = LoggerFactory.getLogger(PatrolAreaAction.class);
 
@@ -37,7 +42,7 @@ public class PatrolAreaAction {
 	 */
 	@RequestMapping(value = "/addPatrolArea.do")
 	@ResponseBody
-	public ReturnResult addPatrolArea(PatrolArea patrolArea) {
+	public ReturnResult addPatrolArea(PatrolArea patrolArea,HttpServletRequest request) {
 		patrolArea.setBackColor("backColor");
 		patrolArea.setBackTransparence("backTransparence");
 		patrolArea.setCoordinates("coordinates");
@@ -50,6 +55,7 @@ public class PatrolAreaAction {
 		if(i < 0){
 			return ReturnResult.FAILUER("巡逻区域名称重复");
 		}
+		addLog(request, "添加巡逻区域成功", 2);
 		return ReturnResult.SUCCESS();
 	}
 	
@@ -60,11 +66,13 @@ public class PatrolAreaAction {
 	 */
 	@RequestMapping(value = "/deletePatrolArea.do")
 	@ResponseBody
-	public ReturnResult deletePatrolArea(@RequestParam(value = "id", required =true) Integer id) {
+	public ReturnResult deletePatrolArea(@RequestParam(value = "id", required =true) Integer id,
+			HttpServletRequest request) {
 		int i = patrolAreaService.deletePatrolArea(id);
 		if(i == 0){
 			return ReturnResult.FAILUER("删除数据不存在");
 		}
+		addLog(request, "删除巡逻区域成功", 2);
 		return ReturnResult.SUCCESS("成功", i);
 	}
 	
@@ -75,8 +83,9 @@ public class PatrolAreaAction {
 	 */
 	@RequestMapping(value = "/modifyPatrolArea.do")
 	@ResponseBody
-	public ReturnResult modifyPatrolArea(PatrolArea patrolArea) {
+	public ReturnResult modifyPatrolArea(PatrolArea patrolArea,HttpServletRequest request) {
 		int i = patrolAreaService.updatePatrolArea(patrolArea);
+		addLog(request, "修改巡逻区域成功", 2);
 		return ReturnResult.SUCCESS("", i);
 	}
 	

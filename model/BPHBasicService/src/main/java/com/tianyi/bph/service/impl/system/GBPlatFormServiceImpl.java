@@ -35,7 +35,6 @@ public class GBPlatFormServiceImpl implements GBPlatFormService {
 	private GBDeviceMapper deviceMapper;
 
 	@Override
-	@Cacheable(cacheName = cacheName)
 	public GBOrgan getOrganTree(int organId) {
 		List<GBOrgan> list = organMapper.selectByExample(new GBOrganExample());
 		if (list != null && !list.isEmpty()) {
@@ -63,6 +62,7 @@ public class GBPlatFormServiceImpl implements GBPlatFormService {
 			this.nodes = nodes;
 		}
 
+		@Cacheable(cacheName = cacheName)
 		public GBOrgan buildTree() {
 			GBOrgan parent = null;
 			it = nodes.iterator();
@@ -126,8 +126,8 @@ public class GBPlatFormServiceImpl implements GBPlatFormService {
 					.selectGBOrganIdByOrganId(organId);
 			if (!GBIds.isEmpty()) {
 				example.createCriteria().andGbOrganIdIn(GBIds);
+				list = deviceMapper.selectByExample(example);
 			}
-			list = deviceMapper.selectByExample(example);
 		}
 		return list;
 	}
@@ -151,5 +151,31 @@ public class GBPlatFormServiceImpl implements GBPlatFormService {
 	@Override
 	public GBDevice getGBDeviceById(Integer gbDeviceId) {
 		return deviceMapper.selectByPrimaryKey(gbDeviceId);
+	}
+
+	@Override
+	public List<GBOrgan> loadGbOrgan(Integer organId, Integer parentId) {
+		List<GBOrgan> list = organMapper.selectByGBOrganId(parentId);
+		if (!list.isEmpty()) {
+			List<Integer> keys = organGBOrganMapper
+					.selectGBOrganIdByOrganId(organId);
+			if (!keys.isEmpty()) {
+				for (Integer key : keys) {
+					for (GBOrgan organ : list) {
+						if (organ.getId().equals(key)) {
+							organ.setChecked(true);
+						}
+					}
+				}
+			}
+		}
+		return list;
+	}
+
+	@Override
+	public List<GBDevice> getGBDeviceListByGBOrganId(Integer gbOrganId) {
+		GBDeviceExample example = new GBDeviceExample();
+		example.createCriteria().andGbOrganIdEqualTo(gbOrganId);
+		return deviceMapper.selectByExample(example);
 	}
 }

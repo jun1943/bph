@@ -1,6 +1,7 @@
 package com.tianyi.bph.service.duty;
 
 import java.util.List;
+import java.util.Map;
 
 import com.tianyi.bph.domain.duty.Org;
 import com.tianyi.bph.domain.system.Organ;
@@ -20,4 +21,6 @@ public interface DutyTaskService {
 	 * @return
 	 */
 	List<TaskTargetVM>  loadTaskTargetVMList(Integer taskType,Organ org);
+
+	TaskTargetVM getTaskTargetInfo(Map<String, Object> map);
 }

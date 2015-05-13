@@ -202,7 +202,26 @@ function show_hide(type){
 		}
 	}
 }
+
+/**
+ * 修改密码界面 跳转
+ */
+function gotoUpdatePassword(){
+	var organId = $.trim($("#organId").val());
+	var sessionId = $.trim($("#token").val());
+	$("#mydialog").tyWindow({
+		width: "660px",
+		height: "590px",
+	    title: "帐号管理",
+	    position: {
+	        top: "100px"
+	      },
+		content: "<%=path %>/admin/gotoUpdatePassword.do?userId="+${User.userId}+"&random="+Math.random(),
+		iframe : true
+		});
+	}
 </script>
+<div id="mydialog"></div>
 <div class="navbar">
       <div class="navbar-inner">
         <div class="container-fluid">
@@ -219,6 +238,7 @@ function show_hide(type){
             <ul class='nav pull-right'><!----用户信息---->
               <li><div class="box">${sessionScope.SESSIN_USERNAME }</div></li>
               <li><div class="box">授权登录</div></li>
+              <li><a href="javascript: gotoUpdatePassword();">修改密码</a></li>
               <li><a href="<%=path %>/admin/logout.do">退出</a></li>
             </ul><!----用户信息结束---->
           </div>

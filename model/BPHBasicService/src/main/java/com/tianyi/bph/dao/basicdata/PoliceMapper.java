@@ -10,6 +10,7 @@ import com.tianyi.bph.domain.basicdata.IntercomGroup;
 import com.tianyi.bph.domain.basicdata.Police;
 import com.tianyi.bph.domain.basicdata.PoliceType;
 import com.tianyi.bph.query.basicdata.GpsBaseVM;
+import com.tianyi.bph.query.basicdata.PoliceJJVM;
 import com.tianyi.bph.query.basicdata.PoliceVM;
 import com.tianyi.bph.query.basicdata.UserObjectVM;
 /**
@@ -153,12 +154,10 @@ public interface PoliceMapper {
 	 * @param orgId
 	 * @return
 	 */
-	List<Police> getPoliceInfo(Map<String, Object> map);
+	List<PoliceJJVM> getPoliceInfo(Map<String, Object> map);
 	
 	List<PoliceVM> findByidCardAndId(Map<String, Object> map);
 	List<PoliceVM> findBycodeAndId(Map<String, Object> map);
 	List<PoliceVM> findByintercomPersonAndId(Map<String, Object> map);
-	
-	 
 	 
 }

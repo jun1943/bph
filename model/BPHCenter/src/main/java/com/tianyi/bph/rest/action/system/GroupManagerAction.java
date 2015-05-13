@@ -3,6 +3,10 @@ package com.tianyi.bph.rest.action.system;
 import java.util.Date;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
+import net.sf.json.JSONArray;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,15 +15,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.tianyi.bph.BaseLogController;
 import com.tianyi.bph.common.MessageCode;
 import com.tianyi.bph.common.ReturnResult;
 import com.tianyi.bph.domain.system.GroupManager;
+import com.tianyi.bph.domain.system.JsonPoint;
 import com.tianyi.bph.service.system.GroupManagerService;
 import com.tianyi.bph.service.system.GroupOtherService;
 
 @Controller
 @RequestMapping("/client/groupManager")
-public class GroupManagerAction {
+public class GroupManagerAction extends BaseLogController{
 	
 	private static final Logger log=LoggerFactory.getLogger(GroupManagerAction.class);
 	
@@ -41,7 +47,11 @@ public class GroupManagerAction {
 		@RequestParam(value="userId",required=true) Integer userId,
 		@RequestParam(value="organId",required=true) Integer organId,
 		@RequestParam(value="shareType",required=true) Integer shareType,
-		@RequestParam(value="jsonData",required=true) String jsonData){
+		@RequestParam(value="groupType",required=true) Integer groupType,
+		@RequestParam(value="sourceData",required=false) String sourceData,
+		@RequestParam(value="areaType",required=false) Integer areaType,
+		@RequestParam(value="areaContent",required=false) String areaContent,
+		HttpServletRequest request){
 		int id;
 		try {
 			GroupManager groupManager=new GroupManager();
@@ -49,12 +59,16 @@ public class GroupManagerAction {
 			groupManager.setUserId(userId);
 			groupManager.setOrganId(organId);
 			groupManager.setShareType(shareType);
-			groupManager.setJsonData(jsonData);
+			groupManager.setSourceData(sourceData);
+			groupManager.setAreaType(areaType);
+			groupManager.setAreaContent(areaContent);
 			groupManager.setCreateTime(new Date());
+			groupManager.setGroupType(groupType);
 			id=groupManagerService.insert(groupManager);
 		} catch (Exception e) {
 			return ReturnResult.FAILUER("保存收藏信息失败");
 		}
+		addLog(request, "添加收藏信息成功", 2);
 		return ReturnResult.MESSAGE(MessageCode.STATUS_SUCESS,"保存收藏信息成功",id);
 	}
 	
@@ -75,8 +89,12 @@ public class GroupManagerAction {
 		@RequestParam(value="groupName",required=false) String groupName,
 		@RequestParam(value="userId",required=false) Integer userId,
 		@RequestParam(value="organId",required=false) Integer organId,
+		@RequestParam(value="groupType",required=false) Integer groupType,
 		@RequestParam(value="shareType",required=false) Integer shareType,
-		@RequestParam(value="jsonData",required=false) String jsonData){
+		@RequestParam(value="sourceData",required=false) String sourceData,
+		@RequestParam(value="areaType",required=false) Integer areaType,
+		@RequestParam(value="areaContent",required=false) String areaContent,
+		HttpServletRequest request){
 		
 		try {
 			GroupManager groupManager=new GroupManager();
@@ -85,7 +103,10 @@ public class GroupManagerAction {
 			groupManager.setUserId(userId);
 			groupManager.setOrganId(organId);
 			groupManager.setShareType(shareType);
-			groupManager.setJsonData(jsonData);
+			groupManager.setSourceData(sourceData);
+			groupManager.setAreaType(areaType);
+			groupManager.setAreaContent(areaContent);
+			groupManager.setGroupType(groupType);
 			int id=groupManagerService.updateByPrimaryKeySelective(groupManager);
 			if(id ==0){
 				return ReturnResult.FAILUER("修改信息失败或收藏列表不存在");
@@ -93,6 +114,7 @@ public class GroupManagerAction {
 		} catch (Exception e) {
 			return ReturnResult.FAILUER("修改信息失败");
 		}
+		addLog(request, "修改收藏信息成功", 2);
 		return ReturnResult.MESSAGE(MessageCode.STATUS_SUCESS,"修改信息成功");
 	}
 	
@@ -107,17 +129,19 @@ public class GroupManagerAction {
 	@ResponseBody
 	public ReturnResult saveByJsonData(
 			@RequestParam(value="groupId",required=true) Integer groupId,
-			@RequestParam(value="jsonData",required=true) String jsonData
+			@RequestParam(value="sourceData",required=true) String sourceData,
+			HttpServletRequest request
 			){
 		try {
 			GroupManager groupManager=new GroupManager();
 			groupManager.setGroupId(groupId);
-			groupManager.setJsonData(jsonData);
+			groupManager.setSourceData(sourceData);
 			groupManagerService.saveByJsonData(groupManager);
 			
 		} catch (Exception e) {
 			return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL,"添加资源失败");
 		}
+		addLog(request, "添加资源成功", 2);
 		return ReturnResult.MESSAGE(MessageCode.STATUS_SUCESS,"添加资源成功");
 	}
 	/**
@@ -130,17 +154,19 @@ public class GroupManagerAction {
 	@ResponseBody
 	public ReturnResult deleteSource(
 			@RequestParam(value="groupId",required=true) Integer groupId,
-			@RequestParam(value="listId",required=true) Integer listId
+			@RequestParam(value="sourceId",required=true) Integer sourceId,
+			HttpServletRequest request
 			){
 		try {
 			GroupManager groupManager= new GroupManager();
 			groupManager.setGroupId(groupId);
-			groupManager.setListId(listId);
+			groupManager.setSourceId(sourceId);
 			groupManagerService.deleteSource(groupManager);
 		} catch (Exception e) {
 			log.debug("删除资源失败",e.getMessage());
 			return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL,"删除资源失败");
 		}
+		addLog(request, "删除资源成功", 2);
 		return ReturnResult.MESSAGE(MessageCode.STATUS_SUCESS,"删除资源成功");
 	}
 	/**
@@ -166,7 +192,10 @@ public class GroupManagerAction {
 	@RequestMapping(value="/deleteGroupInfo.do")
 	@ResponseBody
 	public ReturnResult deleteGroupInfo(
-			@RequestParam(value="groupId",required=true)Integer groupId){
+			@RequestParam(value="groupId",required=true)Integer groupId,
+			@RequestParam(value="groupType",required=true)Integer groupType,
+			HttpServletRequest request
+			){
 		try {
 			groupManagerService.deleteByPrimaryKey(groupId);
 		
@@ -174,6 +203,7 @@ public class GroupManagerAction {
 			log.debug("删除收藏信息失败");
 			return ReturnResult.FAILUER("删除异常，删除失败");
 		}
+		addLog(request, "删除收藏列表成功", 2);
 		return ReturnResult.MESSAGE(MessageCode.STATUS_SUCESS,"删除成功");
 	}
 	

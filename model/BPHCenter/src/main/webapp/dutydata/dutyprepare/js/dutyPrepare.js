@@ -1912,14 +1912,13 @@ var DutyItemManage={
 					var taskType = dutyTypeRow.taskType;
 
 					if (taskType > 0) {
-						//DutyItemManage.loadTaskTarget(taskType);
+						DutyItemManage.loadTaskTarget(taskType,row.itemId,row.id);
 						$('#lblPoliceInfo').text("警员："+row.name + " 的关联任务");
-						
 						m_target = row; 
 						 var winTask =$('#taskWindow');
 						 winTask.kendoWindow({
-					                        width: "450px",
-					                        height: "400px",
+					                        width: "600px", 
+					                        height:"530px",
 					                        title: "警员关联任务"
 					                    });
 						 winTask.data("kendoWindow").open();  
@@ -1933,10 +1932,12 @@ var DutyItemManage={
 				$("body").popjs({"title":"提示","content":"请选择操作数据，只能在警员上设置关联任务"}); 
 			}
 		},
-		loadTaskTarget:function(taskType) {
+		loadTaskTarget:function(taskType,itemid,did) {
 			var pars = {
 				'orgId' : m_dutyprepare_Org.id,
-				'taskType' : taskType
+				'taskType' : taskType,
+				'policeId' : itemid,
+				'dutyId' : did
 			};
 
 			$.ajax({
@@ -1955,37 +1956,35 @@ var DutyItemManage={
 									    model: { id: "targetId" }
 									  }
 							});
+							$("#taskGrid").empty();
+							//$("taskGridBox").append("<div id='taskGrid'></div>");
 							
-							$("#taskGrid").remove();
-							$("taskGridBox").append("<div id='taskGrid'></div>");
-							
+							$('#pol_taskType').val(taskType);
 							switch(taskType){
-							case 1:
+							case 2:
 								$("#taskGrid").kendoGrid(	{
-									dataSource:ds,
-									height : 250,
+									dataSource:ds,   
 									sortable : true,
 									selectable : "multiple", 
 									columns : [{
 											title : "名称",
-											field:"areaName"
+											field: "areaName"
+											 
 										},{
 											title:"点位名称",
 											field : "name"
-										},{
-											title : "操作",
-											template:""
-										} ]
+										} ],
+									editable: true
 								}); 
 								break;
-							case 2:
-								$("#taskGrid").kendoGrid(	{
-									height : 250,
-									sortable : true,
+							case 1:
+								$("#taskGrid").kendoGrid(	{ 
+									dataSource:ds,   
+									sortable : true,  
 									selectable : "multiple", 
 									columns : [{
-											title : "名称",
-											field:"areaName"
+											title : "名称", 
+											field: "areaName"
 										},{
 											title:"点位名称",
 											field : "name"
@@ -1995,28 +1994,23 @@ var DutyItemManage={
 										},{
 											title : "停留时间(分钟)",
 											field : "stayTime"
-										},{
-											title : "操作",
-											template:""
-										} ]
+										} ],
+									editable: true
 								}); 
 								break;
 							case 3:
-								$("#taskGrid").kendoGrid(	{
-									dataSource:ds,
-									height : 250,
+								$("#taskGrid").kendoGrid(	{  
+									dataSource:ds, 
 									sortable : true,
 									selectable : "multiple", 
 									columns : [{
 											title : "名称",
-											field:"areaName"
+											field: "areaName"  
 										},{
 											title:"点位名称",
 											field : "name"
-										},{
-											title : "操作",
-											template:""
-										} ]
+										} ],
+									editable: true
 								}); 
 								break;
 							}
@@ -2099,8 +2093,61 @@ var DutyItemManage={
 				winUserNode.close();
 			}	
 		},
-		onTaskConfirm:function(){
+		onTaskConfirm:function(){   
+			DutyItemManage.getTaskList(); 
+		},
+		getTaskList:function(){
+			m_target.targets =[];
+			var treeList = $("#dutyItemTV").data("kendoTreeView");
+    		var dataitems = treeList.dataItem();
 			
+			var tkType = $("#pol_taskType").val(); 
+			var grid = $("#taskGrid").data("kendoGrid");
+			if(tkType == 1 || tkType == "1"){
+				for(var i = 0;i< grid._data.length ;i++){  
+					if(grid._data[i].dirty)
+					{
+						var pt = {};
+						pt.dutyId = m_target.dutyId;
+						pt.dutyItemId = m_target.id;
+						pt.policeId = m_target.itemId;
+						pt.taskTypeId = m_target.taskType;
+						pt.targetId = grid._data[i].id;
+						if(grid._data[i].count != undefined){
+							if($.trim(grid._data[i].count) != ""){
+								pt.count = $.trim(grid._data[i].count);
+							}else{
+								pt.count = 0;
+							}
+						}else{
+							pt.count = 0;
+						}
+						if(grid._data[i].stayTime != undefined){
+							if($.trim(grid._data[i].stayTime) != ""){
+								pt.stayTime = $.trim(grid._data[i].stayTime);
+							}else{
+								pt.stayTime = 0;
+							}
+						}else{
+							pt.stayTime = 0;
+						} 
+						m_target.targets.push(pt);  
+					}
+					 
+				} 
+			}else{
+				for(var i = 0;i< grid._data.length ;i++){  
+					var pt = {};
+					pt.dutyId = m_target.dutyId;
+					pt.dutyItemId = m_target.id;
+					pt.policeId = m_target.itemId;
+					pt.taskTypeId = m_target.taskType;
+					pt.targetId = grid._data[i].id; 
+					pt.count = null; 
+					pt.stayTime = null; 
+					m_target.targets.push(pt);
+				}
+			}
 		},
 		onDeleteNode:function(uid){
 			var tv = $("#dutyItemTV").data("kendoTreeView");

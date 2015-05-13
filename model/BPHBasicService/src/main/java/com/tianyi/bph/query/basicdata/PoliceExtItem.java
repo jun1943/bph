@@ -7,7 +7,7 @@ import com.tianyi.bph.domain.basicdata.Police;
 
 public class PoliceExtItem {
 
-	private Police data;
+	private PoliceJJVM data;
 	
 	private Integer dutyItemId;
 	/**
@@ -76,10 +76,10 @@ public class PoliceExtItem {
 //	public void setLevel(Integer level) {
 //		this.level = level;
 //	}
-	public Police getData() {
+	public PoliceJJVM getData() {
 		return data;
 	}
-	public void setData(Police data) {
+	public void setData(PoliceJJVM data) {
 		this.data = data;
 	}
 }

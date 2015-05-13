@@ -11,7 +11,7 @@ public interface RoleService {
 	//增
 	public int addRole(Role role);
 	//删
-	public int deleteRole(Integer id);
+	public int deleteRole(Role role);
 	//改
 	public int updateRole(Role role);
 	//查询

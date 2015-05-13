@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.tianyi.bph.BaseLogController;
 import com.tianyi.bph.domain.system.Area;
 import com.tianyi.bph.domain.system.CircleLayer;
 import com.tianyi.bph.service.system.CircleLayerService;
@@ -31,7 +32,7 @@ import com.tianyi.bph.common.ReturnResult;
  */
 @Controller
 @RequestMapping("/circleLayer")
-public class CircleLayerAction {
+public class CircleLayerAction extends BaseLogController {
 
 	static final Logger log = LoggerFactory.getLogger(CircleLayerAction.class);
 
@@ -44,11 +45,14 @@ public class CircleLayerAction {
 	 */
 	@RequestMapping(value = "/modifyCircleLayer.do", method = RequestMethod.POST)
 	@ResponseBody
-	public ReturnResult modifyCircleLayer(@RequestBody String body) {
+	public ReturnResult modifyCircleLayer(@RequestBody String body,
+			HttpServletRequest request) {
 		try {
 			CircleLayerVo circleLayer = JsonUtils.toObj(body, CircleLayerVo.class);
 			CircleLayer c = circleLayer.ctrate();
-			return ReturnResult.SUCCESS("成功", circleLayerService.updateCircleLayer(c));
+			c=circleLayerService.updateCircleLayer(c);
+			addLog(request, "修改圈层成功", 2);
+			return ReturnResult.SUCCESS("成功", c);
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			return ReturnResult.FAILUER(e.getMessage());

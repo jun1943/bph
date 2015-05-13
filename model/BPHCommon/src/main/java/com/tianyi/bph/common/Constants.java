@@ -34,15 +34,17 @@ public class Constants {
 	public static final String MQ_TYPE_POLICE = "A"; // 警员
 	public static final String MQ_TYPE_VEHICLE = "B"; // 警车
 	public static final String MQ_TYPE_ORGAN = "C"; // 机构
-	public static final String MQ_TYPE_ICON = "D"; // 警车
+	public static final String MQ_TYPE_ICON = "D"; // 图标 占时不用
 	public static final String MQ_TYPE_VIDEO = "E"; // 视频点位
 	public static final String MQ_TYPE_REPORT = "F"; // 报备信息
 	public static final String MQ_TYPE_USER = "G"; // 用户
-	public static final String MQ_TYPE_GPS = "H"; // GPS
+	public static final String MQ_TYPE_ALARM = "H"; // 警情 数据
 	public static final String MQ_TYPE_CARDKOU = "I"; // 卡口
 	public static final String MQ_TYPE_CARDPOINT = "J"; // 卡点
 	public static final String MQ_TYPE_AREA = "K"; // 区域
 	public static final String MQ_TYPE_WEAPON = "L"; // 武器
+
+	public static final String MQ_TYPE_GPS = "M";// GPS 基础数据
 
 	public static final int MQ_OPERATE_ADD = 1; // 新增
 	public static final int MQ_OPERATE_UPDATE = 2; // 修改

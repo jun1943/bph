@@ -28,5 +28,7 @@ public interface GBOrganMapper {
 	int updateByPrimaryKeySelective(GBOrgan record);
 
 	int updateByPrimaryKey(GBOrgan record);
+	
+	List<GBOrgan> selectByGBOrganId(@Param("gbId")Integer gbId);
 
 }

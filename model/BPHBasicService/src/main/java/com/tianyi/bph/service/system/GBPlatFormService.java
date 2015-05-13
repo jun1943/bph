@@ -32,4 +32,8 @@ public interface GBPlatFormService {
 
 	public GBDevice getGBDeviceById(Integer gbDeviceId);
 
+	List<GBOrgan> loadGbOrgan(Integer organId,Integer parentId);
+	
+	public List<GBDevice> getGBDeviceListByGBOrganId(Integer gbOrganId);
+
 }

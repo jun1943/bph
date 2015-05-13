@@ -43,20 +43,16 @@ $(document).ready(function() {
 </script>
 <div id="template">
  
-	<div class="fl ml30 set-hei48">    
-		<div class="temp">
-			<div class="ty-total-decorate"><span id="gridListTotal"></span><i></i></div>
-			<div class="ty-decorate2"></div>
-		</div>
-	</div>
-	<div class="fl set-hei48">
-		<div class="ty-decorate1"></div> 
-                   <span id="btncreateGroup" class="k-button"  onclick="PolicegroupManage.createGroup()">创建分组</span>
+	<div class="fl ml30 set-hei48">
+	<span id="btncreateGroup" class="k-button"  onclick="PolicegroupManage.createGroup()">创建分组</span>
                    <span id="btneditGroup" class="k-button"  onclick="PolicegroupManage.editGroup()">修改分组</span> 
                    <span id="btndeleteGroup" class="k-button"  onclick="PolicegroupManage.deleteGroup()">删除分组</span>
                    <span id="btnaddMember" class="k-button"  onclick="PolicegroupManage.addMember()">添加成员</span> 
                    <span id="btndeleteMember" class="k-button"  onclick="PolicegroupManage.deleteMember()">删除成员</span> 
-                   <span id="btnclearUpMember" class="k-button"  onclick="PolicegroupManage.clearUpMember()">清空成员</span> 
+                   <span id="btnclearUpMember" class="k-button"  onclick="PolicegroupManage.clearUpMember()">清空成员</span>     
+		<div class="temp">
+			<div class="ty-total-decorate"><span id="gridListTotal"></span><i></i></div>
+		</div>
 	</div>
 	<div class="fr set-hei48">
 		<div class="ty-screen-mode" id="tyScreenMode">

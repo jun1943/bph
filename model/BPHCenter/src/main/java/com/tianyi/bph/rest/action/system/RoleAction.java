@@ -67,7 +67,7 @@ public class RoleAction {
 	public ReturnResult deleteRole(
 			@RequestParam(value = "id", required =true) Integer id) {
 		
-		roleService.deleteRole(id);
+		//roleService.deleteRole(id);
 
 		return ReturnResult.SUCCESS();
 	}

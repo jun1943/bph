@@ -43,14 +43,7 @@ $(document).ready(function() {
 </script>
 <div id="template">
  
-	<div class="fl ml30 set-hei48">   
-		<div class="temp">
-			<div class="ty-total-decorate"><span id="gridListTotal"></span><i></i></div>
-			<div class="ty-decorate2"></div>
-		</div>
-	</div>
-	<div class="fl set-hei48">
-		<div class="ty-decorate1"></div> 
+<div class="fl ml30 set-hei48">
 					<input type="hidden" id="organCode" name="organCode" value="${organ.code}">
 					<input type="hidden" id="dutyDate" name="dutyDate" value="${dutyDate}">
                    <span id="btnaddParentNode" class="k-button"  onclick="DutyPrepareManage.showDutyTypeWindow()">勤务类型选择</span>
@@ -59,8 +52,11 @@ $(document).ready(function() {
                    <span id="btnunLockNode" class="k-button"  onclick="DutyPrepareManage.clearDuty()">清空报备</span> 
                    <span id="btnlockNode" class="k-button"  onclick="DutyPrepareManage.onShowTemplateWindow()">保存模板</span> 
                    <span id="btnlockNode" class="k-button"  onclick="DutyPrepareManage.onSaveDuty()">保存</span> 
-                   <!--<span id="btnlockNode" class="k-button"  onclick="DutyPrepareManage.onExportDuty()">导出</span>-->
-	</div>
+                   <!--<span id="btnlockNode" class="k-button"  onclick="DutyPrepareManage.onExportDuty()">导出</span>-->  
+		<div class="temp">
+			<div class="ty-total-decorate"><span id="gridListTotal"></span><i></i></div>
+		</div>
+	</div> 
 	<div class="fr set-hei48"> 
 		<div class="ty-screen-mode" id="tyScreenMode">
 			<i class="ty-screen-mode-btn1" title="标准模式"></i><i class="ty-screen-mode-btn2" title="模块全屏"></i><i class="ty-screen-mode-btn3" title="内容全屏"></i>

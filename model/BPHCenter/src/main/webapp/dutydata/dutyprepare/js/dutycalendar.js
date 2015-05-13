@@ -32,6 +32,22 @@ $(function() {
 	changeDivHeight(); // 琛ㄦ牸鑷姩楂樺害璁剧疆
 	getDateData(y + "-" + m + "-" + 1);// 鍒濆鍖栭粯璁ゆ湀浠芥暟鎹� 
 });
+function loadData(pageNo){  
+	m_dutyCalendar_Org.id = $("#organId").val();
+	m_dutyCalendar_Org.code =$("#organCode").val();
+	m_dutyCalendar_Org.path =$("#organPath").val(); 
+	sessionId = $("#token").val();
+	m_year = $("#dutyyears").val();
+	m_month = $("#dutymonth").val();
+ 
+	y = m_year;
+	m = m_month;
+	$("#sp_years").text(y+"年");
+	$("#sp_month").text(m+"月");
+	changeDivHeight(); // 琛ㄦ牸鑷姩楂樺害璁剧疆
+	getDateData(y + "-" + m + "-" + 1);// 鍒濆鍖栭粯璁ゆ湀浠芥暟鎹� 
+}
+
 // 璁剧疆鏃ュ巻绐椾綋鐨勯珮搴�
 function changeDivHeight() {
 

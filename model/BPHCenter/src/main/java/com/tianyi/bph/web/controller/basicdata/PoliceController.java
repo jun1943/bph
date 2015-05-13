@@ -29,6 +29,7 @@ import com.tianyi.bph.domain.basicdata.PoliceType;
 import com.tianyi.bph.domain.system.Organ;
 import com.tianyi.bph.domain.system.User;
 import com.tianyi.bph.query.basicdata.GpsBaseVM;
+import com.tianyi.bph.query.basicdata.PoliceExtItem;
 import com.tianyi.bph.query.basicdata.PoliceVM;
 import com.tianyi.bph.query.system.UserQuery;
 import com.tianyi.bph.service.basicdata.PoliceService;
@@ -89,8 +90,7 @@ public class PoliceController {
 		Organ organ = new Organ();
 		if (organId != null) {
 			organ = organService.getOrganByPrimaryKey(organId);
-		}
-		
+		} 
 		query.setOrganId(organId);
 		mv.addObject("query", query);
 		mv.addObject("organ", organ);

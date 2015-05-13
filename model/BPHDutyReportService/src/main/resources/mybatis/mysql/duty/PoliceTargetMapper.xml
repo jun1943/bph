@@ -165,6 +165,6 @@
   
   <delete id="deleteByDutyId" parameterType="java.lang.Integer">
   	delete from t_duty_police_target where duty_id=#{dutyId,jdbcType=INTEGER}
-  </delete>
+  </delete> 
   
 </mapper>

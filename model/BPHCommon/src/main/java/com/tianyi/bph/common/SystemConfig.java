@@ -10,6 +10,9 @@ import org.slf4j.LoggerFactory;
 
 public class SystemConfig {
 	private static final Logger log=LoggerFactory.getLogger(SystemConfig.class);
+	/** 初始化状态 */
+    private static boolean initFlag = false;
+    private static final Properties PROP = new Properties();
 	private String serverPath;
 	
 	public String getServerPath() {
@@ -90,6 +93,7 @@ public class SystemConfig {
 	public final static String SYSTEM_MANAGER=getInstance().getProperty("systemManager");//基础数据
 	public final static String DUTY_MANAGER=getInstance().getProperty("dutyManager");//勤务报备
 	public final static String POLICE_MANAGER=getInstance().getProperty("policeManager");//接处警
+	public final static String REPORT_GROUP=getInstance().getProperty("reportGroup");//接处警
 	
 	public final static String AccessServerPort="accessServerPort";
 	public final static String accessServerPortBack="accessServerPort_back";
@@ -175,5 +179,23 @@ public class SystemConfig {
         }
         return randomCode.toString();
 	}
+	
+	 /**
+     * 重新装配
+     * @param flag
+     */
+    public static void reload(boolean flag) {
+        if (!initFlag || flag) {
+            try {
+                PROP.clear();
+                InputStream inStream = SystemConfig.class.getClassLoader().getResourceAsStream("system.properties");
+                PROP.load(inStream);
+                initFlag = true;
+            }
+            catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
+        }
+    }
 	
 }

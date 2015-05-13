@@ -1,11 +1,8 @@
 package com.tianyi.bph.web.controller.system;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -17,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.tianyi.bph.BaseLogController;
 import com.tianyi.bph.common.MessageCode;
 import com.tianyi.bph.common.PageReturn;
 import com.tianyi.bph.common.Pager;
@@ -25,7 +23,7 @@ import com.tianyi.bph.common.SystemConfig;
 import com.tianyi.bph.domain.system.Organ;
 import com.tianyi.bph.domain.system.User;
 import com.tianyi.bph.query.system.OrganQuery;
-import com.tianyi.bph.service.impl.system.OrganServiceImpl;
+import com.tianyi.bph.service.system.LogService;
 import com.tianyi.bph.service.system.OrganService;
 import com.tianyi.bph.service.system.UserOtherOrganService;
 import com.tianyi.bph.web.cache.UserCache;
@@ -35,11 +33,12 @@ import com.tianyi.bph.web.cache.UserCache;
  */
 @Controller
 @RequestMapping("/web/organx")
-public class OrganController{
+public class OrganController extends BaseLogController{
 	private static final Logger logger =LoggerFactory.getLogger(OrganController.class);
 	
 	@Autowired private OrganService organService;
 	@Autowired UserOtherOrganService userOtherService;
+	@Autowired LogService logService;
 	/**
 	 *  web 机构列表展示
 	 * @param name
@@ -98,10 +97,11 @@ public class OrganController{
 		OrganQuery organQuery=new OrganQuery();
 		User user=(User) request.getAttribute("User");
 		if(!StringUtils.isEmpty(name)){organQuery.setName(name);}
-		if(StringUtils.isEmpty(organLevel)){
-			organQuery.setOrganLevel("2");
+		organQuery.setOrganLevel(organLevel);
+		if(organId != null){
+			organQuery.setId(organId);
 		}else{
-			organQuery.setOrganLevel(organLevel);
+			organQuery.setId(user.getOrgId());
 		}
 		if(!StringUtils.isEmpty(organPath)){
 			organQuery.setPath(organPath);
@@ -242,7 +242,8 @@ public class OrganController{
 			@RequestParam(value="shortName",required=true)String shortName,
 			@RequestParam(value="parentId",required=true)String parentId,
 			@RequestParam(value="orgTypeCode",required=true)String orgTypeCode,
-			@RequestParam(value="note",required=false)String note
+			@RequestParam(value="note",required=false)String note,
+			HttpServletRequest request
 			){
 		try{
 			Organ organ=new Organ();
@@ -258,6 +259,10 @@ public class OrganController{
 			if(organ==null){
 				return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL,MessageCode.ADD_ORGAN_FAIL_BYCODENAME);
 			}
+			/**
+			 * 日志入库
+			 */
+			addLog(request, "添加机构成功",2);
 		}catch(Exception e){
 			logger.debug(e.getMessage());
 			return ReturnResult.FAILUER(MessageCode.ADD_ORGAN_FAIL);
@@ -305,7 +310,8 @@ public class OrganController{
 			@RequestParam(value="shortName",required=true)String shortName,
 			@RequestParam(value="parentId",required=true)Integer parentId,
 			@RequestParam(value="orgTypeCode",required=true)String orgTypeCode,
-			@RequestParam(value="note",required=false)String note
+			@RequestParam(value="note",required=false)String note,
+			HttpServletRequest request
 			) {
 		try{
 			Organ organ=new Organ();
@@ -319,8 +325,12 @@ public class OrganController{
 			organ.setNote(note);
 			organ=organService.updateOrgan(organ);
 			if(organ==null){
-				return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL,"修改失败，机构名或机构编码重复");
+				return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL,"修改失败，机构名已存在");
 			}
+			/**
+			 * 日志入库
+			 */
+			addLog(request, "修改机构成功",2);
 		}catch(Exception e){
 			logger.debug(e.getMessage());
 			return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL,MessageCode.UPDATE_ORGAN_FAIL);
@@ -337,12 +347,17 @@ public class OrganController{
 	@RequestMapping({"/deleteOrgan.do","/deleteOrgan.action"})
 	@ResponseBody
 	public ReturnResult deleteOrgan(
-			@RequestParam(value = "organId", required =true) Integer organId){
+			@RequestParam(value = "organId", required =true) Integer organId,
+			HttpServletRequest request){
 		try{
 			int i=organService.deleteOrgan(organId);
 			if(i==0){
 				return ReturnResult.MESSAGE(MessageCode.STATUS_HASCHILD,MessageCode.DELETE_ORGAN_FAIL);
 			}
+			/**
+			 * 日志入库
+			 */
+			addLog(request, "删除机构成功",2);
 		}catch(Exception e){
 			logger.debug(e.getMessage());
 			return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL,MessageCode.DELETE_ORGAN_FAIL);
@@ -360,7 +375,7 @@ public class OrganController{
 	 * @param request
 	 * @return
 	 */
-	@RequestMapping(value="/addOrganTreeElement.do")
+	/*@RequestMapping(value="/addOrganTreeElement.do")
 	@ResponseBody
 	public ReturnResult testOrganTree(
 			@RequestParam(value="name",required=false)String name,
@@ -423,5 +438,5 @@ public class OrganController{
 			}
 		}
 		return ReturnResult.MESSAGE(MessageCode.STATUS_SUCESS,"成功",organStrList);
-	}
+	}*/
 }

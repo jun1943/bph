@@ -26,10 +26,10 @@ $(function() {
 			dataTextField : "text",
 			panelHeight : "auto",
 			dataSource : [ {
-				id : 1,
+				id : 2,
 				text : "社区"
 			}, {
-				id : 2,
+				id : 1,
 				text : "巡区"
 			}, {
 				id : 3,

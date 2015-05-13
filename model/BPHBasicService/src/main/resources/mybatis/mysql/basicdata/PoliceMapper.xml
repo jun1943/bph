@@ -444,7 +444,7 @@
 	</sql>
 
 
-	<select id="getPoliceInfo" parameterType="java.util.Map" resultType="com.tianyi.bph.domain.basicdata.Police">
+	<select id="getPoliceInfo" parameterType="java.util.Map" resultType="com.tianyi.bph.query.basicdata.PoliceJJVM">
 		select
 		p.id as id,
 		p.name as name,
@@ -461,7 +461,12 @@
 		p.gps_name as gpsName, 
 		p.sync_state as syncState,
 		p.platform_id as platformId ,
-		p.isUsed as isused 
+		p.isUsed as isused ,
+		(
+			select count(*) from b_pj_police  pj 
+			LEFT JOIN b_jjdb jj on pj.JJDBH = jj.JJDBH
+			where pj.PJ_POLICE_ID = p.id    and  jj.AJZT != 9 
+		) as jjcount
 		from t_police as p 
 		<if  test="orgPath != null">
 		left join t_organ as org on p.org_id = org.organ_id

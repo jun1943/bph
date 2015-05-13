@@ -14,7 +14,7 @@ public class GroupTest extends BaseTest {
 	
 	//@Test
 	public void testSave(){
-		groupAction.saveGroupInfo("222", 1, 1, 1, "[{\"id\":\"1\",\"groupType\":\"2\"}]");
+		//groupAction.saveGroupInfo("222", 1, 1, 1, "[{\"id\":\"1\",\"groupType\":\"2\"}]");
 	}
 	
 	@Test

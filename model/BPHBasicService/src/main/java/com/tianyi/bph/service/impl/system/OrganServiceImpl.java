@@ -11,8 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.googlecode.ehcache.annotations.Cacheable;
 import com.tianyi.bph.common.Constants;
 import com.tianyi.bph.common.MessageCode;
 import com.tianyi.bph.common.Pager;
@@ -181,12 +179,15 @@ public class OrganServiceImpl implements OrganService{
 		Organ organ=null;
 		List<Organ> organList=null;
 		List<String> expandedList=null;
-		List<String> orgPList=new ArrayList<String>();//存储当前机构的上级机构
-		List<Organ> parentList = organDao.findOrganById(query);//通过id获取上级机构集合
+		//List<String> orgPList=new ArrayList<String>();//存储当前机构的上级机构
+		/*List<Organ> parentList = organDao.findOrganById(query);//通过id获取上级机构集合
 		for (Organ organV : parentList) {
 			orgPList.add(organV.getId()+"");
-		}
+		}*/
 		
+		/**
+		 * 存储展开节点的节点集合
+		 */
 		if(!StringUtils.isEmpty(query.getExpandeds())){
 			String[] strList=query.getExpandeds().split(",");
 			expandedList=Arrays.asList(strList);
@@ -195,8 +196,8 @@ public class OrganServiceImpl implements OrganService{
 			expandedMap.clear();
 		}
 		
-		//根据用户获取跨机构ids
-		List<String> jumpList=userOtherOrganDao.getOrganIdByUserId(query.getUserId());
+			/*//根据用户获取跨机构ids
+			List<String> jumpList=userOtherOrganDao.getOrganIdByUserId(query.getUserId());
 			for (String string : orgPList) {
 				if(jumpList.contains(string)){//跨越机构中有当前机构的上级机构，则直接跳过。用当前机构去遍历树
 					organ=organDao.selectByPrimaryKey(Integer.parseInt(string));
@@ -206,18 +207,22 @@ public class OrganServiceImpl implements OrganService{
 				}else{
 					parentMap.clear();
 				}
-			}
+			}*/
 			if(organ == null){//跨机构中没有上级机构，则用当前机构作为根节点
-			  organ=organDao.selectByPrimaryKey(query.getId());//当前暂时为默认根节点;
+			  organ=organDao.selectByPrimaryKey(query.getId());//这里确立的是根节点;
 		    }
 			organ.setExpanded(true);
 			
 			//下面这是模糊查询的内容
 			if(!StringUtils.isEmpty(query.getName())){
-				List<String> nameList=new ArrayList<String>();//存储通过Name查询获取的机构Ids
+				//List<String> nameList=new ArrayList<String>();//存储通过Name查询获取的机构Ids
 				List<String> idsStr=new ArrayList<String>();
+				
 				List<Organ> list=organDao.getOrgansByName(query);//获取Name模糊查询出来的数据
-				for (Organ organVV : list) {
+				if(list.size() ==0){
+					return null;
+				}
+				/*for (Organ organVV : list) {
 					nameList.add(organVV.getId()+"");
 				}
 				boolean flag=false;
@@ -229,9 +234,9 @@ public class OrganServiceImpl implements OrganService{
 				}
 				if(!flag){
 					return null;
-				}
+				}*/
 				organList=new ArrayList<Organ>();
-				for(Organ o:list){
+				for(Organ o:list){//遍历通过name查询出来的list。然后添加到organlist中，遍历去重
 					query.setId(o.getId());
 					List<Organ> idList = organDao.findOrganById(query);//通过id获取上级机构
 					for(Organ og:idList){
