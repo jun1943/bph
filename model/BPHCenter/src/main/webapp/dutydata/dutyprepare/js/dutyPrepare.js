@@ -193,7 +193,7 @@ var DutyPrepareManage={
 						m_targetPoint = req.data;
 						if (duty == null) {
 							duty = {};
-							duty.id = duty.id;
+							duty.id = 0;
 							duty.ymd = m_ymd.ymd;
 							duty.orgId = m_dutyprepare_Org.id;
 							duty.items = [];
