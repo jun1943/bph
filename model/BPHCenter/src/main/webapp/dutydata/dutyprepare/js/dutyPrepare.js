@@ -299,7 +299,7 @@ var DutyPrepareManage={
 							type : "POST",
 							dataType : "json",
 							data : {
-								"temId" : row.Id
+								"temId" : row.id
 							},
 							success : function(req) {
 								if (req.code==200) {// 成功填充数据
