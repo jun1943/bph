@@ -12,10 +12,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>扁平化指挥系统</title>
-<meta
-	content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no'
-	name='viewport' />
+<title>扁平化指挥系统</title> 
 
 <%@ include file="../../emulateIE.jsp" %>
 <script type="text/javascript">
@@ -29,16 +26,23 @@ $(function() {
 			dataTextField : "text",
 			panelHeight : "auto",
 			dataSource : [ {
-				id : 1,
+				id : 2,
 				text : "社区"
 			}, {
-				id : 2,
+				id : 1,
 				text : "巡区"
 			}, {
 				id : 3,
 				text : "卡点"
 			} ]
 	});
+	$("#txtDutyTypeParentName").val(window.parent.m_parentNode_pkg.parentName);
+	$("#txtDutyTypeParentFullPath").val(window.parent.m_parentNode_pkg.parentFullPath);
+	$("#txtDutyTypeParentId").val(window.parent.m_parentNode_pkg.parentId); 
+	$("#chkUnMax").attr("checked","checked"); 
+	$("#radioDisplayType1").attr("checked","checked");  
+	$("#radioAttireType1").attr("checked","checked"); 
+	$("#radioArmamentType1").attr("checked","checked");  
 });
 
 var bph_dutyTypeAdd_pkg={}; 
@@ -52,7 +56,7 @@ var DutyTypeAddManage= {
 			dataType : "json",
 			// async:false,
 			success : function(req) {
-				if (req.isSuccess) {// 成功填充数据
+				if (req.success) {// 成功填充数据
 					// var a = JSON.parse(req.rows);
 					var dataSource = new kendo.data.TreeListDataSource({
 					    data: req.rows
@@ -77,7 +81,7 @@ var DutyTypeAddManage= {
 		$.ajax({
 			url : "<%=basePath%>dutyTypeWeb/saveDutyType.do?sessionId="+sessionId,
 			type : "post",
-			data : bph_dutyTypeAdd_pkg,
+			data : {"dutyType" : JSON.stringify(bph_dutyTypeAdd_pkg)},
 			dataType : "json",
 			success : function(req) { 
 				if(req.code==200){ 
@@ -97,14 +101,21 @@ var DutyTypeAddManage= {
 		bph_dutyTypeAdd_pkg.parentId = $("#txtDutyTypeParentId").val();
 		var dname = $("#txtDutyTypeName").val();
 		if ($.trim(dname).length > 20) {
-			$("body").popjs({"title":"提示","content":"勤务类型名称长度过长，限制长度为20！"}); 
-			return;
+			$("body").popjs({"title":"提示","content":"勤务类型名称长度过长，限制长度为1-20！","callback":function(){
+								$("#txtDutyTypeName").focus();
+								return;
+							}});    
+					
+				return;
 		}
 		var myReg = /^[^|"'<>]*$/;
 		if (!myReg.test($.trim(dname))) {
-			$("body").popjs({"title":"提示","content":"勤务类型名称含有非法字符！"});  
-			$('#txtDutyTypeName').focus();
-			return;
+			$("body").popjs({"title":"提示","content":"勤务类型名称含有非法字符！","callback":function(){
+								$("#txtDutyTypeName").focus();
+								return;
+							}});    
+					
+				return;
 		}
 		bph_dutyTypeAdd_pkg.name = $.trim(dname);
 		
@@ -115,7 +126,11 @@ var DutyTypeAddManage= {
 			var r = /^[0-9]*[1-9][0-9]*$/;
 			var value = $.trim(personcount);
 			if (!r.test(value)) {
-				$("body").popjs({"title":"提示","content":"人数必须为正整数！"});  
+				$("body").popjs({"title":"提示","content":"人数必须为正整数！","callback":function(){
+								$("#txtMaxPolice").focus();
+								return;
+							}});    
+					
 				return;
 			} else {
 				bph_dutyTypeAdd_pkg.maxPolice = value;
@@ -126,7 +141,7 @@ var DutyTypeAddManage= {
 		var items = properties.dataItems();
 		for ( var i = 0; i < items.length; i++) {
 			var p = {};
-			var pId = ss[i].id;
+			var pId = items[i].id;
 			p.id = pId;
 			bph_dutyTypeAdd_pkg.properties.push(p);
 		}
@@ -174,18 +189,21 @@ var DutyTypeAddManage= {
 						</li>
 						<li class="ty-input">
 							<label class="ty-input-label" for="txtMaxPolice">人数上限:</label><input type="text" class="k-textbox" name="txtMaxPolice" id="txtMaxPolice"  disabled="disabled" />
-							<input id=chkUnMax 	type="checkbox"  onclick="DutyTypeAddManage.changeUnMax()" ></input>不限</label> 
+							<input id="chkUnMax" 	type="checkbox"  onclick="DutyTypeAddManage.changeUnMax()" ></input>不限</label> 
+						</li>
+						<li class="ty-input">
+							<label class="ty-input-label" for="cmbProperty">类型属性:</label>
+						</li>
+						<li class="ty-input">
+							<select id="cmbProperty" style="width:400px;height:30px;"  datmultiple="multiple" a-options="editable:false"></select>
+						</li>
+						<li class="ty-input">
+							<label class="ty-input-label" for="cmbTaskType">关联任务:</label><input  id="cmbTaskType" data-options="editable:false"  />
 						</li>
 						<li class="ty-input">
 							<label class="ty-input-label">统计显示:</label>
 							<label><input id="radioDisplayType1" name="displayType"  type="radio" value="0" ></input>人数 </label>
 						    <label><input id="radioDisplayType2" name="displayType"  type="radio" value="1"	></input>名称 </label>
-						</li>
-						<li class="ty-input">
-							<label class="ty-input-label" for="cmbProperty">类型属性:</label><select id="cmbProperty"  datmultiple="multiple" a-options="editable:false"></select>
-						</li>
-						<li class="ty-input">
-							<label class="ty-input-label" for="cmbTaskType">关联任务:</label><input id="cmbTaskType" data-options="editable:false"  />
 						</li>
 						<li class="ty-input">
 							<label class="ty-input-label">着装方式:</label>
@@ -194,8 +212,8 @@ var DutyTypeAddManage= {
 						</li>
 						<li class="ty-input">
 							<label class="ty-input-label">着装方式:</label>
-							<label><input id="radioAttireType1" name="armamentType"  type="radio" value="0" ></input>非武装</label> 
-							<label><input id="radioAttireType2" name="armamentType"  type="radio" value="1" ></input>武装</label>
+							<label><input id="radioArmamentType1" name="armamentType"  type="radio" value="0" ></input>非武装</label> 
+							<label><input id="radioArmamentType2" name="armamentType"  type="radio" value="1" ></input>武装</label>
 						</li> 
 					</ul>
 					<p style="float:left;width:100%;margin-top:10px;">

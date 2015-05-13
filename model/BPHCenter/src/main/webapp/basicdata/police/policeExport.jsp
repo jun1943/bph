@@ -20,6 +20,15 @@
 <%@ include file="../../emulateIE.jsp" %>
 <script  type="text/javascript">
 var fileUrl ="";
+$(function() {
+	var retMsg = $.trim($("#retMsgList").html());
+	if(retMsg.length>4){
+		$("body").popjs({"title":"提示","content":retMsg,"callback":function(){
+			window.parent.window.parent.PoliceManage.onClose();
+			window.parent.$("#dialog").tyWindow.close();
+		}});   
+	}  
+});
 var policeImportManage = {
 		downLoadModel:function(){
 			var urlStr = "<%=basePath %>excelModel/PoliceInfo.xls"; 
@@ -43,7 +52,8 @@ function checkType(e){
 	fileUrl = filepath;
 	var files =src.files; 
 	
-	filepath=filepath.substring(filepath.lastIndexOf('.')+1,filepath.length)
+	$("#fileUpload").val(fileUrl);
+	filepath=filepath.substring(filepath.lastIndexOf('.')+1,filepath.length);
 	if(filepath != 'xls'){
 		$("body").popjs({"title":"提示","content":"只能上传97--2003版本格式文件，后缀名为.xls","callback":function(){
 								src.value="";
@@ -56,11 +66,11 @@ function checkType(e){
 }
 </script>
 </head>
-<body>
+<body class="ty-body">
 	<form id="policeimportForm" method="post" enctype="multipart/form-data"
 		action="<%=basePath %>servlet/ExcelImportServlet">
 		<div id="vertical">
-			<div id="horizontal" style="height: 300px; width: 400px;">
+			<div id="horizontal" style="height: 500px; width: 500px;">
 				<div class="pane-content">
 					<!-- 左开始 -->
 					<div class="demo-section k-header">
@@ -68,17 +78,22 @@ function checkType(e){
 							<input id="orgId" name="orgId" type="hidden" value="${organ.id}" />
 							<input id="dataType" name="dataType" value="policeData" type="hidden"/>
 							<input id="sessionId" value="${requestScope.sessionId}"  name="sessionId" type="hidden" />
-							<input type="file"  onchange="checkType(event)"  id="fileName"  style="width:180px" name="fileName" text="选择文件上传" /> <a
-								href="<%=basePath %>excelModel/PoliceInfo.xls" style="font-size:12px;color:#819f0;"
-								onclick="">[点击下载excel模板]</a>
+							<input type="file"  onchange="checkType(event)"  id="fileName" class="ty-file" name="fileName" text="选择文件上传" /> 
+							<input type="text" class="k-textbox" id="fileUpload" readonly="readonly"/><button class="ty-upfile" onmousemove="document.getElementById('fileName').style.top=(event.clientY-10)+'px';document.getElementById('fileName').style.left= (event.clientX)+'px';">选择</button>
+							<a href="<%=basePath %>excelModel/PoliceInfo.xls" style="font-size:12px;color:#819f0;" onclick="">[点击下载excel模板]</a>
 						</p> <label style="font-size:12px;color:#819f0;">上传文件时，请先下载模板文件填写
 							；</label><br /> <label style="font-size:12px;color:#819f0;">文件对象为：97—03版本的excel文件，后缀格式为xls；</label>
 							<br /> <label style="font-size:12px;color:#819f0;">文件大小为：1Mb；</label>
 					 <p>  	
 					 	<span id="submit" class="k-button"  onClick="policeImportManage.fileFormSubmit();" >开始导入</span> 
 					</p> 
-					 <p style="color: red">${requestScope.uploadError}</p> 
-					 
+					
+					 <p id="retMsgList" style="display:none">
+						${requestScope.uploadError}  <br />
+					 	 <c:forEach var="item" items="${requestScope.uploadlist}">
+					 	 	${item} <br />
+					 	 </c:forEach> 
+					 </p>
 					</div>
 				</div>
 			</div>

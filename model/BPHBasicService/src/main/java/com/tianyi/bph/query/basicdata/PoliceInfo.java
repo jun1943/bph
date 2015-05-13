@@ -5,7 +5,7 @@ import java.util.List;
 import com.tianyi.bph.domain.basicdata.Police;
  
 
-public class PoliceInfo  extends ItemInfo<Police> {
+public class PoliceInfo  extends ItemInfo<PoliceJJVM> {
 	
 	private  List<GpsInfo> gpsItems;
 	

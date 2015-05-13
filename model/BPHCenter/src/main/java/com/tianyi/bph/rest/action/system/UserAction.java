@@ -25,12 +25,13 @@ import com.tianyi.bph.common.Md5Encrypt;
 import com.tianyi.bph.common.MessageCode;
 import com.tianyi.bph.common.Pager;
 import com.tianyi.bph.common.ReturnResult;
-import com.tianyi.bph.common.ehcache.CacheUtils;
 import com.tianyi.bph.domain.system.User;
 import com.tianyi.bph.query.system.UserQuery;
+import com.tianyi.bph.rest.CommonUtils;
 import com.tianyi.bph.rest.PrivilegeCache;
 import com.tianyi.bph.rest.PrivilegeCache.PrivilegeUser;
-import com.tianyi.bph.service.LogService;
+import com.tianyi.bph.service.ServiceSetService;
+import com.tianyi.bph.service.system.LogService;
 import com.tianyi.bph.service.system.UserAddModuleService;
 import com.tianyi.bph.service.system.UserRoleService;
 import com.tianyi.bph.service.system.UserService;
@@ -51,6 +52,8 @@ public class UserAction {
 	@Autowired UserRoleService userRoleService;
 	
 	@Autowired UserAddModuleService userAddModuleService;
+	
+	@Autowired ServiceSetService serviceConfService;
 	
 	@Autowired LogService logService;
 	
@@ -78,16 +81,30 @@ public class UserAction {
 		ReturnResult result = userService.userLogin(username, password);
 		if (MessageCode.STATUS_SUCESS == result.getCode()) {
 			User user = (User) result.getData();
-			//添加session缓存
-			//UserCache.instance.addUserCache(user,request.getSession());
+			/**
+			 * 用户权限
+			 */
+			List<String> funListStr=userRoleService.getFunctionsByUserId(user.getUserId());
+			user.setFunctionList(funListStr);
+			/**
+			 * 服务配置信息
+			 */
+			user=serviceConfService.getServcieList(user);
 			
+			/**
+			 * session 缓存管理
+			 */
 			HttpSession session = request.getSession();
 			session.setAttribute("User", user);
-			//UserCache.addSession(request.getSession().getId(), session);
-			CacheUtils.updateValue(manager, CacheUtils.USER_BASE_DATA, request.getSession().getId(), session);
-			user.setSessionId(request.getSession().getId());
-			//添加日志记录
-			//logService.AddOperateLog(username, CommonUtils.getRemoteIp(request),"用户登录系统成功！");
+			//CacheUtils.updateValue(manager, CacheUtils.USER_BASE_DATA, session.getId(), session);
+			//CacheUtils.invalidateValue(manager, CacheUtils.USER_BASE_DATA, session);
+			//user.setSessionId(request.getSession().getId());
+			/**
+			 * 添加日志记录
+			 */
+			logService.insert(CommonUtils.getRemoteIp(request),user.getUserId()+"",
+					user.getUserName(),"用户登录系统成功",1);
+			
 			request.getSession().setAttribute("SESSIN_USERNAME",user.getUserName());
 			return result;
 		} else {
@@ -104,9 +121,16 @@ public class UserAction {
 	@ResponseBody
 	public ReturnResult loginOut(@RequestParam(value="sessionId",required=true)String sessionId,
 			HttpServletRequest request) {
-		HttpSession session=(HttpSession) CacheUtils.getObjectValue(manager, CacheUtils.USER_BASE_DATA, sessionId);
+		HttpSession session=(HttpSession) request.getSession();
+		
+		/**
+		 * 添加日志记录
+		 */
+		User user=(User) session.getAttribute("User");
+		logService.insert(CommonUtils.getRemoteIp(request),user.getUserId()+"",
+				user.getUserName(),"退出系统成功",1);
 		session.invalidate();
-		CacheUtils.invalidateValue(manager, CacheUtils.USER_BASE_DATA, sessionId);
+		//CacheUtils.invalidateValue(manager, CacheUtils.USER_BASE_DATA, session.getId());
 		return ReturnResult.SUCCESS("成功退出！");
 	}
 

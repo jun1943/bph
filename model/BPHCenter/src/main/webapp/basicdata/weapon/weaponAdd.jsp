@@ -77,20 +77,28 @@ var WeaponAddManage= {
 			}
 			 
 			var pnumber = $.trim($("#weaponNumber").val()); 
+			var myReg = /^[^@\/\'\\\"#$%&\^\*]+$/;
 			if(pnumber.length>0){
+			
+				if(!myReg.test(pnumber)){
+						$("body").popjs({"title":"提示","content":"武器编号不能包含特殊字符","callback":function(){
+								$("#weaponNumber").focus();
+							}});  
+						return;
+				}
 				if (pnumber.length > 20) { 
 							$("body").popjs({"title":"提示","content":"武器编号长度出错，限制长度为0--20！","callback":function(){
 								$("#weaponNumber").focus();
 							}});    
 					return;
 				}
-				WeaponAddManage.isExistWeapon(pnumber,0, 0);
-				if (!isExist) { 
-							$("body").popjs({"title":"提示","content":"该武器编号在"+bph_Exist_OrgName+"机构下已经存在，请确认之后添加","callback":function(){
-								$("#weaponNumber").focus();
-							}});    
-					return; 
-				}
+				//WeaponAddManage.isExistWeapon(pnumber,0, 0);
+				//if (!isExist) { 
+				//			$("body").popjs({"title":"提示","content":"该武器编号在"+bph_Exist_OrgName+"机构下已经存在，请确认之后添加","callback":function(){
+				//				$("#weaponNumber").focus();
+				//			}});    
+				//	return; 
+				//}
 			}else{ 
 							$("body").popjs({"title":"提示","content":"请录入武器编号","callback":function(){
 								$("#weaponNumber").focus();
@@ -104,6 +112,14 @@ var WeaponAddManage= {
 								$("#weaponStandard").focus();
 							}});    
 				return;
+			}
+			if(wstandard.length >0){
+				if(!myReg.test(wstandard)){
+						$("body").popjs({"title":"提示","content":"子弹数目不能包含特殊字符","callback":function(){
+								$("#weaponStandard").focus();
+							}});  
+						return;
+				}
 			}
 			bph_weaponAdd_pkg.standard = wstandard; 
 			WeaponAddManage.isComplete = true;
@@ -149,6 +165,35 @@ var WeaponAddManage= {
 				}
 			});
 		},
+			// 判断警员是否存在
+			isExistNumber:function() { 
+			var pnumber = $.trim($("#weaponNumber").val()); 
+			
+			if(pnumber.length>0){
+				$.ajax({
+					url : "<%=basePath%>weaponWeb/isExistWeapon.do?sessionId="+sessionId,
+					type : "POST",
+					dataType : "json",
+					async : false,
+					data : {
+						"param" : pnumber,
+						"type"  : 0,
+						"id"    : 0
+					},
+					success : function(req) {
+					if (req.code!=200) {  
+						bph_Exist_OrgName = req.description; 
+						$("body").popjs({"title":"提示","content":"该武器编号在"+bph_Exist_OrgName+"机构下已存在，请确认后添加","callback":function(){
+								$("#weaponNumber").focus(); 
+								return;
+							}});   
+						return; 
+						
+					}
+					}
+				});
+				}
+			},
 		clearAddFrom:function(){
 			$("#weaponNumber").val();
 			$("#weaponStandard").val();
@@ -157,7 +202,7 @@ var WeaponAddManage= {
 </script>
 </head>
 
-<body>
+<body class="ty-body">
 	<div id="vertical">
 		<div id="horizontal">
 			<div class="pane-content">
@@ -169,14 +214,14 @@ var WeaponAddManage= {
 							id="weaponId"><input type="hidden"
 							id="orgId" value="${organ.id}" /></li>
 						<li style="padding:5px;"><span class="ty-input-warn">*</span><label for="weaponNumber" class="fl mr5">武器编号:</label><input
-							type="text" class="k-textbox" name="weaponNumber"
+							type="text" class="k-textbox" name="weaponNumber"  onblur="WeaponAddManage.isExistNumber()" 
 							id="weaponNumber" /></li>
-						<li style="padding:5px;"><label for="weaponStandard" class="fl mr5">子弹数目:</label><input type="text"
+						<li style="padding:5px;"><span class="ty-input-warn"></span><label for="weaponStandard" class="fl mr5">子弹数目:</label><input type="text"
 							class="k-textbox" name="weaponStandard" id="weaponStandard" /></li>
 					</ul>
-					<p style="padding:5px;">
+					<p class="ty-input-row">
 						<!--<span class="k-button"  onclick="WeaponAddManage.saveWeaponNotOut()">保存并继续</span>-->
-						<span class="k-button"  onclick="WeaponAddManage.saveWeaponWithOut()">保存</span>
+						<button class="ty-button"  onclick="WeaponAddManage.saveWeaponWithOut()">保存</button>
 					</p>
 
 

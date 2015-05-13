@@ -29,6 +29,7 @@ import com.tianyi.bph.domain.basicdata.Icons;
 import com.tianyi.bph.domain.basicdata.Weapon;
 import com.tianyi.bph.domain.basicdata.WeaponType;
 import com.tianyi.bph.domain.system.Organ;
+import com.tianyi.bph.domain.system.User;
 import com.tianyi.bph.query.basicdata.GpsVM;
 import com.tianyi.bph.query.basicdata.WeaponVM;
 import com.tianyi.bph.query.system.UserQuery;
@@ -60,11 +61,15 @@ public class GpsController {
 	public ModelAndView gotoGpsList(
 			HttpServletRequest request,
 			@RequestParam(value = "gpsNumber", required = false) String number,
-			@RequestParam(value = "organId", required = true, defaultValue = "1") Integer organId,
+			@RequestParam(value = "organId", required = false) Integer organId,
 			@RequestParam(value = "searchType", required = true, defaultValue = "1") Integer searchType,
 			@RequestParam(value = "pageSize", required = false, defaultValue = "10") Integer pageSize,
 			@RequestParam(value = "pageNo", required = false, defaultValue = "1") Integer pageNo) {
 		UserQuery query = new UserQuery();
+		User user = (User) request.getAttribute("User");
+		if (organId == null) {
+			organId = user.getOrgId();
+		}
 		if (!StringUtils.isEmpty(number)) {
 			query.setUserName(number);
 		}

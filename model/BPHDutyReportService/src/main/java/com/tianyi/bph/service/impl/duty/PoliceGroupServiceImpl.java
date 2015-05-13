@@ -77,7 +77,7 @@ public class PoliceGroupServiceImpl implements PoliceGroupService {
 		}
 
 		for (Object oid : orgIds) {
-			Integer id = (Integer) oid;
+			Integer id = Integer.parseInt(oid.toString());
 
 			PoliceGroupOrg pgo = new PoliceGroupOrg();
 			pgo.setOrgId(id.intValue());

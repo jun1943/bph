@@ -73,7 +73,7 @@ public class VehicleGroupServiceImpl implements VehicleGroupService {
 		}
 
 		for(Object oid : orgIds){
-			Integer id=(Integer)oid;
+			Integer id=Integer.parseInt(oid.toString());//  (Integer)oid;
 			
 			VehicleGroupOrg pgo=new VehicleGroupOrg();
 			pgo.setOrgId(id.intValue());

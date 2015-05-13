@@ -1,6 +1,9 @@
 package com.tianyi.bph.rest.action.system;
 
 import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.tianyi.bph.BaseLogController;
 import com.tianyi.bph.common.Pager;
 import com.tianyi.bph.domain.system.CardPoint;
 import com.tianyi.bph.query.system.CardPointQuery;
@@ -23,7 +27,7 @@ import com.tianyi.bph.common.ReturnResult;
  */
 @Controller
 @RequestMapping("/cardPoint")
-public class CardPointAction {
+public class CardPointAction extends BaseLogController {
 
 	static final Logger log = LoggerFactory.getLogger(CardPointAction.class);
 
@@ -72,8 +76,10 @@ public class CardPointAction {
 	 */
 	@RequestMapping(value = "/deleteCardPoint.do")
 	@ResponseBody
-	public ReturnResult deleteCardPoint(@RequestParam(value = "id", required =true) Integer id) {
+	public ReturnResult deleteCardPoint(@RequestParam(value = "id", required =true) Integer id
+			,HttpServletRequest request) {
 		int i = cardPointService.deleteCardPoint(id);
+		addLog(request, "删除卡点成功", 2);
 		return ReturnResult.SUCCESS("", i);
 	}
 	
@@ -84,8 +90,9 @@ public class CardPointAction {
 	 */
 	@RequestMapping(value = "/modifyCardPoint.do")
 	@ResponseBody
-	public ReturnResult modifyCardPoint(CardPoint cardPoint) {
+	public ReturnResult modifyCardPoint(CardPoint cardPoint,HttpServletRequest request) {
 		CardPoint c = cardPointService.updateCardPoint(cardPoint);
+		addLog(request, "修改卡点信息成功", 2);
 		return ReturnResult.SUCCESS("成功", c);
 	}
 	

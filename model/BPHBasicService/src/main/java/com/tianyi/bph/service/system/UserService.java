@@ -129,5 +129,31 @@ public interface UserService {
 	 * @return
 	 */
 	public void updateUserByMySelect(User user);
+	
+	/**
+	 * 不分页条件查询
+	 * @param query 用户信息
+	 * @return
+	 */
+	public List<User> getListForPoliceId(Integer policeId);
+	
+	/**
+	 * 修改用户密码
+	 * 2015-5-6
+	 * @param id 用户ID
+	 * @param oldPwd 旧密码
+	 * @param newPwd 新密码
+	 * @param cfmPwd 确认密码
+	 * @return
+	 */
+	public ReturnResult updatePassword(Long id, String oldPwd, String newPwd, String cfmPwd);
+	
+	/**
+	 *  重置密码<br>
+	 *  2015-5-8
+	 * @param id
+	 * @return
+	 */
+	public ReturnResult resetPassword(Long id);
 
 }

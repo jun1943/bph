@@ -22,23 +22,15 @@
 <script type="text/javascript">
 var sessionId = $("#token").val();
 
+var fileUrl ="";
 $(function() {
-	var args = getUrlArgs();
-	if (args.optType == 0 || args.optType == "0") { 
-					$("body").popjs({"title":"提示","content":"请求数据的size超出了规定的大小,限制大小2M!"});  
-	} else if (args.optType == 1 || args.optType == "1") {
-					$("body").popjs({"title":"提示","content":"请求类型enctype != multipart/form-data"});  
-	} else if (args.optType == 2 || args.optType == "2") {
-					$("body").popjs({"title":"提示","content":"上传过程异常，导致其原因可能是磁盘已满或者其它原因"});   
-	} else if (args.optType == 3 || args.optType == "3") {
-					$("body").popjs({"title":"提示","content":"请选择图片类型"});   
-	} else if (args.optType == 4 || args.optType == "4") {
-					$("body").popjs({"title":"提示","content":"请输入图标名称"});   
-	} else if (args.optType == 5 || args.optType == "5") {
-					$("body").popjs({"title":"提示","content":"文件写入服务器磁盘错误"});    
-	} else if (args.optType == 6 || args.optType == "6") {
-					$("body").popjs({"title":"提示","content":"请选择要上传的图标！"});  
-	} 
+	var retMsg = $("#retMsg").html(); 
+	if(retMsg.length>0){ 
+		$("body").popjs({"title":"提示","content":retMsg,"callback":function(){
+			window.parent.window.parent.IconManage.onClose();
+			window.parent.$("#dialog").tyWindow.close();
+		}});   
+	}
 	$("#iconsType").kendoComboBox({
 		dataTextField : "name",
 		dataValueField : "id",
@@ -72,47 +64,79 @@ function getUrlArgs() {
 }
 
 function iconFormSubmit(){
-	var iconTypeId=$("#").val();
+	var iconTypeId=$("#iconsType").val();
 	if(iconTypeId==0){
 		$("body").popjs({"title":"提示","content":"请选择图片类型"}); 
 		return;
 	}
 	var iconname = $("#iconsName").val();
 	if(iconname==""||$.trim(iconname)==""){
-		$("body").popjs({"title":"提示","content":"请输入图片名称"}); 
+		$("body").popjs({"title":"提示","content":"请输入图片名称","callback":function(){
+								$("#iconsName").focus();
+								return; 
+							}});  
 		return; 
-	} else{
-		$('#iconSubForm').submit();
 	}
+	if(fileUrl == undefined ||fileUrl ==""){
+		$("body").popjs({"title":"提示","content":"请选择图标进行上传","callback":function(){ 
+								return; 
+							}});  
+		return; 
+	}
+	
+	$('#iconSubForm').submit();
+}
+function checkType(e){
+	 var src=e.target || window.event.srcElement;
+
+	var filepath=src.value;
+	fileUrl = filepath;
+	var files =src.files; 
+	
+	//$("#upfile").val(fileUrl);
+	$("#fileUpload").val(fileUrl);
+	filepath=filepath.substring(filepath.lastIndexOf('.')+1,filepath.length);
+	if(filepath != 'png'){
+		$("body").popjs({"title":"提示","content":"只能上传png格式图标","callback":function(){
+								src = null;
+								fileUrl = "";
+								return ;
+							}});   
+								return ;
+	} 
+
 }
 </script>
 </head>
 
-<body>
+<body class="ty-body">
 <form id="iconSubForm" method="post" enctype="multipart/form-data"  action="<%=basePath %>servlet/FileUploadServlet" >  
-     <div id="horizontal" style="height: 220px; width: 450px;">
+     <div id="horizontal" style="height: 220px;">
 			<div class="pane-content">
 				<!-- 左开始 -->
 				<div class="demo-section k-header"> 
 					<ul>
-						<li><label for="iconsType">图片类型:</label><input id="iconsType"  name="iconsType"
+						<li><span class="ty-input-warn">*</span><label for="iconsType">图片类型:</label><input id="iconsType"  name="iconsType"
 							placeholder="请选择图片类型..." /><input id="iconsId" value="0"  name="iconsId" type="hidden" />
 							<input id="sessionId" value="${requestScope.sessionId}"  name="sessionId" type="hidden" />
 							</li>
-						<li><label for="iconsName">图标名称:</label><input
+						<li><span class="ty-input-warn">*</span><label for="iconsName">图标名称:</label><input
 							type="text" class="k-textbox" name="iconsName"
-							id="iconsName" value="${requestScope.iconsName}" /></li>
-						<li><label for="iconUrl">图标选择:</label><input type="file" style="width:180px" name="fileName" text="选择文件上传" /></li>
+							id="iconsName"  /></li>
+						<li><span class="ty-input-warn">*</span><label for="iconUrl">图标选择:</label>
+							<input type="file" class="ty-file" onchange="checkType(event);" id="fileName" name="fileName" />
+							<input type="text" class="k-textbox" id="fileUpload" readonly="readonly"/><button class="ty-upfile" onmousemove="document.getElementById('fileName').style.top=(event.clientY-10)+'px';document.getElementById('fileName').style.left= (event.clientX)+'px';">选择</button>
+						</li>
 					</ul>
-					<p>  	
-						<input type="submit" name="submit" style="width:80px"  onClick="iconFormSubmit();" value="保存图标" />
-					</p> 
-					 <p style="color: red">${requestScope.uploadError}</p> 
+					<p style="font-size:10px;">请选择png格式图片进行上传，图标尺寸限制1Mb；</p>
+					<p id="retMsg" style="display:none">${requestScope.uploadError}</p> 
+					<p class="ty-input-row">  	
+					 <button id="submit" class="ty-button" onClick="iconFormSubmit();" >保存图标</button>  
+					</p>
 				</div>
 				
 			</div>
 		</div> 
  </form>   
 </body>
-</style>
 </html>

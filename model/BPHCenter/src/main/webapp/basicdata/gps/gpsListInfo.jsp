@@ -42,7 +42,10 @@ var GpsManage = {
 					url : "<%=basePath%>gpsWeb/getGpsList.do?sessionId="+sessionId,
 					type : "post",
 					data : {
-						"gps_Query" : JSON.stringify(bph_gps_query)
+						"gps_Query" : JSON.stringify(bph_gps_query),
+						"expandeds"		:expandeds,
+						"organId":$("#organId").val(),
+						"organPath":$("#organPath").val()
 					},
 					dataType : "json",
 					success : function(req) {
@@ -147,8 +150,8 @@ var GpsManage = {
 	addGps:function(){
 		var organId = $("#organId").val();
 		$("#dialog").tyWindow({
-			width : "580px",
-			height : "480px",
+			width : "600px",
+			height : "500px",
 			title : "新增定位设备信息",
 			position : {
 				top : "100px"
@@ -163,8 +166,8 @@ var GpsManage = {
 	editGps:function(gpsId){
 		var organId = $("#organId").val();
 		$("#dialog").tyWindow({
-			width : "580px",
-			height : "480px",
+			width : "600px",
+			height : "500px",
 			title : "编辑定位设备信息",
 			position : {
 				top : "100px"

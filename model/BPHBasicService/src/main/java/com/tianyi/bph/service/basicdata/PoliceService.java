@@ -10,6 +10,7 @@ import com.tianyi.bph.domain.basicdata.PoliceType;
 import com.tianyi.bph.query.basicdata.GpsBaseVM;
 import com.tianyi.bph.query.basicdata.PoliceExtItem;
 import com.tianyi.bph.query.basicdata.PoliceInfo;
+import com.tianyi.bph.query.basicdata.PoliceJJVM;
 import com.tianyi.bph.query.basicdata.PoliceVM;
 import com.tianyi.bph.query.basicdata.UserObjectVM;
  
@@ -184,7 +185,7 @@ public interface PoliceService {
 	 * @param orgId
 	 * @return
 	 */
-	 public List<Police> getPoliceInfo(Integer orgId,Integer isSubOrg);
+	 public List<PoliceJJVM> getPoliceInfo(Integer orgId,Integer isSubOrg);
 	
 	
 	

@@ -51,6 +51,12 @@ public class UserServiceImpl implements UserService{
 		boolean isUnique = isUnique(userQuery);
 		if (!isUnique) {
 			return ReturnResult.MESSAGE(MessageCode.STATUS_NOTUNIQUE, "用户名重复");
+		}
+		if(user.getPoliceUserId()!=null){
+			List uList = userDao.getListForPoliceId(user.getPoliceUserId());
+			if(uList.size()>0){
+				return ReturnResult.MESSAGE(MessageCode.STATUS_NOTUNIQUE, "该警员已绑定其它帐号");
+			}
 		}		
 		user.setPassword(Md5Encrypt.md5(user.getPassword()));
 		user.setCreateTime(new Date());
@@ -115,6 +121,15 @@ public class UserServiceImpl implements UserService{
 		boolean isUnique = isUnique(userQuery);
 		if (!isUnique) {
 			return ReturnResult.MESSAGE(MessageCode.STATUS_NOTUNIQUE, "用户名重复");
+		}
+		if(user.getPoliceUserId()!=null){
+			UserQuery query = new UserQuery();
+			query.setUserId(user.getUserId());
+			query.setPoliceUserId(user.getPoliceUserId());
+			Integer uCount = userDao.getListForPoliceIdAndUserId(query);
+			if(uCount>0){
+				return ReturnResult.MESSAGE(MessageCode.STATUS_NOTUNIQUE, "该警员已绑定其它帐号");
+			}
 		}
 		user.setUpdateTime(new Date());
 		Long userId = user.getUserId();
@@ -291,6 +306,65 @@ public class UserServiceImpl implements UserService{
 	 */
 	public void updateUserByMySelect(User user){
 		userDao.updateByMySelective(user);		
+	}
+
+	@Override
+	public List<User> getListForPoliceId(Integer policeId) {
+		// TODO Auto-generated method stub
+		return userDao.getListForPoliceId(policeId);
+	}
+	
+	/**
+	 * 修改用户密码
+	 * 2015-5-6
+	 * @param id 用户ID
+	 * @param oldPwd 旧密码
+	 * @param newPwd 新密码
+	 * @param cfmPwd 确认密码
+	 * @return
+	 */
+	@Transactional
+	public ReturnResult updatePassword(Long id, String oldPwd, String newPwd,
+			String cfmPwd) {
+		ReturnResult result = new ReturnResult();
+		// 基本参数验证
+		if (StringUtils.isEmpty(newPwd)) {
+			return result.FAILUER("新密码不能为空！");
+		}
+		if (StringUtils.isEmpty(oldPwd)) {
+			return result.FAILUER("旧密码不能为空！");
+		}
+		if (StringUtils.isEmpty(cfmPwd)) {
+			return result.FAILUER("确认密码不能为空！");
+		}
+		if (!StringUtils.equals(newPwd, cfmPwd)) {
+			return result.FAILUER("确认密码与新密码不一置！");
+		}
+		// 获取用户基本信息
+		User user = userDao.selectByPrimaryKey(id);
+		if(user != null){
+			if (!user.getPassword().equals(Md5Encrypt.md5(oldPwd))) {
+				return result.FAILUER("传入参数【旧密码】错误！");
+			}
+		}
+		System.out.println(Md5Encrypt.md5(oldPwd) + " == " +user.getPassword());
+		// 执行更新密码的操作（通过MD5加密后，再保存数据库）
+		userDao.updatePassword(id, Md5Encrypt.md5(newPwd));
+		return result.SUCCESS("修改成功!");
+	}
+
+	@Override
+	@Transactional
+	public ReturnResult resetPassword(Long id) {
+		ReturnResult result = new ReturnResult();
+		String def = "123456"; // 默认的重置密码
+		try{
+			// 执行更新密码的操作（通过MD5加密后，再保存数据库）
+			userDao.updatePassword(id, Md5Encrypt.md5(def));
+			return result.SUCCESS("重置密码成功！");
+		}catch(Exception e){
+			return result.FAILUER("重置密码失败，失败原因：" + e.getMessage());
+		}
 	}
 
 }

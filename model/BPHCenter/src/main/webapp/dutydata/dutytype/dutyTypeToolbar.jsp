@@ -43,20 +43,19 @@ $(document).ready(function() {
 </script>
 <div id="template">
  
-	<div class="fl ml30 set-hei48">   
+	<div class="fl ml30 set-hei48">
+	<span id="btnaddParentNode" class="k-button"  onclick="DutyTyepManage.addParentNode()">新建根节点</span>
+                   <span id="btnaddChildNode" class="k-button"  onclick="DutyTyepManage.addChildNode()">新建子节点</span> 
+                   <span id="btnaddChildNode" class="k-button"  onclick="DutyTyepManage.editDutyType()">编辑</span> 
+                   <span id="btndeleteNode" class="k-button"  onclick="DutyTyepManage.deleteDutyType()">删除</span> 
+                   <span id="btnunLockNode" class="k-button"  onclick="DutyTyepManage.unLockNode()">启用</span> 
+                   <span id="btnlockNode" class="k-button"  onclick="DutyTyepManage.lockNode()">锁定</span>    
 		<div class="temp">
 			<div class="ty-total-decorate"><span id="gridListTotal"></span><i></i></div>
-			<div class="ty-decorate2"></div>
+			
 		</div>
 	</div>
-	<div class="fl set-hei48">
-		<div class="ty-decorate1"></div> 
-                   <span id="btnaddParentNode" class="k-button"  onclick="DutyTyepManage.addParentNode()">新建根节点</span>
-                   <span id="btnaddChildNode" class="k-button"  onclick="DutyTyepManage.addChildNode()">新建子节点</span> 
-                   <span id="btndeleteNode" class="k-button"  onclick="DutyTyepManage.deleteNode()">删除</span> 
-                   <span id="btnunLockNode" class="k-button"  onclick="DutyTyepManage.unLockNode()">启用</span> 
-                   <span id="btnlockNode" class="k-button"  onclick="DutyTyepManage.lockNode()">锁定</span> 
-	</div>
+	
 	<div class="fr set-hei48">
 		<div class="ty-screen-mode" id="tyScreenMode">
 			<i class="ty-screen-mode-btn1" title="标准模式"></i><i class="ty-screen-mode-btn2" title="模块全屏"></i><i class="ty-screen-mode-btn3" title="内容全屏"></i>

@@ -1,6 +1,8 @@
 package com.tianyi.bph.web.controller.dutydata;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -19,10 +21,9 @@ import com.tianyi.bph.service.system.OrganService;
 @RequestMapping("/dutyRouteWeb")
 public class DutyRouteController {
 
-
-
 	@Autowired
 	private OrganService organService;
+
 	/**
 	 * web跳转到勤务类型列表
 	 * 
@@ -35,24 +36,32 @@ public class DutyRouteController {
 	@ResponseBody
 	public ModelAndView gotoDutyTypeList(
 			@RequestParam(value = "organId", required = true, defaultValue = "1") Integer organId,
-			HttpServletRequest request) {
-		UserQuery query = new UserQuery();
+			@RequestParam(value = "date", required = false) String date,
+			HttpServletRequest request) throws Exception {
 		ModelAndView mv = new ModelAndView(
 				"/dutydata/dutyprepare/dutyCalendar.jsp");
 		Organ organ = new Organ();
 		if (organId != null) {
 			organ = organService.getOrganByPrimaryKey(organId);
 		}
-
-		Calendar c = Calendar.getInstance();
-		int years = c.get(Calendar.YEAR);
-		int month = c.get(Calendar.MONTH) + 1;
-		query.setOrganId(organId);
-		query.setPageNo(years);
-		query.setPageSize(month);
+		int years = 0;
+		int month = 0;
+		if (date != null && !date.equals("")) {
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+			Date d = sdf.parse(date);
+			Calendar cld = Calendar.getInstance();
+			cld.setTime(d);
+			years = cld.get(Calendar.YEAR);
+			month = cld.get(Calendar.MONTH) + 1;
+		} else {
+			Calendar c = Calendar.getInstance();
+			years = c.get(Calendar.YEAR);
+			month = c.get(Calendar.MONTH) + 1;
+		}
 		mv.addObject("organ", organ);
-		mv.addObject("query", query);
-		mv.addObject("num", "200");
+		mv.addObject("dutyyears", years);
+		mv.addObject("dutymonth", month);
+		mv.addObject("num", "300");
 		return mv;
 	}
 
@@ -86,7 +95,8 @@ public class DutyRouteController {
 		query.setPageSize(month);
 		mv.addObject("organ", organ);
 		mv.addObject("query", query);
-		mv.addObject("num", "200");
+		mv.addObject("dutyDate", ymd);
+		mv.addObject("num", "300");
 		return mv;
 	}
 

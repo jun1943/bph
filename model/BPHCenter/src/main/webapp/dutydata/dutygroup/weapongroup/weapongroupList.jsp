@@ -13,7 +13,7 @@
 <html>
 <head>
 <title>扁平化指挥系统</title>
-<%@ include file="../../emulateIE.jsp" %>	
+<%@ include file="../../../emulateIE.jsp" %>	
 <meta
 	content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no'
 	name='viewport' />
@@ -25,7 +25,7 @@
 		<div id='main-nav-bg'></div>
 		<nav class="" id="main-nav">
 			<div class='navigation'>
-				<%@ include file="../../left.jsp"%>
+				<%@ include file="../../../left.jsp"%>
 			</div>
 		</nav>
 		<section id='content'>
@@ -40,7 +40,7 @@
 								<h1>定位设备分组管理</h1>
 
 								<div class="clear box">
-									<%@ include file="gpsgroupSearch.jsp"%>
+									<%@ include file="weapongroupSearch.jsp"%>
 								</div>
 							</div>
 						</div>
@@ -50,7 +50,7 @@
 							<!----信息显示区---->
 							<div class="span8 box">
 								<!----表格---->
-								<%@ include file="gpsgroupListInfo.jsp"%>
+								<%@ include file="weapongroupListInfo.jsp"%>
 							</div>
 							<!----表格结束---->
 						</div>

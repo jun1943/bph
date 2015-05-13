@@ -6,82 +6,62 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
-  <head>
-    <base href="<%=basePath%>">
-    
-    <title>My JSP 'gpsgroupEditGroup.jsp' starting page</title>
-    
-	<meta http-equiv="pragma" content="no-cache">
-	<meta http-equiv="cache-control" content="no-cache">
-	<meta http-equiv="expires" content="0">    
-	<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
-	<meta http-equiv="description" content="This is my page">
-	<!--
-	<link rel="stylesheet" type="text/css" href="styles.css">
-	-->
+<head>
+<base href="<%=basePath%>">
 
-<script type="text/javascript">
-var opteType = ""
-$(function() {
-	
-	opteType = optType;
-	//	var row = $("#dtVehicleGroup").datagrid("getSelected");
-	var kGrid = $("#dtVehicleGroup").data("kendoGrid");
-	var row = kGrid.dataItem(kGrid.select());
-	if (row !== null) {
-		var id = row.id;
-		VehicleGroupManage.loadVehicleGroup(id,
-				VehicleGroupManage.displayVehicleGroup);
+<title>扁平化客户端</title>
+<%@ include file="../../../emulateIE.jsp" %>
 
-		//VehicleGroupManage.showVehicleGroupDlg();
-	}
-	
+
+<script type="text/javascript"> 
+var sessionId = $("#token").val(); 
+var m_group_Id = 0;
+var bph_Exist_OrgName; 
+var m_checkedNodes_id ="";
+var m_vehicleGroup_Org = {
+	id : $("#organId").val(),
+	orgCode : "",
+	orgPath : $("#organPath").val(),
+	groupId : m_group_Id,
+	sourceType:"Vehicle"
+}; 
 	//获取树的信息
-	$.ajax({
-		url : "orgTest/treelist.do",
-		type : "POST",
-		dataType : "json",
-		data : {
-			orgId : m_vehicleGroup_Org.id,
-			orgCode : m_vehicleGroup_Org.code,
-			orgPath : m_vehicleGroup_Org.path
-		},
-		// async : false,
-		success : function(req) {
-			if (req.code == 200) {
-
-				var json_data = JSON.stringify(req.data);
-
-				$("#treeOrg").kendoTreeView({
-					checkboxes : true,
-					dataTextField : "shortName",
-					check : VehicleGroupManage.onCheck,//check复选框
-					dataSource : [ eval('(' + json_data + ')') ]
-				}).data("kendoTreeView");
-			} else {
-				alert("提示, " + req.msg + ", warning");
-			}
-		}
-	});
-	
-});
-
-var VehicleGroupManage = {
-		//查询需要修改选项的信息
-		loadVehicleGroup : function(id, callback) {
-			$.ajax({
-				url : "vehicleGroup/loadVehicleGroup.do",
-				type : "POST",
-				dataType : "json",
-				data : {
-					'vehicleGroupId' : id
-				},
-				// async : false,
-				success : function(req) {
-					callback(req);
+	$(function() {
+		m_group_Id =  $("#txtVehicleGroupId").val();
+		m_vehicleGroup_Org.groupId = m_group_Id;
+		//获取树的信息
+		$.ajax({
+			url : "<%=basePath%>organWeb/treelist.do?sessionId="+sessionId,
+			type : "POST",
+			dataType : "json",
+			data : m_vehicleGroup_Org,
+			// async : false,
+			success : function(req) {
+				if (req.code==200) { 
+					var json_data = JSON.stringify(req.data);
+					
+					$("#treeOrg").kendoTreeView({ 
+					    checkboxes: true,
+					    dataTextField: "shortName",
+					    check : VehicleGroupManage.onCheck,//check复选框
+					    dataSource: [eval('(' + json_data + ')')]
+					}).data("kendoTreeView");
+				} else {
+					alert("提示, "+req.msg+"", "warning");
 				}
-			});
-		},
+			}
+		});
+		var isshared = $("#txtIsShared").val();
+		if(isshared==0||isshared=="0"){
+			$("#radio_unshared").attr("checked","checked");
+				$("#divOrg").css("visibility", "hidden");
+		}else{
+			$("#radio_shared").attr("checked","checked");
+				$("#divOrg").css("visibility", "visible");
+		}
+	}); 
+
+var VehicleGroupManage = { 
 		//单选是否共享事件
 		changeShareType : function() {
 			var val = $('input:radio[name="shareType"]:checked').val();
@@ -133,133 +113,129 @@ var VehicleGroupManage = {
 			// pg.name = $('#txtVehicleGroupName').val();
 			var groupName = $.trim($("#txtVehicleGroupName").val());
 			if (groupName == "" && groupName == undefined) {
-				alert("操作提示, 请填写分组名称", "error");
-				$("#txtVehicleGroupName").focus();
-				return;
+					$("body").popjs({"title":"提示","content":"请填写分组名称","callback":function(){
+								$("#txtVehicleGroupName").focus();
+								return;
+							}});     
+					return;
 			}
 
-			if (groupName.length > 20) {
-				alert("错误提示, 分组名称长度过长，限制长度1-20！", "error");
-				$("#txtVehicleGroupName").focus();
-				return;
-			}
-			var myReg = /^[^|"'<>]*$/;
-			if (!myReg.test(groupName)) {
-				alert("错误提示, 分组名称含有非法字符！", "error");
-				$("#txtVehicleGroupName").focus();
-				return;
-			}
-			if (opteType == "add") {
-				VehicleGroupManage.isExistGroup(groupName,
-						m_vehicleGroup_Org.id);
-				if (!isExist) {
-					alert("错误提示, 该分组名称已存在，请重新填写分组名称", "error");
-					$("#txtVehicleGroupName").focus();
-					return;
-				}
-			}
+				if (groupName.length > 20) {
+					$("body").popjs({"title":"提示","content":"分组名称长度过长","callback":function(){
+								$("#txtVehicleGroupName").focus();
+								return;
+							}});      
+						return;  
+				} 
 			pg.name = groupName;
 
 			pg.shareType = $('input:radio[name="shareType"]:checked').val();
-
-			var s = m_checkedNodes_id;
-
-			if (m_checkedNodes_id.length > 0) {
-				pg.shareOrgIds = m_checkedNodes_id.split(",");
+ 
+			if(pg.shareType ==0||pg.shareType=="0"){
+					var shOrgId =  m_vehicleGroup_Org.id;
+					pg.shareOrgIds.push(shOrgId);
+			}else{
+ 				var selectIds ="";
+ 				var  selectNode = $("#treeOrg").data("kendoTreeView");
+ 				var checkedNodes = [];
+ 				VehicleGroupManage.checkedNodeIds(selectNode.dataSource.view(),
+						checkedNodes);
+				if (checkedNodes.length > 0) {
+					selectIds = checkedNodes.join(","); 
+				} else {
+					selectIds = "";
+				}		
+				if (selectIds.length > 0) {
+					pg.shareOrgIds = selectIds.split(",");
+				}		
 			}
-
-			/**
-			 * 强制选择根节点！
-			 */
-			/* var node = $('#treeOrg').tree('find', m_vehicleGroup_Org.id);
-			$('#treeOrg').tree('check', node.target);
-
-			var nodes = $('#treeOrg').tree('getChecked');
-			var count = nodes.length;
-
-			for ( var i = 0; i < count; i++) {
-				var n = nodes[i];
-				pg.shareOrgIds.push(n.id);
-			} */
-
 			$.ajax({
-				url : "vehicleGroupTest/saveVehicleGroup.do",
-				type : "POST",
-				dataType : "json",
-				data : {
-					'vehicleGroup' : JSON.stringify(pg)
-				},
-				async : false,
-				success : function(req) {
-					if (req.isSuccess) {
-						/* $('#dtVehicleGroup').datagrid('reload');
-						$('#txtVehicleGroupId').val(req.id);// 回写保存后的id
-						$('#winPG').window('close'); */
-						/* VehicleGroupManage
-								.bindDtGroup("vehicleGroupTest/list.do"); */
-						alert("提示, 保存成功!");
-						$("#winPG").data("kendoWindow").close();
-					} else {
-						alert("提示, " + req.msg + ", warning");
+					url : "<%=basePath%>vehicleGroupWeb/saveVehicleGroup.do?sessionId="+sessionId,
+					type : "POST",
+					dataType : "json",
+					data : {
+						'vehicleGroup' : JSON.stringify(pg)
+					},
+					async : false,
+					success : function(req) {
+						if (req.code == 200) { 
+							 $("body").popjs({"title":"提示","content":"分组信息保存成功","callback":function(){ 
+								window.parent.window.parent.VehicleGroupManage.onCloseGorup();
+								window.parent.$("#dialog").tyWindow.close();
+							}}); 
+						} else {
+							$("body").popjs({"title":"提示","content":"分组信息保存失败"});
+						}
 					}
+				});
+		}, 
+			isExistGroup : function() {
+				isExist = false;
+				var name =  $.trim($("#txtVehicleGroupName").val());
+				var myReg = /^[^|"'<>]*$/;
+				if (!myReg.test(name)) {
+					$("body").popjs({"title":"提示","content":"分组名称包含特殊字符，请重新输入"}); 
+					$("#txtVehicleGroupName").focus();
+					return;
+				}  
+				if(name.length>0){
+					$.ajax({
+						url : "<%=basePath%>vehicleGroupWeb/isExistGroup.do?sessionId="+sessionId,
+						type : "POST",
+						dataType : "json",
+						async : false,
+						data : {
+							"name" : name,
+							"orgId" : $("#organId").val(),
+							"groupId" :$("#txtVehicleGroupId").val(),
+							"optType":1
+						},
+						success : function(req) {
+							if (req.code!=200) {  
+									bph_Exist_OrgName = req.description;
+									$("body").popjs({"title":"提示","content":"该分组名称当前机构下已存在，请确认后添加","callback":function(){
+									$("#txtVehicleGroupName").focus(); 
+									return;
+							}});    
+							return;
+							
+							}
+						}
+					});
 				}
-			});
-		},
-		//判断车辆组名是否存在（重复）
-		isExistGroup : function(name, orgId) {
-			isExist = false;
-			$.ajax({
-				url : "vehicleGroup/isExistGroup.do",
-				type : "POST",
-				dataType : "json",
-				async : false,
-				data : {
-					"name" : name,
-					"orgId" : orgId
-				},
-				success : function(req) {
-					if (req.isSuccess && req.Message == "UnExits") {
-						isExist = true;
-					}
-				}
-			});
-		},
+			}
 };
 </script>
   </head>
   
   <body>
-	<!-- <div id="vertical" style="overflow-x:hidden;"> -->
-		<div id="winPG" style="width:330px;height:320px;" title="车辆分组管理">
-			<div class="pane-content">
+		<div id="winPG" style="width:560px;height:320px;" title="车辆分组管理">
+			<div style="float:left;width:250px;margin-top:10px;">
 				<!-- 左开始 -->
 				<div class="demo-section k-header"> 
-					<input type="hidden" id="txtVehicleGroupId"></input>
+					<input type="hidden" id="txtVehicleGroupId" value="${vehiclegroup.id}"></input>
+					<input type="hidden" id="txtIsShared" value="${vehiclegroup.shareType}"></input>
 					<ul>
 						<li class="ty-input"><label class="ty-input-label" for="txtVehicleGroupName">组名称:</label><input
-							type="text" class="k-textbox" name="txtVehicleGroupName"
+							type="text" class="k-textbox" name="txtVehicleGroupName" value="${vehiclegroup.name}"  onblur="VehicleGroupManage.isExistGroup();"
 							id="txtVehicleGroupName" /></li>
-						<li class="ty-input"><label class="ty-input-label" for="shareType">共享类型:</label>
-							<label><input type="radio" class="k-textbox" name="shareType" value="0"
-							onclick="VehicleGroupManage.changeShareType()" id="radioShare1" />不共享</label>
-							<label><input type="radio" class="k-textbox" name="shareType" value="1"
-							onclick="VehicleGroupManage.changeShareType()" id="radioShare2" />共享到下级</label>
-							</li>
-						<li class="ty-input">
-							<div class="groupwindowdiv">
-								<div id="divOrg">
-									<ul id="treeOrg" style="overflow:auto"></ul>
-								</div>
-							</div>
-						</li>
-						
+						<li class="ty-input"><label>共享类型:</label>
+							<label><input id="radio_unshared" type="radio" name="shareType" value="0"
+							onclick="VehicleGroupManage.changeShareType()" />不共享</label>
+							<label><input id="radio_shared" type="radio" name="shareType" value="1"
+							onclick="VehicleGroupManage.changeShareType()"  />共享到下级</label>
+							</li> 
 					</ul>
-					<p style="float:left;width:100%;margin-top:10px;">
+					<p style="float:left;width:250px;margin-top:10px;">
 						<span class="k-button"  onclick="VehicleGroupManage.saveVehicleGroup()">保存</span>
 					</p>
 				</div>
 			</div>
-		<!-- </div> -->
+							<div style="width:300px; float:left">
+								<div id="divOrg" style="height:450px; overflow:auto" >
+									<ul id="treeOrg" style="overflow:auto"></ul>
+								</div>
+							</div> 
 	</div>
   </body>
 </html>

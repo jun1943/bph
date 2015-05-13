@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import com.tianyi.bph.common.Constants;
@@ -38,6 +39,7 @@ public class BusinessAspect {
 	 * @param jp
 	 * @param object
 	 */
+	@Async
 	@AfterReturning(value = "@annotation(com.tianyi.bph.common.annotation.MQDataInterceptor)", returning = "object")
 	public void afterProcess(JoinPoint jp, Object object) {
 		Signature signature = jp.getSignature();
@@ -54,7 +56,8 @@ public class BusinessAspect {
 					data.setData(object);
 					data.setType(type);
 					data.setOperTypeCode(operate);
-					if (rabbitTemplate != null&&rabbitTemplate.isConfirmListener()) {
+					if (rabbitTemplate != null
+							&& rabbitTemplate.isConfirmListener()) {
 						rabbitTemplate.convertAndSend(Constants.MQ_ROUTING_KEY
 								+ "." + type, JsonUtils.toJson(data));
 						log.info("发送信息到mq队列完成：" + JsonUtils.toJson(data));

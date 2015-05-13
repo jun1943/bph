@@ -25,6 +25,38 @@ public class User {
 		this.sessionId = sessionId;
 	}
 
+	private MqConfig mqconf;
+	
+	private FtpConfig ftpconf;
+	
+	public MqConfig getMqconf() {
+		return mqconf;
+	}
+
+	public void setMqconf(MqConfig mqconf) {
+		this.mqconf = mqconf;
+	}
+
+	public FtpConfig getFtpconf() {
+		return ftpconf;
+	}
+
+	public void setFtpconf(FtpConfig ftpconf) {
+		this.ftpconf = ftpconf;
+	}
+
+	public GpsConfig getGpsconf() {
+		return gpsconf;
+	}
+
+	public void setGpsconf(GpsConfig gpsconf) {
+		this.gpsconf = gpsconf;
+	}
+
+	private GpsConfig gpsconf;
+	
+	
+
 	//所属机构
     private Integer orgId;
     

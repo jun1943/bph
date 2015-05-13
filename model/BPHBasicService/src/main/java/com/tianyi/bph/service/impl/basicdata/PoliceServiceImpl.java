@@ -29,6 +29,7 @@ import com.tianyi.bph.query.basicdata.GpsInfo;
 import com.tianyi.bph.query.basicdata.ItemInfo;
 import com.tianyi.bph.query.basicdata.PoliceExtItem;
 import com.tianyi.bph.query.basicdata.PoliceInfo;
+import com.tianyi.bph.query.basicdata.PoliceJJVM;
 import com.tianyi.bph.query.basicdata.PoliceVM;
 import com.tianyi.bph.query.basicdata.UserObjectVM;
 import com.tianyi.bph.query.basicdata.WeaponInfo;
@@ -354,7 +355,7 @@ public class PoliceServiceImpl implements PoliceService {
 	 * 
 	 * @see com.tianyi.drs.basedata.service.PoliceService#loadListByOrgId(Map)
 	 */
-	public List<Police> getPoliceInfo(Integer orgId,Integer isSubOrg) {
+	public List<PoliceJJVM> getPoliceInfo(Integer orgId,Integer isSubOrg) {
 		// TODO Auto-generated method stub
 		Organ org = new Organ();
 		String orgPath = "";
@@ -433,9 +434,9 @@ public class PoliceServiceImpl implements PoliceService {
 			}
 		}
 
-		List<Police> mps = policeMapper.getPoliceInfo(map);
+		List<PoliceJJVM> mps = policeMapper.getPoliceInfo(map);
 
-		for (Police mp : mps) {
+		for (PoliceJJVM mp : mps) {
 			if (!cache2.containsKey(mp.getId())) {
 				PoliceInfo ep2 = new PoliceInfo();
 				ep2.setData(mp);
@@ -499,7 +500,7 @@ public class PoliceServiceImpl implements PoliceService {
 
 	private PoliceInfo createPoliceInfo(ExtDbResult result) {
 		PoliceInfo item = new PoliceInfo();
-		Police data = this.createPolice(result);
+		PoliceJJVM data = this.createPolice(result);
 		item.setDutyItemId(result.getDutyItemId());
 		item.setData(data);
 		item.setItemTypeId(result.getItemTypeId());
@@ -542,8 +543,8 @@ public class PoliceServiceImpl implements PoliceService {
 		return info;
 	}
 
-	private Police createPolice(ExtDbResult result) {
-		Police p = new Police();
+	private PoliceJJVM createPolice(ExtDbResult result) {
+		PoliceJJVM p = new PoliceJJVM();
 		p.setGpsId(result.getPoliceGpsId());
 		p.setGpsName(result.getPoliceGpsName());
 		p.setId(result.getPoliceId());

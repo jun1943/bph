@@ -9,6 +9,7 @@ import com.tianyi.bph.query.duty.OrgWithGpsVM;
 import com.tianyi.bph.query.duty.OrgWithPoliceVM;
 import com.tianyi.bph.query.duty.OrgWithVehicleVM;
 import com.tianyi.bph.query.duty.OrgWithWeaponVM;
+import com.tianyi.bph.query.duty.OrganGroupVM;
  
 /**
  * 组织机构映射类
@@ -55,4 +56,12 @@ public interface OrgMapper {
 	List<OrgWithGpsVM> loadOrgWithGpsVMList(Integer id);
 
 	Org selectByPrimaryKey(Integer qid);
+
+	List<OrganGroupVM> loadOrgVehicleGroupVMList(Map<String, Object> map);
+
+	List<OrganGroupVM> loadOrgPoliceGroupVMList(Map<String, Object> map);
+
+	List<OrganGroupVM> loadOrgWeaponGroupVMList(Map<String, Object> map);
+
+	List<OrganGroupVM> loadOrgGpsGroupVMList(Map<String, Object> map);
 }

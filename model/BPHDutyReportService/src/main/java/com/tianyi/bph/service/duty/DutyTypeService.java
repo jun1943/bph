@@ -62,7 +62,7 @@ public interface DutyTypeService {
 	 * @param id
 	 * @return
 	 */
-	ResultMsg deleteNode(Integer id);
+	boolean deleteNode(Integer id);
  
 	/**
 	 * 加载勤务类型列表数据，并分页
@@ -77,5 +77,6 @@ public interface DutyTypeService {
 	 * @return
 	 */
 	List<DutyItemCountVM> loadDutyItemCount(Map<String, Object> map);
+	List<DutyType> loadDutyTypeByParentId(Integer pid);
  
 }

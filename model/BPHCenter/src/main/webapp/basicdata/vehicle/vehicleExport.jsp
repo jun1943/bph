@@ -22,6 +22,15 @@
 <script type="text/javascript">
 var sessionId = $("#token").val();
 var fileUrl = "";
+$(function() {
+	var retMsg = $.trim($("#retMsgList").html());
+	if(retMsg.length>4){
+		$("body").popjs({"title":"提示","content":retMsg,"callback":function(){
+			window.parent.window.parent.VehicleManage.onClose();
+			window.parent.$("#dialog").tyWindow.close();
+		}});   
+	}  
+});
 var vehicleImportManage = {
 		downLoadModel:function(){
 			var urlStr = "<%=basePath %>excelModel/VehicleInfo.xls"; 
@@ -45,7 +54,8 @@ function checkType(e){
 	fileUrl = filepath;
 	var files =src.files;
 	
-	filepath=filepath.substring(filepath.lastIndexOf('.')+1,filepath.length)
+	$("#fileUpload").val(fileUrl);
+	filepath=filepath.substring(filepath.lastIndexOf('.')+1,filepath.length);
 	if(filepath != 'xls'){
 		$("body").popjs({"title":"提示","content":"只能上传97--2003版本格式文件，后缀名为.xls","callback":function(){
 								src.value="";
@@ -68,7 +78,7 @@ function checkType(e){
 }
 </script>
 </head>
-<body>
+<body class="ty-body">
 	<form id="vehicleimportForm" method="post" enctype="multipart/form-data"
 		action="<%=basePath %>servlet/ExcelImportServlet">
 		<div id="vertical">
@@ -79,17 +89,21 @@ function checkType(e){
 						<p>
 							<input id="orgId" name="orgId" type="hidden" value="${organ.id}" />
 							<input id="dataType" name="dataType" value="vehicleData" type="hidden"/>
-							<input type="file" onchange="checkType(event)"  id="fileName"   name="fileName" style="width:180px" text="选择文件上传" /> <a
-								href="<%=basePath %>excelModel/VehicleInfo.xls" style="font-size:12px;color:#819f0;"
-								onclick="">[点击下载excel模板]</a>
+							<input type="file" onchange="checkType(event)"  id="fileName"   name="fileName" class="ty-file" text="选择文件上传" /> 
+							<input type="text" class="k-textbox" id="fileUpload" readonly="readonly"/><button class="ty-upfile" onmousemove="document.getElementById('fileName').style.top=(event.clientY-10)+'px';document.getElementById('fileName').style.left= (event.clientX)+'px';">选择</button>
+							<a href="<%=basePath %>excelModel/VehicleInfo.xls" style="font-size:12px;color:#819f0;" onclick="">[点击下载excel模板]</a>
 						</p> <label style="font-size:12px;color:#819f0;">上传文件时，请先下载模板文件填写
 							；</label><br /> <label style="font-size:12px;color:#819f0;">文件对象为：97—03版本的excel文件，后缀格式为xls；</label>
 							<br /> <label style="font-size:12px;color:#819f0;">文件大小为：1Mb以内；</label>
 					 <p>  	
 					 	<span id="submit" class="k-button"  onClick="vehicleImportManage.fileFormSubmit();" >开始导入</span> 
 					</p> 
-					 <p style="color: red">${requestScope.uploadError}</p> 
-					 
+					 <p id="retMsgList" style="display:none">
+						${requestScope.uploadError}  <br />
+					 	 <c:forEach var="item" items="${requestScope.uploadlist}">
+					 	 	${item} <br />
+					 	 </c:forEach> 
+					 </p>
 					</div>
 				</div>
 			</div>

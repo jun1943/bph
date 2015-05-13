@@ -1,6 +1,9 @@
 package com.tianyi.bph.rest.action.system;
 
 import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.tianyi.bph.BaseLogController;
 import com.tianyi.bph.common.JsonUtils;
 import com.tianyi.bph.common.Pager;
 import com.tianyi.bph.domain.system.PatrolPoint;
@@ -24,7 +28,7 @@ import com.tianyi.bph.common.ReturnResult;
  */
 @Controller
 @RequestMapping("/patrolPoint")
-public class PatrolPointAction {
+public class PatrolPointAction extends BaseLogController {
 
 	static final Logger log = LoggerFactory.getLogger(PatrolPointAction.class);
 
@@ -38,7 +42,7 @@ public class PatrolPointAction {
 	 */
 	@RequestMapping(value = "/addPatrolPoint.do")
 	@ResponseBody
-	public ReturnResult addPatrolPoint(PatrolPoint patrolPoint) {
+	public ReturnResult addPatrolPoint(PatrolPoint patrolPoint,HttpServletRequest request) {
 		patrolPoint.setCoordinate("coordinate");
 		patrolPoint.setName("测试");
 		patrolPoint.setNote("note");
@@ -48,6 +52,7 @@ public class PatrolPointAction {
 		if(i < 0){
 			return ReturnResult.FAILUER("必达点位名称重复");
 		}
+		addLog(request, "添加必达点成功", 2);
 		return ReturnResult.SUCCESS();
 	}
 	
@@ -59,8 +64,9 @@ public class PatrolPointAction {
 	@RequestMapping(value = "/deletePatrolPoint.do")
 	@ResponseBody
 	public ReturnResult deletePatrolPoint(
-			@RequestParam(value = "id", required =true) Integer id) {
+			@RequestParam(value = "id", required =true) Integer id,HttpServletRequest request) {
 		patrolPointService.deletePatrolPoint(id);
+		addLog(request, "删除必达点成功", 2);
 		return ReturnResult.SUCCESS();
 	}
 	
@@ -71,8 +77,9 @@ public class PatrolPointAction {
 	 */
 	@RequestMapping(value = "/modifyPatrolPoint.do")
 	@ResponseBody
-	public ReturnResult modifyPatrolPoint(PatrolPoint patrolPoint) {
+	public ReturnResult modifyPatrolPoint(PatrolPoint patrolPoint,HttpServletRequest request) {
 		int i = patrolPointService.updatePatrolPoint(patrolPoint);
+		addLog(request, "修改必达点成功", 2);
 		return ReturnResult.SUCCESS("", i);
 	}
 	

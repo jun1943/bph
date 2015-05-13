@@ -32,4 +32,6 @@ public interface AreaMapper {
 	int updateByPrimaryKey(Area record);
 
 	List<Area> selectByOrganId(@Param("path") String path);
+
+	int checkAreaName(@Param("areaName") String areaName,@Param("areaType")Integer areaType);
 }

@@ -54,4 +54,10 @@ public class DutyTaskServiceImpl implements DutyTaskService{
 		return ls;
 	}
 
+	@Override
+	public TaskTargetVM getTaskTargetInfo(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return dutyTaskMapper.getTaskTargetInfo(map);
+	}
+
 }

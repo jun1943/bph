@@ -56,9 +56,11 @@ public class AreaAction {
 			@RequestParam(value = "relationUserIds", required = false) String relationUserIds,
 			HttpServletRequest request) {
 		try {
+			if (!StringUtils.hasLength(areaName)) {
+				ReturnResult.FAILUER("用户名不能为空");
+			}
 			Area area = new Area();
-			String s = new String(areaName.getBytes("ISO-8859-1"), "UTF-8");
-			area.setAreaName(s);
+			area.setAreaName(new String(areaName.getBytes("ISO-8859-1"), "UTF-8"));
 			area.setAreaType(areaType);
 			area.setChangeRange(false);// 基础添加 没 绘制
 			area.setCreateTime(new Date());
@@ -261,6 +263,9 @@ public class AreaAction {
 	public ReturnResult addAreaPoint(@RequestBody String body) {
 		try {
 			AreaPoint point = JsonUtils.toObj(body, AreaPoint.class);
+			if (!StringUtils.hasLength(point.getName())) {
+				return ReturnResult.FAILUER("失败！", "必达点名字");
+			}
 			return ReturnResult.SUCCESS("成功！", service.addAreaPoint(point));
 		} catch (Exception e) {
 			log.error(e.getMessage());

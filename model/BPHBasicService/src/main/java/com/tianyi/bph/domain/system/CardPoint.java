@@ -14,7 +14,7 @@ public class CardPoint {
 	private int circleLayerId;	//所属圈层 +
 	private String name;			//名称
 	private int organId;			//责任机构
-	private int type;				//类型
+	private int type;				//类型  1卡点  2机动组
 	private String angle;			//角度
 	private String telephone;	//电话 +
 	private int intercomGroupId;	//对讲机组号

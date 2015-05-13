@@ -29,6 +29,9 @@ public class TaskTargetVM {
 	 */
 	private Integer stayTime;
 	
+	private Integer isSelected;
+	private Integer pointId;
+	
 	public Integer getCount() {
 		return count;
 	}
@@ -64,6 +67,18 @@ public class TaskTargetVM {
 	}
 	public void setAreaName(String areaName) {
 		this.areaName = areaName;
+	}
+	public Integer getIsSelected() {
+		return isSelected;
+	}
+	public void setIsSelected(Integer isSelected) {
+		this.isSelected = isSelected;
+	}
+	public Integer getPointId() {
+		return pointId;
+	}
+	public void setPointId(Integer pointId) {
+		this.pointId = pointId;
 	}
 	
 }

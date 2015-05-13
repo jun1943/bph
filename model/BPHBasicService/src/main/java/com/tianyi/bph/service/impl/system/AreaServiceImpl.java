@@ -40,8 +40,10 @@ public class AreaServiceImpl implements AreaService {
 	@MQDataInterceptor(type = Constants.MQ_TYPE_AREA, operate = Constants.MQ_OPERATE_ADD)
 	@Transactional(readOnly = false)
 	public Area addArea(Area area) {
-		if (area == null) {
-			throw new RestException("传入参数为空！");
+		int count = mapper
+				.checkAreaName(area.getAreaName(), area.getAreaType());
+		if (count > 0) {
+			throw new RestException("区域名已经存在！");
 		}
 		mapper.insert(area);
 		if (area.getRelationUserKeys() != null) {
@@ -116,8 +118,8 @@ public class AreaServiceImpl implements AreaService {
 		if (area == null) {
 			throw new RestException("修改的区域不存在！");
 		}
-		if (area.getFlag() != 2) {
-			area.setFlag(2);
+		if (area.getFlag() != AreaExample.flag_escape) {
+			area.setFlag(AreaExample.flag_escape);
 			mapper.updateByPrimaryKey(area);
 		}
 		return id;
@@ -143,10 +145,16 @@ public class AreaServiceImpl implements AreaService {
 	}
 
 	@Override
+	@Transactional(readOnly = false)
 	public AreaPoint addAreaPoint(AreaPoint areaPoint) {
 		Area area = mapper.selectByPrimaryKey(areaPoint.getAreaId());
 		if (area == null) {
 			throw new RestException("巡区不存在!");
+		}
+		int count = areaPointMapper.checkAreaPointName(areaPoint.getAreaId(),
+				areaPoint.getName());
+		if (count > 0) {
+			throw new RestException("必达点名字已经存在!");
 		}
 		areaPointMapper.insert(areaPoint);
 		return areaPoint;
@@ -160,12 +168,19 @@ public class AreaServiceImpl implements AreaService {
 	}
 
 	@Override
+	@Transactional(readOnly = false)
 	public AreaPoint updateAreaPoint(AreaPoint point) {
+		int count = areaPointMapper.checkAreaPointName(point.getAreaId(),
+				point.getName());
+		if (count > 0) {
+			throw new RestException("必达点名字已经存在!");
+		}
 		areaPointMapper.updateByPrimaryKey(point);
 		return point;
 	}
 
 	@Override
+	@Transactional(readOnly = false)
 	public int deleteAreaPoint(Integer areaPointId) {
 		areaPointMapper.deleteByPrimaryKey(areaPointId);
 		return areaPointId;

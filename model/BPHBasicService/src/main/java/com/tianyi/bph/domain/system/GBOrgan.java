@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.springframework.beans.BeanUtils;
 
-public class GBOrgan  implements Serializable{
+public class GBOrgan implements Serializable {
 	/**
 	 * 
 	 */
@@ -18,13 +18,12 @@ public class GBOrgan  implements Serializable{
 	private Integer parentId;
 	private Integer type;
 	private String stdId;
-	
-	
+
 	private boolean checked;
 	private boolean expanded;// 是否展开节点 0不展开 1展开
-	
-	
-	
+
+	private boolean hasChild;
+
 	private List<GBOrgan> items;
 
 	public Integer getId() {
@@ -118,6 +117,14 @@ public class GBOrgan  implements Serializable{
 
 	public void setChecked(boolean checked) {
 		this.checked = checked;
+	}
+
+	public boolean isHasChild() {
+		return hasChild;
+	}
+
+	public void setHasChild(boolean hasChild) {
+		this.hasChild = hasChild;
 	}
 
 }

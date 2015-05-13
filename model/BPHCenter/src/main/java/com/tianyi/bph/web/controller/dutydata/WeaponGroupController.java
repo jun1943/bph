@@ -17,15 +17,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.tianyi.bph.common.ReturnResult;
+import com.tianyi.bph.common.MessageCode;
+import com.tianyi.bph.common.ReturnResult; 
+import com.tianyi.bph.domain.duty.PoliceGroupMember;
 import com.tianyi.bph.domain.duty.WeaponGroup;
-import com.tianyi.bph.domain.duty.WeaponGroupMember;
-import com.tianyi.bph.domain.duty.WeaponGroupOrg;
+import com.tianyi.bph.domain.duty.WeaponGroupMember; 
 import com.tianyi.bph.query.duty.WeaponGroupMemberVM;
 import com.tianyi.bph.query.duty.WeaponGroupVM;
 import com.tianyi.bph.service.duty.WeaponGroupService;
 import com.tianyi.bph.service.system.OrganService;
-
 
 @Controller
 @RequestMapping("/weaponGroupWeb")
@@ -35,10 +35,10 @@ public class WeaponGroupController {
 	protected WeaponGroupService weaponGroupService;
 	@Autowired
 	private OrganService organService;
-	
 
 	/**
 	 * 获取武器分组列表
+	 * 
 	 * @param query
 	 * @param page
 	 * @param rows
@@ -46,61 +46,32 @@ public class WeaponGroupController {
 	 * @return
 	 */
 	@RequestMapping(value = "list.do")
-	public @ResponseBody ReturnResult List(
+	public @ResponseBody
+	ReturnResult List(
 			@RequestParam(value = "weaponGroup_Query", required = false) String query,
-			@RequestParam(value = "page", required = false) Integer page,
-			@RequestParam(value = "rows", required = false) Integer rows,
 			HttpServletRequest request) {
-	
-		JSONObject joQuery =JSONObject.fromObject(query);
 
-		int orgId=joQuery.getInt("orgId");
-		String orgCode=joQuery.getString("orgCode");
-		
+		JSONObject joQuery = JSONObject.fromObject(query);
+
+		int orgId = joQuery.getInt("orgId");
+
 		Map<String, Object> map = new HashMap<String, Object>();
-		page = page == 0 ? 1 : page;
-		map.put("pageStart", (page-1) * rows);
-		map.put("pageSize", rows);
-		map.put("orgCode", orgCode);
-		map.put("orgId", orgId);
-		
-		map.put("inSubOrg", 0);
-		
-		int total=weaponGroupService.loadVMCountByOrgId(map);
 
-		List<WeaponGroupVM> pgvms=weaponGroupService.loadVMListByOrgId(map);
-		
-		//ListResult<WeaponGroupVM> rs=new ListResult<WeaponGroupVM>(total,pgvms);
-		
-		//String ss=JSONObject.fromObject(rs).toString();
-		
+		map.put("pageStart", 0);
+		map.put("pageSize", 10);
+		map.put("orgId", orgId);
+
+		map.put("inSubOrg", 0);
+
+		int total = weaponGroupService.loadVMCountByOrgId(map);
+		List<WeaponGroupVM> pgvms = weaponGroupService.loadVMListByOrgId(map);
 		return ReturnResult.MESSAGE(200, "", total, pgvms);
-		
+
 	}
-	
-	/**
-	 * 获取当前组织机构及下级机构
-	 * @param weaponGroupId
-	 * @param request
-	 * @return
-	 */
-	@RequestMapping(value = "getShareOrgs.do")
-	public @ResponseBody String getShareOrgs(
-			@RequestParam(value = "weaponGroupId", required = false) Integer weaponGroupId,
-			HttpServletRequest request
-			){
-		
-		
-		List<WeaponGroupOrg> ls = weaponGroupService.loadShareOrgList(weaponGroupId);
-		
-		String rs=JSONArray.fromObject(ls).toString();
-		
-		return rs;
-		
-	}
-	
+
 	/**
 	 * 根据分组id，获取组成员列表
+	 * 
 	 * @param query
 	 * @param page
 	 * @param rows
@@ -108,114 +79,203 @@ public class WeaponGroupController {
 	 * @return
 	 */
 	@RequestMapping(value = "loadMemberByGroupId.do")
-	public @ResponseBody ReturnResult loadMemberByGroupId(
+	public @ResponseBody
+	ReturnResult loadMemberByGroupId(
 			@RequestParam(value = "groupId", required = false) Integer groupId,
 			@RequestParam(value = "page", required = false) Integer page,
 			@RequestParam(value = "rows", required = false) Integer rows,
 			HttpServletRequest request) {
-		
-//		JSONObject joQuery =JSONObject.fromObject(query);
-
-//		int groupId=joQuery.getInt("groupId");
-//		page=page==0?1:page;
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("pageStart", 0);
 		map.put("pageSize", 10);
 		map.put("groupId", groupId);
-		
-		int total=weaponGroupService.countMemberByGroupId(groupId);
 
-		List<WeaponGroupMemberVM> ms=weaponGroupService.loadMemberByGroupId(map);
-	
-//		ListResult<WeaponGroupMemberVM> rs=new ListResult<WeaponGroupMemberVM>(total,ms);
-		
-//		String ss=JSONObject.fromObject(rs).toString();
-		
+		int total = weaponGroupService.countMemberByGroupId(groupId);
+
+		List<WeaponGroupMemberVM> ms = weaponGroupService
+				.loadMemberByGroupId(map);
 		return ReturnResult.MESSAGE(200, "", total, ms);
 	}
+
 	/**
 	 * 添加组成员
+	 * 
 	 * @param members
 	 * @param request
 	 * @return
 	 */
 	@RequestMapping(value = "appendMember.do")
-	public @ResponseBody String appendMember(
+	public @ResponseBody
+	ReturnResult appendMember(
 			@RequestParam(value = "members", required = false) String members,
-			HttpServletRequest request
-			){
-		
-		JSONArray jaMembers=JSONArray.fromObject(members);
-				
-		//Collection<PoliceGroupMember> collection=JSONArray.toCollection(jaMembers, PoliceGroupMember.class);
+			HttpServletRequest request) {
+		try {
+			JSONArray jaMembers = JSONArray.fromObject(members); 
+			List<?> list2 = JSONArray.toList(jaMembers,
+					new WeaponGroupMember(), new JsonConfig());// 参数1为要转换的JSONArray数据，参数2为要转换的目标数据，即List盛装的数据
 
-		List<?> list2 = JSONArray.toList(jaMembers, new WeaponGroupMember(), new JsonConfig());//参数1为要转换的JSONArray数据，参数2为要转换的目标数据，即List盛装的数据
-		
-		List<WeaponGroupMember> ls=new ArrayList<WeaponGroupMember>();
-		
-		for(Object o:list2){
-			WeaponGroupMember pgm=(WeaponGroupMember)o;
-			ls.add(pgm);
+			List<WeaponGroupMember> ls = new ArrayList<WeaponGroupMember>();
+
+			for (Object o : list2) {
+				WeaponGroupMember pgm = (WeaponGroupMember) o;
+				ls.add(pgm);
+			}
+			weaponGroupService.appendMemeber(ls);
+			return ReturnResult.MESSAGE(MessageCode.STATUS_SUCESS, "删除成功", 0,
+					null);
+
+		} catch (Exception ex) {
+			return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL, "查询数据出错", 0,
+					null);
 		}
-		
-		weaponGroupService.appendMemeber(ls);
-
-		JSONObject rs=new JSONObject();
-		rs.accumulate("isSuccess", true);
-		
-		return rs.toString();
+		 
 	}
-	
+
 	/**
 	 * 保存武器分组信息
+	 * 
 	 * @param weaponGroup
 	 * @param request
 	 * @return
 	 */
 	@RequestMapping(value = "saveWeaponGroup.do")
-	public @ResponseBody String saveWeaponGroup(
+	public @ResponseBody
+	ReturnResult saveWeaponGroup(
 			@RequestParam(value = "weaponGroup", required = false) String weaponGroup,
-			HttpServletRequest request
-			){
-		
-		JSONObject joPG =JSONObject.fromObject(weaponGroup);
-		
-		WeaponGroup pg=new WeaponGroup();
-		pg.setId(joPG.getInt("id"));
-		pg.setName(joPG.getString("name"));
-		pg.setShareType(joPG.getInt("shareType"));
-		pg.setOrgId(joPG.getInt("orgId"));
-		
-		JSONArray jaOrgIds=joPG.getJSONArray("shareOrgIds");
-		
-		Object[] orgIds=jaOrgIds.toArray();
-		
-		weaponGroupService.saveWeaponGroup(pg, orgIds);
-		
-		JSONObject rs=new JSONObject();
-		rs.accumulate("isSuccess", true);
-		rs.accumulate("msg", "");
-		rs.accumulate("id", pg.getId());
-		return rs.toString();
+			HttpServletRequest request) {
+
+		try {
+			JSONObject joPG = JSONObject.fromObject(weaponGroup);
+
+			WeaponGroup pg = new WeaponGroup();
+			pg.setId(joPG.getInt("id"));
+			pg.setName(joPG.getString("name"));
+			pg.setShareType(joPG.getInt("shareType"));
+			pg.setOrgId(joPG.getInt("orgId"));
+			pg.setPlatformId(1);
+			pg.setSyncState(true);
+			JSONArray jaOrgIds = joPG.getJSONArray("shareOrgIds");
+
+			Object[] orgIds = jaOrgIds.toArray();
+
+			weaponGroupService.saveWeaponGroup(pg, orgIds);
+			return ReturnResult.MESSAGE(MessageCode.STATUS_SUCESS, "", 0, null);
+		} catch (Exception ex) {
+			return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL, "", 0, null);
+		}
 	}
+
 	/**
 	 * 删除武器分组
+	 * 
 	 * @param weaponGroupId
 	 * @param request
 	 * @return
 	 */
 	@RequestMapping(value = "deleteWeaponGroup.do")
-	 public @ResponseBody String deleteWeaponGroup(
-			 @RequestParam(value="weaponGroupId",required=false) Integer weaponGroupId,
-				HttpServletRequest request
-				){
-		 
-		weaponGroupService.deleteById(weaponGroupId);
-		 
-		JSONObject rs=new JSONObject();
-		rs.accumulate("isSuccess", true);
-		rs.accumulate("msg", "");
-		 	
-		return rs.toString();
-	 }
+	public @ResponseBody
+	ReturnResult deleteWeaponGroup(
+			@RequestParam(value = "weaponGroupId", required = false) Integer weaponGroupId,
+			HttpServletRequest request) {
+		try {
+			if (weaponGroupId > 0) {
+				weaponGroupService.deleteById(weaponGroupId);
+				return ReturnResult.MESSAGE(MessageCode.STATUS_SUCESS, "删除成功",
+						0, null);
+			} else {
+				return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL, "删除成功", 0,
+						null);
+			}
+		} catch (Exception ex) {
+			return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL, "查询数据出错", 0,
+					null);
+		}
+	}
+
+	/**
+	 * 删除组成员
+	 * 
+	 * @param memberId
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "delMemberById.do")
+	public @ResponseBody
+	ReturnResult delMemberById(
+			@RequestParam(value = "memberId", required = false) Integer memberId,
+			HttpServletRequest request) {
+		try {
+			if (memberId > 0) {
+				weaponGroupService.delMemberById(memberId);
+				return ReturnResult.MESSAGE(MessageCode.STATUS_SUCESS, "删除成功",
+						0, null);
+			} else {
+				return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL, "删除成功", 0,
+						null);
+			}
+		} catch (Exception ex) {
+			return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL, "查询数据出错", 0,
+					null);
+		}  
+	}
+	/**
+	 * 清除组成员
+	 * 
+	 * @param weaponGroupId
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "cleanMemberByGroupId.do")
+	public @ResponseBody
+	ReturnResult cleanMemberByGroupId(
+			@RequestParam(value = "weaponGroupId", required = false) Integer weaponGroupId,
+			HttpServletRequest request) {
+		try {
+			if (weaponGroupId > 0) {
+				weaponGroupService.cleanMember(weaponGroupId);
+				return ReturnResult.MESSAGE(MessageCode.STATUS_SUCESS, "删除成功",
+						0, null);
+			} else {
+				return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL, "删除成功", 0,
+						null);
+			}
+		} catch (Exception ex) {
+			return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL, "查询数据出错", 0,
+					null);
+		} 
+	}
+	/**
+	 * 判断是否有有分组存在
+	 * 
+	 * 判断是否分组名称重复；
+	 */
+	@RequestMapping(value = "isExistGroup.do")
+	public @ResponseBody
+	ReturnResult isExistGroup(
+			@RequestParam(value = "name", required = false) String name,
+			@RequestParam(value = "optType", required = false) Integer optType,
+			@RequestParam(value = "groupId", required = false) Integer groupId,
+			@RequestParam(value = "orgId", required = false) Integer orgId)
+			throws Exception {
+		try {
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("name", name);
+			map.put("groupId", groupId);
+			map.put("optType", optType);
+			map.put("orgId", orgId);
+			List<WeaponGroup> vehicleGroup = weaponGroupService
+					.findByNameAndOrg(map);
+			if (vehicleGroup.size() > 0) {
+				return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL, "", 0,
+						null);
+			} else {
+				return ReturnResult.MESSAGE(MessageCode.STATUS_SUCESS, "", 0,
+						null);
+			}
+		} catch (Exception ex) {
+			return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL, "查询数据出错", 0,
+					null);
+		}
+	}
+
 }

@@ -331,6 +331,9 @@
   		<if test ="number !=null">
   			and g.number like CONCAT('%','${number}','%' )  
   		</if>
+  		<if test ="gpsname !=null">
+  			and g.gps_name like CONCAT('%','${gpsname}','%' )  
+  		</if>
   		<if test ="ids !=null">
   			and g.type_id in
 

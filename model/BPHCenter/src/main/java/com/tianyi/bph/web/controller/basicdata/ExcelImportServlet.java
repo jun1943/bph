@@ -6,7 +6,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
@@ -44,6 +46,7 @@ public class ExcelImportServlet extends HttpServlet {
 	private Connection conn = null;
 	private final static String SEPARATOR = "|";
 	private PreparedStatement ps = null;
+	private PreparedStatement pes = null;
 
 	@Override
 	protected void doPost(HttpServletRequest request,
@@ -62,21 +65,15 @@ public class ExcelImportServlet extends HttpServlet {
 			// 请求数据的size超出了规定的大小.
 			e.printStackTrace();
 			request.setAttribute("uploadError", "请求数据的size超出了规定的大小");
-			request.getRequestDispatcher("/basicdata/police/policeExport.jsp")
-					.forward(request, response);
 			return;
 		} catch (FileUploadBase.InvalidContentTypeException e) {
 			// 无效的请求类型,即请求类型enctype != "multipart/form-data"
 			request.setAttribute("uploadError",
 					"请求类型enctype != multipart/form-data");
-			request.getRequestDispatcher("/basicdata/police/policeExport.jsp")
-					.forward(request, response);
 			return;
 		} catch (FileUploadException e) {
 			// 如果都不是以上子异常,则抛出此总的异常,出现此异常原因无法说明.
 			request.setAttribute("uploadError", "上传过程异常，导致其原因可能是磁盘已满或者其它原因");
-			request.getRequestDispatcher("/basicdata/police/policeExport.jsp")
-					.forward(request, response);
 			return;
 		}
 		String dataType = "";
@@ -116,37 +113,104 @@ public class ExcelImportServlet extends HttpServlet {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 						request.setAttribute("uploadError", "写入磁盘错误");
-						request.getRequestDispatcher
-
-						("/basicdata/police/policeExport.jsp").forward(request,
-								response);
 						return;
 					}
+					boolean isSuccess = false;
+					List<String> retMsgList = new ArrayList<String>();
 					if (dataType.equals("policeData")) {
-						operationPoliceDataToDb(orgId, path);
+						isSuccess = operationPoliceDataToDb(orgId, path,
+								retMsgList);
+						if (isSuccess) {
+							if(retMsgList.size()>0){
+								request.setAttribute("uploadError", "部分数据导入成功,详细信息:");
+							}else{
+								request.setAttribute("uploadError", "导入成功\n\r");
+							}
+							request.setAttribute("uploadlist", retMsgList);
+						} else {
+							request.setAttribute("uploadError",
+									"导入失败，写入文件内容格式不是要求文件内容格式，请参考模板文件上传");
+							if (retMsgList.size() > 0) {
+								retMsgList = new ArrayList<String>();
+								request.setAttribute("uploadlist", retMsgList);
+							}
+						}
+						request.getRequestDispatcher(
+								"/basicdata/police/policeExport.jsp").forward(
+								request, response);
 					} else if (dataType.equals("vehicleData")) {
-						operationVehicleDataToDb(orgId, path);
+						isSuccess = operationVehicleDataToDb(orgId, path,
+								retMsgList);
+						if (isSuccess) {
+							if(retMsgList.size()>0){
+								request.setAttribute("uploadError", "部分数据导入成功,详细信息:");
+							}else{
+								request.setAttribute("uploadError", "导入成功\n\r");
+							}
+							request.setAttribute("uploadlist", retMsgList);
+						} else {
+							request.setAttribute("uploadError",
+									"导入失败，写入文件内容格式不是要求文件内容格式，请参考模板文件上传");
+							if (retMsgList.size() > 0) {
+								retMsgList = new ArrayList<String>();
+								request.setAttribute("uploadlist", retMsgList);
+							}
+						}
+						request.getRequestDispatcher(
+								"/basicdata/vehicle/vehicleExport.jsp")
+								.forward(request, response);
 					} else if (dataType.equals("gpsData")) {
-						operationGpsDataToDb(orgId, path);
+						isSuccess = operationGpsDataToDb(orgId, path,
+								retMsgList);
+						if (isSuccess) {
+							if(retMsgList.size()>0){
+								request.setAttribute("uploadError", "部分数据导入成功,详细信息:");
+							}else{
+								request.setAttribute("uploadError", "导入成功\n\r");
+							}
+							request.setAttribute("uploadlist", retMsgList);
+						} else {
+							request.setAttribute("uploadError",
+									"导入失败，写入文件内容格式不是要求文件内容格式，请参考模板文件上传");
+							if (retMsgList.size() > 0) {
+								retMsgList = new ArrayList<String>();
+								request.setAttribute("uploadlist", retMsgList);
+							}
+						}
+						request.getRequestDispatcher(
+								"/basicdata/gps/gpsExport.jsp").forward(
+								request, response);
 					} else if (dataType.equals("weaponData")) {
-						operationWeaponDataToDb(orgId, path);
+						isSuccess = operationWeaponDataToDb(orgId, path,
+								retMsgList);
+						if (isSuccess) {
+							if(retMsgList.size()>0){
+								request.setAttribute("uploadError", "部分数据导入成功,详细信息:");
+							}else{
+								request.setAttribute("uploadError", "导入成功\n\r");
+							}
+							request.setAttribute("uploadlist", retMsgList);
+						} else {
+							request.setAttribute("uploadError",
+									"导入失败，写入文件内容格式不是要求文件内容格式，请参考模板文件上传");
+							if (retMsgList.size() > 0) {
+								retMsgList = new ArrayList<String>();
+								request.setAttribute("uploadlist", retMsgList);
+							}
+						}
+						request.getRequestDispatcher(
+								"/basicdata/weapon/weaponExport.jsp").forward(
+								request, response);
 					}
-
 				}
 			}
-		} else {
-			request.setAttribute("uploadError", "请选择要上传的Excel文件！");
-			request.getRequestDispatcher("/basicdata/police/policeExport.jsp")
-					.forward(request, response);
-			return;
 		}
-		request.setAttribute("uploadError", "导入成功");
-		request.getRequestDispatcher("/basicdata/police/policeExport.jsp")
-				.forward(request, response);
 	}
 
-	private void operationWeaponDataToDb(int orgId, String path) {
+	private boolean operationWeaponDataToDb(int orgId, String path,
+			List<String> retMsgList) {
 		// TODO Auto-generated method stub
+		boolean isSuccess = false;
 		File pc = new File(path);
 		conn = DBClassMysql.getMysql();
 		if (pc.exists()) {
@@ -159,111 +223,162 @@ public class ExcelImportServlet extends HttpServlet {
 				// int rows = sheet.getPhysicalNumberOfRows();
 
 				int minRowIx = sheet.getFirstRowNum();
-				int maxRowIx = sheet.getLastRowNum();
+				int maxRowIx = sheet.getPhysicalNumberOfRows();
 				int rows = 0;
-				if ((maxRowIx - minRowIx) > 2) {
+				if ((maxRowIx - minRowIx) >= 2) {
 					rows = maxRowIx - minRowIx;
 				}
-				// 只有行大于2的时候，才有数据，前面两行为title栏位
-				if (rows > 0 && rows > 2) {
-					// 遍历行
-					for (int i = 2; i <= rows; i++) {
-						// 读取左上端单元格?
-						HSSFRow row = sheet.getRow(i);
-						// 行不为空
-						if (row != null) {
-							// 获取到Excel文件中的所有的列?
-							int cells = row.getPhysicalNumberOfCells();
-							String value = "";
-							for (int j = 0; j < cells; j++) {
-								// 获取到列的值?
-								HSSFCell cell = row.getCell(j);
-								if (cell != null) {
+				try {
+					// 只有行大于2的时候，才有数据，前面两行为title栏位
+					if (rows > 0 && rows >= 2) {
+						// 遍历行
+						for (int i = 2; i <= rows; i++) {
+							// 读取左上端单元格?
+							HSSFRow row = sheet.getRow(i);
+							// 行不为空
+							if (row != null) {
+								// 获取到Excel文件中的所有的列?
+								int cells = row.getPhysicalNumberOfCells();
+								String value = "";
+								for (int j = 0; j < 3; j++) {
+									// 获取到列的值?
+									HSSFCell cell = row.getCell(j);
+									if (cell != null) {
 
-									switch (cell.getCellType()) {
-									case Cell.CELL_TYPE_BOOLEAN:
-										// sb.append(SEPARATOR +
-										// cellValue.getBooleanValue());
-										value += (cell.getBooleanCellValue() + SEPARATOR);
-										break;
-									case Cell.CELL_TYPE_NUMERIC:
-										// 这里的日期类型会被转换为数字类型，需要判别后区分处理
-										if (DateUtil.isCellDateFormatted(cell)) {
-											value += (cell.getDateCellValue() + SEPARATOR);
-										} else {
+										switch (cell.getCellType()) {
+										case Cell.CELL_TYPE_BOOLEAN:
+											// sb.append(SEPARATOR +
+											// cellValue.getBooleanValue());
 											value += (cell
-													.getNumericCellValue() + SEPARATOR);
+													.getBooleanCellValue() + SEPARATOR);
+											break;
+										case Cell.CELL_TYPE_NUMERIC:
+											// 这里的日期类型会被转换为数字类型，需要判别后区分处理
+											if (DateUtil
+													.isCellDateFormatted(cell)) {
+												value += (cell
+														.getDateCellValue() + SEPARATOR);
+											} else {
+												value += (cell
+														.getNumericCellValue() + SEPARATOR);
+											}
+											// sb.append(cellValue.getBooleanValue());
+											break;
+										case Cell.CELL_TYPE_STRING:
+											// sb.append(SEPARATOR +
+											// cellValue.getStringValue());
+											value += (cell.getStringCellValue() + SEPARATOR);
+											break;
+										case Cell.CELL_TYPE_FORMULA:
+											value += (cell.getStringCellValue() + SEPARATOR);
+											break;
+										case Cell.CELL_TYPE_BLANK:
+											value += ("0.0" + SEPARATOR);
+											break;
+										case Cell.CELL_TYPE_ERROR:
+											value += ("0.0" + SEPARATOR);
+											break;
+										default:
+											value += ("0.0" + SEPARATOR);
+											break;
 										}
-										// sb.append(cellValue.getBooleanValue());
-										break;
-									case Cell.CELL_TYPE_STRING:
-										// sb.append(SEPARATOR +
-										// cellValue.getStringValue());
-										value += (cell.getStringCellValue() + SEPARATOR);
-										break;
-									case Cell.CELL_TYPE_FORMULA:
-										value += (cell.getStringCellValue()+ SEPARATOR);
-										break;
-									case Cell.CELL_TYPE_BLANK:
+									} else {
 										value += ("0.0" + SEPARATOR);
-										break;
-									case Cell.CELL_TYPE_ERROR:
-										value += (cell.getStringCellValue() + SEPARATOR);
-										break;
-									default:
-										value += (cell.getStringCellValue() + SEPARATOR);
-										break;
 									}
 								}
-							}
-							String[] val = value.split("\\|");
-							String sql = "insert into t_weapon (type_id,org_id,number,standard,sync_state, platform_id) values (?,?,?,?,?,?)";
-							try {
-								// ps.clearParameters();
-								ps = conn.prepareStatement(sql);
-								ps.setInt(1, getWeaponTypeId(val[1]));
-								ps.setInt(2, orgId);
+								String[] val = value.split("\\|");
+
+								String regMsg = "";
 								String number = val[0] == null ? "" : val[0]
-										.trim().equals("0.0") ? ""
-										: val[0];
-								ps.setString(3, number);
-								String standards = val[2] == null ? "" : val[2]
-										.trim().equals("0.0") ? "" : val[2];
-								ps.setString(4, standards);
-								ps.setBoolean(5, true);
-								ps.setInt(6, 1);
+										.trim().equals("0.0") ? "" : val[0];
+								if (number.equals("")) {
+									regMsg += "第" + (i - 1)
+											+ "行数据错误，详细：武器编号为空;";
+								} else {
+									try {
+										String existSql = "select count(*) from t_weapon where number = '"
+												+ number + "' ";
+										pes = conn.prepareStatement(existSql);
+										ResultSet rs = pes.executeQuery();
+										int count = 0;
+										while (rs.next()) {
+											count = rs.getInt(1);
+										}
+										if (count == 0) {
+											String sql = "insert into t_weapon (type_id,org_id,number,standard,sync_state, platform_id) values (?,?,?,?,?,?)";
+											try {
+												// ps.clearParameters();
+												ps = conn.prepareStatement(sql);
+												ps.setInt(1,
+														getWeaponTypeId(val[1]));
+												ps.setInt(2, orgId);
+												ps.setString(3, number);
+												String standards = val[2] == null ? ""
+														: val[2].trim().equals(
+																"0.0") ? ""
+																: val[2];
+												ps.setString(4, standards);
+												ps.setBoolean(5, true);
+												ps.setInt(6, 1);
 
-								ps.executeUpdate();
-							} catch (SQLException e1) {
-								// TODO Auto-generated catch block
-								e1.printStackTrace();
+												ps.executeUpdate();
+												isSuccess = true;
+											} catch (SQLException e1) {
+												// TODO Auto-generated catch
+												// block
+												return isSuccess;
+											}
+										} else {
+											regMsg += "第"
+													+ (i - 1)
+													+ "行数据导入失败，详细：数据库已经存在该编号的武器数据;";
+										}
+
+									} catch (SQLException e1) {
+										// TODO Auto-generated catch block
+										return isSuccess;
+									}
+								}
+
+								if (regMsg.length() > 0) {
+									retMsgList.add(regMsg);
+								}
+								isSuccess = true;
 							}
-						}
 
+						}
 					}
+				} catch (Exception ex) {
+					return isSuccess;
 				}
 				try {
-					ps.cancel();
+					if (pes != null) {
+						pes.cancel();
+					}
+					if (ps != null) {
+						ps.cancel();
+					}
 				} catch (SQLException e1) {
 					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					return isSuccess;
 				}
 				try {
 					conn.close();
 				} catch (SQLException e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+					return isSuccess;
 				}
 
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				return isSuccess;
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				return isSuccess;
 			}
 			pc.delete();
 		}
+		return isSuccess;
 	}
 
 	private Integer getGpsTypeId(String typename) {
@@ -306,9 +421,10 @@ public class ExcelImportServlet extends HttpServlet {
 		return tId;
 	}
 
-	private void operationGpsDataToDb(int orgId, String path) {// TODO
-																// Auto-generated
-																// method stub
+	private boolean operationGpsDataToDb(int orgId, String path,
+			List<String> retMsgList) {// TODO
+		// method stub
+		boolean isSuccess = false;
 		File pc = new File(path);
 		conn = DBClassMysql.getMysql();
 		if (pc.exists()) {
@@ -321,114 +437,176 @@ public class ExcelImportServlet extends HttpServlet {
 				// int rows = sheet.getPhysicalNumberOfRows();
 
 				int minRowIx = sheet.getFirstRowNum();
-				int maxRowIx = sheet.getLastRowNum();
+				int maxRowIx = sheet.getPhysicalNumberOfRows();
 				int rows = 0;
-				if ((maxRowIx - minRowIx) > 2) {
+				if ((maxRowIx - minRowIx) >= 2) {
 					rows = maxRowIx - minRowIx;
 				}
 				// 只有行大于2的时候，才有数据，前面两行为title栏位
-				if (rows > 0 && rows > 2) {
-					// 遍历行
-					for (int i = 2; i <= rows; i++) {
-						// 读取左上端单元格?
-						HSSFRow row = sheet.getRow(i);
-						// 行不为空
-						if (row != null) {
-							// 获取到Excel文件中的所有的列?
-							int cells = row.getPhysicalNumberOfCells();
-							String value = "";
-							for (int j = 0; j < cells; j++) {
-								// 获取到列的值?
-								HSSFCell cell = row.getCell(j);
-								if (cell != null) {
+				try {
+					if (rows > 0 && rows >= 2) {
+						// 遍历行
+						for (int i = 2; i <= rows; i++) {
+							// 读取左上端单元格?
+							HSSFRow row = sheet.getRow(i);
+							// 行不为空
+							if (row != null) {
+								// 获取到Excel文件中的所有的列?
+								int cells = row.getPhysicalNumberOfCells();
+								String value = "";
+								for (int j = 0; j < 3; j++) {
+									// 获取到列的值?
+									HSSFCell cell = row.getCell(j);
+									if (cell != null) {
 
-									switch (cell.getCellType()) {
-									case Cell.CELL_TYPE_BOOLEAN:
-										// sb.append(SEPARATOR +
-										// cellValue.getBooleanValue());
-										value += (cell.getBooleanCellValue() + SEPARATOR);
-										break;
-									case Cell.CELL_TYPE_NUMERIC:
-										// 这里的日期类型会被转换为数字类型，需要判别后区分处理
-										if (DateUtil.isCellDateFormatted(cell)) {
-											value += (cell.getDateCellValue() + SEPARATOR);
-										} else {
+										switch (cell.getCellType()) {
+										case Cell.CELL_TYPE_BOOLEAN:
+											// sb.append(SEPARATOR +
+											// cellValue.getBooleanValue());
 											value += (cell
-													.getNumericCellValue() + SEPARATOR);
+													.getBooleanCellValue() + SEPARATOR);
+											break;
+										case Cell.CELL_TYPE_NUMERIC:
+											// 这里的日期类型会被转换为数字类型，需要判别后区分处理
+											if (DateUtil
+													.isCellDateFormatted(cell)) {
+												value += (cell
+														.getDateCellValue() + SEPARATOR);
+											} else {
+												value += (cell
+														.getNumericCellValue() + SEPARATOR);
+											}
+											// sb.append(cellValue.getBooleanValue());
+											break;
+										case Cell.CELL_TYPE_STRING:
+											// sb.append(SEPARATOR +
+											// cellValue.getStringValue());
+											value += (cell.getStringCellValue() + SEPARATOR);
+											break;
+										case Cell.CELL_TYPE_FORMULA:
+											value += (cell.getStringCellValue() + SEPARATOR);
+											break;
+										case Cell.CELL_TYPE_BLANK:
+											value += ("0.0" + SEPARATOR);
+											break;
+										case Cell.CELL_TYPE_ERROR:
+											value += ("0.0" + SEPARATOR);
+											break;
+										default:
+											value += ("0.0" + SEPARATOR);
+											break;
 										}
-										// sb.append(cellValue.getBooleanValue());
-										break;
-									case Cell.CELL_TYPE_STRING:
-										// sb.append(SEPARATOR +
-										// cellValue.getStringValue());
-										value += (cell.getStringCellValue() + SEPARATOR);
-										break;
-									case Cell.CELL_TYPE_FORMULA:
-										value += (cell.getStringCellValue() + SEPARATOR);
-										break;
-									case Cell.CELL_TYPE_BLANK:
+									} else {
 										value += ("0.0" + SEPARATOR);
-										break;
-									case Cell.CELL_TYPE_ERROR:
-										value += (cell.getStringCellValue() + SEPARATOR);
-										break;
-									default:
-										value += (cell.getStringCellValue() + SEPARATOR);
-										break;
 									}
 								}
-							}
-							String[] val = value.split("\\|");
-							String sql = "insert into t_gps (type_id,org_id,number,gps_name,icon_url,sync_state, platform_id) values (?,?,?,?,?,?,?)";
-							try {
-								// ps.clearParameters();
-								ps = conn.prepareStatement(sql);
-								ps.setInt(1, getGpsTypeId(val[0]));
-								ps.setInt(2, orgId);
-								ps.setString(3, val[2] == null ? "" : val[2]
-										.trim().equals("0.0") ? "" : val[2]);
-								ps.setString(4, val[1] == null ? "" : val[1]
-										.trim().equals("0.0") ? "" :val[1]);
-								ps.setString(5, "images/images/gpsDemo.png");
-								ps.setBoolean(6, true);
-								ps.setInt(7, 1);
+								String[] val = value.split("\\|");
 
-								ps.executeUpdate();
-							} catch (SQLException e1) {
-								// TODO Auto-generated catch block
-								e1.printStackTrace();
+								String regMsg = "";
+								String gpsNumber = val[2] == null ? "" : val[2]
+										.trim().equals("0.0") ? "" : val[2];
+								if (gpsNumber.equals("")) {
+									regMsg += "第" + (i - 1)
+											+ "行数据错误，详细：定位设备编号为空;";
+								} else {
+									try {
+										String existSql = "select count(*) from t_gps where number = '"
+												+ gpsNumber + "' ";
+										pes = conn.prepareStatement(existSql);
+										ResultSet rs = pes.executeQuery();
+										int count = 0;
+										while (rs.next()) {
+											count = rs.getInt(1);
+										}
+										if (count == 0) {
+											String sql = "insert into t_gps (type_id,org_id,number,gps_name,icon_url,sync_state, platform_id) values (?,?,?,?,?,?,?)";
+											try {
+												// ps.clearParameters();
+												ps = conn.prepareStatement(sql);
+												ps.setInt(1,
+														getGpsTypeId(val[0]));
+												ps.setInt(2, orgId);
+												ps.setString(
+														3,
+														val[2] == null ? ""
+																: val[2].trim()
+																		.equals("0.0") ? ""
+																		: val[2]);
+												ps.setString(
+														4,
+														val[1] == null ? ""
+																: val[1].trim()
+																		.equals("0.0") ? ""
+																		: val[1]);
+												ps.setString(5, "");
+												ps.setBoolean(6, true);
+												ps.setInt(7, 1);
+
+												ps.executeUpdate();
+											} catch (SQLException e1) {
+												// TODO Auto-generated catch
+												// block
+												return isSuccess;
+											}
+
+										} else {
+											regMsg += "第"
+													+ (i - 1)
+													+ "行数据导入失败，详细：数据库已经存在该编号的定位设备数据;";
+										}
+
+									} catch (SQLException e1) {
+										// TODO Auto-generated catch block
+										return isSuccess;
+									}
+								}
+
+								if (regMsg.length() > 0) {
+									retMsgList.add(regMsg);
+								}
+								isSuccess = true;
 							}
+
 						}
-
 					}
+				} catch (Exception ex) {
+					return isSuccess;
 				}
 				try {
-					ps.cancel();
+					if (pes != null) {
+						pes.cancel();
+					}
+					if (ps != null) {
+						ps.cancel();
+					}
 				} catch (SQLException e1) {
 					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					return isSuccess;
 				}
 				try {
 					conn.close();
 				} catch (SQLException e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+					return isSuccess;
 				}
 
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				return isSuccess;
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				return isSuccess;
 			}
 			pc.delete();
 		}
+		return isSuccess;
 
 	}
 
-	private void operationVehicleDataToDb(int orgId, String path) {
+	private boolean operationVehicleDataToDb(int orgId, String path,
+			List<String> retMsgList) {
 		// TODO Auto-generated method stub
+		boolean isSuccess = false;
 		File pc = new File(path);
 		conn = DBClassMysql.getMysql();
 		if (pc.exists()) {
@@ -441,120 +619,199 @@ public class ExcelImportServlet extends HttpServlet {
 				// int rows = sheet.getPhysicalNumberOfRows();
 
 				int minRowIx = sheet.getFirstRowNum();
-				int maxRowIx = sheet.getLastRowNum();
+				int maxRowIx = sheet.getPhysicalNumberOfRows();
 				int rows = 0;
-				if ((maxRowIx - minRowIx) > 2) {
+				if ((maxRowIx - minRowIx) >= 2) {
 					rows = maxRowIx - minRowIx;
 				}
 				// 只有行大于2的时候，才有数据，前面两行为title栏位
-				if (rows > 0 && rows > 2) {
-					// 遍历行
-					for (int i = 2; i <= rows; i++) {
-						// 读取左上端单元格?
-						HSSFRow row = sheet.getRow(i);
-						// 行不为空
-						if (row != null) {
-							// 获取到Excel文件中的所有的列?
-							int cells = row.getPhysicalNumberOfCells();
-							String value = "";
-							for (int j = 0; j < cells; j++) {
-								// 获取到列的值?
-								HSSFCell cell = row.getCell(j);
-								if (cell != null) {
+				try {
+					if (rows > 0 && rows >= 2) {
+						// 遍历行
+						for (int i = 2; i <= rows; i++) {
+							// 读取左上端单元格?
+							HSSFRow row = sheet.getRow(i);
+							// 行不为空
+							if (row != null) {
+								// 获取到Excel文件中的所有的列?
+								int cells = row.getPhysicalNumberOfCells();
+								String value = "";
+								for (int j = 0; j < 7; j++) {
+									// 获取到列的值?
+									HSSFCell cell = row.getCell(j);
+									if (cell != null) {
 
-									switch (cell.getCellType()) {
-									case Cell.CELL_TYPE_BOOLEAN:
-										// sb.append(SEPARATOR +
-										// cellValue.getBooleanValue());
-										value += (cell.getBooleanCellValue() + SEPARATOR);
-										break;
-									case Cell.CELL_TYPE_NUMERIC:
-										// 这里的日期类型会被转换为数字类型，需要判别后区分处理
-										if (DateUtil.isCellDateFormatted(cell)) {
-											value += (cell.getDateCellValue() + SEPARATOR);
-										} else {
+										switch (cell.getCellType()) {
+										case Cell.CELL_TYPE_BOOLEAN:
+											// sb.append(SEPARATOR +
+											// cellValue.getBooleanValue());
 											value += (cell
-													.getNumericCellValue() + SEPARATOR);
+													.getBooleanCellValue() + SEPARATOR);
+											break;
+										case Cell.CELL_TYPE_NUMERIC:
+											// 这里的日期类型会被转换为数字类型，需要判别后区分处理
+											if (DateUtil
+													.isCellDateFormatted(cell)) {
+												value += (cell
+														.getDateCellValue() + SEPARATOR);
+											} else {
+												value += (cell
+														.getNumericCellValue() + SEPARATOR);
+											}
+											// sb.append(cellValue.getBooleanValue());
+											break;
+										case Cell.CELL_TYPE_STRING:
+											// sb.append(SEPARATOR +
+											// cellValue.getStringValue());
+											value += (cell.getStringCellValue() + SEPARATOR);
+											break;
+										case Cell.CELL_TYPE_FORMULA:
+											value += (cell.getStringCellValue() + SEPARATOR);
+											break;
+										case Cell.CELL_TYPE_BLANK:
+											value += ("0.0" + SEPARATOR);
+											break;
+										case Cell.CELL_TYPE_ERROR:
+											value += ("0.0" + SEPARATOR);
+											break;
+										default:
+											value += ("0.0" + SEPARATOR);
+											break;
 										}
-										// sb.append(cellValue.getBooleanValue());
-										break;
-									case Cell.CELL_TYPE_STRING:
-										// sb.append(SEPARATOR +
-										// cellValue.getStringValue());
-										value += (cell.getStringCellValue() + SEPARATOR);
-										break;
-									case Cell.CELL_TYPE_FORMULA:
-										value += (cell.getStringCellValue() + SEPARATOR);
-										break;
-									case Cell.CELL_TYPE_BLANK:
+									} else {
 										value += ("0.0" + SEPARATOR);
-										break;
-									case Cell.CELL_TYPE_ERROR:
-										value += (cell.getStringCellValue() + SEPARATOR);
-										break;
-									default:
-										value += (cell.getStringCellValue() + SEPARATOR);
-										break;
 									}
 								}
-							}
-							String[] val = value.split("\\|");
-							String sql = "insert into t_vehicle (vehicle_type_id,org_id,number,intercom_group,intercom_person,purpose,brand,site_qty,sync_state, platform_id) values (?,?,?,?,?,?,?,?,?,?)";
-							try {
-								// ps.clearParameters();
-								ps = conn.prepareStatement(sql);
-								ps.setInt(1, getVehicleTypeId(val[0]));
-								ps.setInt(2, orgId);
-								ps.setString(3, val[1] == null ? "" : val[1]
-										.trim().equals("0.0") ? "" : val[1]);
-								ps.setString(4, val[5] == null ? "" : val[5]
-										.trim().equals("0.0") ? "" : val[5]);
-								ps.setString(5, val[6] == null ? "" : val[6]
-										.trim().equals("0.0") ? "" :val[6]);
-								ps.setString(6, val[2] == null ? "" : val[2]
-										.trim().equals("0.0") ? "" : val[2]);
-								ps.setString(7, val[3] == null ? "" : val[3]
-										.trim().equals("0.0") ? "" : val[3]);
-								ps.setString(8, val[4] == null ? "" : val[4]
-										.trim().equals("0.0") ? "" :val[4]);
-								ps.setBoolean(9, true);
-								ps.setInt(10, 1);
+								String[] val = value.split("\\|");
 
-								ps.executeUpdate();
-							} catch (SQLException e1) {
-								// TODO Auto-generated catch block
-								e1.printStackTrace();
+								String regMsg = "";
+								String vehicleNumber = val[1] == null ? ""
+										: val[1].trim().equals("0.0") ? ""
+												: val[1];
+								if (vehicleNumber.equals("")) {
+									regMsg += "第" + (i - 1)
+											+ "行数据错误，详细：车牌号码为空;";
+								} else {
+									try {
+										String existSql = "select count(*) from t_vehicle where number = '"
+												+ vehicleNumber + "' ";
+										pes = conn.prepareStatement(existSql);
+										ResultSet rs = pes.executeQuery();
+										int count = 0;
+										while (rs.next()) {
+											count = rs.getInt(1);
+										}
+										if (count == 0) {
+											String sql = "insert into t_vehicle (vehicle_type_id,org_id,number,intercom_group,intercom_person,purpose,brand,site_qty,sync_state, platform_id) values (?,?,?,?,?,?,?,?,?,?)";
+											try {
+												// ps.clearParameters();
+												ps = conn.prepareStatement(sql);
+												ps.setInt(
+														1,
+														getVehicleTypeId(val[0]));
+												ps.setInt(2, orgId);
+												ps.setString(
+														3,
+														val[1] == null ? ""
+																: val[1].trim()
+																		.equals("0.0") ? ""
+																		: val[1]);
+												ps.setString(
+														4,
+														val[5] == null ? ""
+																: val[5].trim()
+																		.equals("0.0") ? ""
+																		: val[5]);
+												ps.setString(
+														5,
+														val[6] == null ? ""
+																: val[6].trim()
+																		.equals("0.0") ? ""
+																		: val[6]);
+												ps.setString(
+														6,
+														val[2] == null ? ""
+																: val[2].trim()
+																		.equals("0.0") ? ""
+																		: val[2]);
+												ps.setString(
+														7,
+														val[3] == null ? ""
+																: val[3].trim()
+																		.equals("0.0") ? ""
+																		: val[3]);
+												ps.setString(
+														8,
+														val[4] == null ? ""
+																: val[4].trim()
+																		.equals("0.0") ? ""
+																		: val[4]);
+												ps.setBoolean(9, true);
+												ps.setInt(10, 1);
+
+												ps.executeUpdate();
+											} catch (SQLException e1) {
+												// TODO Auto-generated catch
+												// block
+												return isSuccess;
+											}
+										} else {
+											regMsg += "第"
+													+ (i - 1)
+													+ "行数据导入失败，详细：数据库已经存在车牌号的车辆数据;";
+										}
+
+									} catch (SQLException e1) {
+										// TODO Auto-generated catch block
+										return isSuccess;
+									}
+								}
+
+								if (regMsg.length() > 0) {
+									retMsgList.add(regMsg);
+								}
+								isSuccess = true;
 							}
+
 						}
-
 					}
+				} catch (Exception ex) {
+					return isSuccess;
 				}
 				try {
-					ps.cancel();
+					if (pes != null) {
+						pes.cancel();
+					}
+					if (ps != null) {
+						ps.cancel();
+					}
 				} catch (SQLException e1) {
 					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					return isSuccess;
 				}
 				try {
 					conn.close();
 				} catch (SQLException e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+					return isSuccess;
 				}
 
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				return isSuccess;
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				return isSuccess;
 			}
 			pc.delete();
 		}
+		return isSuccess;
 	}
 
-	private void operationPoliceDataToDb(Integer orgId, String path) {
+	private boolean operationPoliceDataToDb(Integer orgId, String path,
+			List<String> retMsgList) {
 		// TODO Auto-generated method stub
+		boolean isSuccess = false;
 		File pc = new File(path);
 		conn = DBClassMysql.getMysql();
 		if (pc.exists()) {
@@ -567,128 +824,200 @@ public class ExcelImportServlet extends HttpServlet {
 				// int rows = sheet.getPhysicalNumberOfRows();
 
 				int minRowIx = sheet.getFirstRowNum();
-				int maxRowIx = sheet.getLastRowNum();
+				int maxRowIx = sheet.getPhysicalNumberOfRows();
 				int rows = 0;
-				if ((maxRowIx - minRowIx) > 2) {
+				if ((maxRowIx - minRowIx) >= 2) {
 					rows = maxRowIx - minRowIx;
 				}
 				// 只有行大于2的时候，才有数据，前面两行为title栏位
-				if (rows > 0 && rows > 2) {
-					// 遍历行
-					for (int i = 2; i <= rows; i++) {
-						// 读取左上端单元格?
-						HSSFRow row = sheet.getRow(i);
-						// 行不为空
-						if (row != null) {
-							// 获取到Excel文件中的所有的列?
-							int cells = row.getPhysicalNumberOfCells();
-							String value = "";
-							for (int j = 0; j < cells; j++) {
-								// 获取到列的值?
-								HSSFCell cell = row.getCell(j);
-								if (cell != null) {
+				try {
+					if (rows > 0 && rows >= 2) {
+						// 遍历行
+						for (int i = 2; i <= rows; i++) {
+							// 读取左上端单元格?
+							HSSFRow row = sheet.getRow(i);
+							// 行不为空
+							if (row != null) {
+								// 获取到Excel文件中的所有的列?
+								int cells = row.getLastCellNum();
+								String value = "";
+								for (int j = 0; j < 9; j++) {
+									// 获取到列的值?
+									HSSFCell cell = row.getCell(j);
+									if (cell != null) {
 
-									switch (cell.getCellType()) {
-									case Cell.CELL_TYPE_BOOLEAN:
-										// sb.append(SEPARATOR +
-										// cellValue.getBooleanValue());
-										value += (cell.getBooleanCellValue() + SEPARATOR);
-										break;
-									case Cell.CELL_TYPE_NUMERIC:
-										// 这里的日期类型会被转换为数字类型，需要判别后区分处理
-										if (DateUtil.isCellDateFormatted(cell)) {
-											value += (cell.getDateCellValue() + SEPARATOR);
-										} else {
+										switch (cell.getCellType()) {
+										case Cell.CELL_TYPE_BOOLEAN:
+											// sb.append(SEPARATOR +
+											// cellValue.getBooleanValue());
 											value += (cell
-													.getNumericCellValue() + SEPARATOR);
+													.getBooleanCellValue() + SEPARATOR);
+											break;
+										case Cell.CELL_TYPE_NUMERIC:
+											// 这里的日期类型会被转换为数字类型，需要判别后区分处理
+											if (DateUtil
+													.isCellDateFormatted(cell)) {
+												value += (cell
+														.getDateCellValue() + SEPARATOR);
+											} else {
+												value += (cell
+														.getNumericCellValue() + SEPARATOR);
+											}
+											// sb.append(cellValue.getBooleanValue());
+											break;
+										case Cell.CELL_TYPE_STRING:
+											// sb.append(SEPARATOR +
+											// cellValue.getStringValue());
+											value += (cell.getStringCellValue() + SEPARATOR);
+											break;
+										case Cell.CELL_TYPE_FORMULA:
+											value += (cell.getStringCellValue() + SEPARATOR);
+											break;
+										case Cell.CELL_TYPE_BLANK:
+											value += ("0.0" + SEPARATOR);
+											break;
+										case Cell.CELL_TYPE_ERROR:
+											value += ("0.0" + SEPARATOR);
+											break;
+										default:
+											value += ("0.0" + SEPARATOR);
+											break;
 										}
-										// sb.append(cellValue.getBooleanValue());
-										break;
-									case Cell.CELL_TYPE_STRING:
-										// sb.append(SEPARATOR +
-										// cellValue.getStringValue());
-										value += (	cell.getStringCellValue()+ SEPARATOR);
-										break;
-									case Cell.CELL_TYPE_FORMULA:
-										value += (cell.getStringCellValue() + SEPARATOR);
-										break;
-									case Cell.CELL_TYPE_BLANK:
-										value += ("0.0"+ SEPARATOR);
-										break;
-									case Cell.CELL_TYPE_ERROR:
-										value += (cell.getStringCellValue() + SEPARATOR);
-										break;
-									default:
-										value += (cell.getStringCellValue() + SEPARATOR);
-										break;
+									} else {
+										value += ("0.0" + SEPARATOR);
 									}
 								}
-							}
-							String[] val = value.split("\\|");
-							String sql = "insert into t_police (type_id,name,org_id,idcardNo,number,title,mobile,mobile_short,intercom_group,intercom_person,gps_name,isUsed,sync_state, platform_id) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-							try {
-								// ps.clearParameters();
-								ps = conn.prepareStatement(sql);
-								ps.setInt(1, 1);
-								ps.setString(2, val[0] == null ? "" : val[0]
-										.trim().equals("0.0") ? "" : val[0]);
-								ps.setInt(3, orgId);
-								ps.setString(4, val[3] == null ? "" : val[3]
-										.trim().equals("0.0") ? "" : val[3]);
-								ps.setString(5, val[2] == null ? "" : val[2]
-										.trim().equals("0.0") ? "" : 
-												val[2]);
-								ps.setString(6, val[4] == null ? "" : val[4]
-										.trim().equals("0.0") ? "" :
-												val[4]);
-								ps.setString(7, val[5] == null ? "" : val[5]
-										.trim().equals("0.0") ? "" : 
-												val[5]);
-								ps.setString(8, val[6] == null ? "" : val[6]
-										.trim().equals("0.0") ? "" : 
-												val[6]);
-								ps.setString(9, val[7] == null ? "" : val[7]
-										.trim().equals("0.0") ? "" :
-												val[7]);
-								ps.setString(10, val[8] == null ? "" : val[8]
-										.trim().equals("0.0") ? "" : 
-												val[8]);
-								ps.setString(11, null);
-								ps.setBoolean(12, true);
-								ps.setBoolean(13, true);
-								ps.setInt(14, 1);
+								String[] val = value.split("\\|");
+								String regMsg = "";
+								String policeName = val[0] == null ? ""
+										: val[0].trim().equals("0.0") ? ""
+												: val[0];
+								String idCardNo = (val[3] == null) ? ""
+										: (val[3].trim().equals("0.0")) ? ""
+												: val[3];
+								String policeCode = val[2] == null ? ""
+										: val[2].trim().equals("0.0") ? ""
+												: val[2];
+								if (policeName.equals("")) {
+									regMsg += "第" + (i - 1) + "行数据错误，详细：姓名为空;";
+								} else if (idCardNo.equals("")) {
+									regMsg += "第" + (i - 1)
+											+ "行数据错误，详细：身份证号码为空";
+								} else if (policeCode.equals("")) {
+									regMsg += "第" + (i - 1) + "行数据错误，详细：警号号码为空";
+								} else {
+									try {
+										String existSql = "select count(*) from t_police where idcardNo = '"
+												+ idCardNo
+												+ "' or number = '"
+												+ policeCode + "' ";
+										pes = conn.prepareStatement(existSql);
+										ResultSet rs = pes.executeQuery();
+										int count = 0;
+										while (rs.next()) {
+											count = rs.getInt(1);
+										}
+										if (count == 0) {
+											String sql = "insert into t_police (type_id,name,org_id,idcardNo,number,title,mobile,mobile_short,intercom_group,intercom_person,gps_name,isUsed,sync_state, platform_id) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+											try {
+												// ps.clearParameters();
+												ps = conn.prepareStatement(sql);
+												ps.setInt(1, 1);
+												ps.setString(2, policeName);
+												ps.setInt(3, orgId);
+												ps.setString(4, idCardNo);
+												ps.setString(5, policeCode);
+												ps.setString(
+														6,
+														val[4] == null ? ""
+																: val[4].trim()
+																		.equals("0.0") ? ""
+																		: val[4]);
+												ps.setString(
+														7,
+														val[5] == null ? ""
+																: val[5].trim()
+																		.equals("0.0") ? ""
+																		: val[5]);
+												ps.setString(
+														8,
+														val[6] == null ? ""
+																: val[6].trim()
+																		.equals("0.0") ? ""
+																		: val[6]);
+												ps.setString(
+														9,
+														val[7] == null ? ""
+																: val[7].trim()
+																		.equals("0.0") ? ""
+																		: val[7]);
+												ps.setString(
+														10,
+														val[8] == null ? ""
+																: val[8].trim()
+																		.equals("0.0") ? ""
+																		: val[8]);
+												ps.setString(11, null);
+												ps.setBoolean(12, true);
+												ps.setBoolean(13, true);
+												ps.setInt(14, 1);
 
-								ps.executeUpdate();
-							} catch (SQLException e1) {
-								// TODO Auto-generated catch block
-								e1.printStackTrace();
+												ps.executeUpdate();
+											} catch (SQLException e1) {
+												// TODO Auto-generated catch
+												// block
+												return isSuccess;
+											}
+										} else {
+											regMsg += "第"
+													+ (i - 1)
+													+ "行数据导入失败，详细：数据库已经存在身份证号或者警号的警员数据;";
+										}
+
+									} catch (SQLException e1) {
+										// TODO Auto-generated catch block
+										return isSuccess;
+									}
+								}
+								if (regMsg.length() > 0) {
+									retMsgList.add(regMsg);
+								}
+								isSuccess = true;
 							}
+
 						}
-
 					}
+				} catch (Exception ex) {
+					return isSuccess;
 				}
 				try {
-					ps.cancel();
+					if (ps != null) {
+						ps.cancel();
+					}
+					if (pes != null) {
+						pes.cancel();
+					}
 				} catch (SQLException e1) {
 					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					return isSuccess;
 				}
 				try {
 					conn.close();
 				} catch (SQLException e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+					return isSuccess;
 				}
 
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				return isSuccess;
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				return isSuccess;
 			}
 			pc.delete();
 		}
+		return isSuccess;
 	}
 
 	@Override

@@ -86,23 +86,13 @@ public class TestController {
 		List<OrgWithPoliceVM> ls=null;
 		
 		if(qid!=null){
-			ls=orgService.loadOrgWithPoliceVMList(qid);
-
-			JSONArray rs=JSONArray.fromObject(ls);
-			
-			String s=rs.toString();
-			
-			return s;
-			
-//			return ReturnResult.MESSAGE(MessageCode.STATUS_SUCESS,
-//					MessageCode.SELECT_ORGAN_FAIL, 0, ls);
-			
+			ls=orgService.loadOrgWithPoliceVMList(qid); 
+			JSONArray rs=JSONArray.fromObject(ls); 
+			String s=rs.toString(); 
+			return s; 
 		}else{
 			
-			return null;
-			
-//			return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL,
-//					MessageCode.SELECT_ORGAN_FAIL, 0, null);
+			return null; 
 		}	
 		
 	}

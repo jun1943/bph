@@ -77,4 +77,6 @@ public interface DutyTaskMapper {
      * @return
      */
     List<TaskTargetVM> loadBayonetByOrg(Map<String,Object> map);
+
+	TaskTargetVM getTaskTargetInfo(Map<String, Object> map);
 }

@@ -27,7 +27,9 @@ import com.tianyi.bph.domain.basicdata.IntercomGroup;
 import com.tianyi.bph.domain.basicdata.Police;
 import com.tianyi.bph.domain.basicdata.PoliceType;
 import com.tianyi.bph.domain.system.Organ;
+import com.tianyi.bph.domain.system.User;
 import com.tianyi.bph.query.basicdata.GpsBaseVM;
+import com.tianyi.bph.query.basicdata.PoliceExtItem;
 import com.tianyi.bph.query.basicdata.PoliceVM;
 import com.tianyi.bph.query.system.UserQuery;
 import com.tianyi.bph.service.basicdata.PoliceService;
@@ -69,11 +71,15 @@ public class PoliceController {
 	public ModelAndView gotoPoliceList(
 			HttpServletRequest request,
 			@RequestParam(value = "userName", required = false) String userName,
-			@RequestParam(value = "organId", required = true, defaultValue = "1") Integer organId,
+			@RequestParam(value = "organId", required = false) Integer organId,
 			@RequestParam(value = "searchType", required = true, defaultValue = "1") Integer searchType,
 			@RequestParam(value = "pageSize", required = false, defaultValue = "10") Integer pageSize,
 			@RequestParam(value = "pageNo", required = false, defaultValue = "1") Integer pageNo) {
 		UserQuery query = new UserQuery();
+		User user = (User) request.getAttribute("User");
+		if (organId == null) {
+			organId = user.getOrgId();
+		}
 		if (!StringUtils.isEmpty(userName)) {
 			query.setUserName(userName);
 		}
@@ -84,7 +90,7 @@ public class PoliceController {
 		Organ organ = new Organ();
 		if (organId != null) {
 			organ = organService.getOrganByPrimaryKey(organId);
-		}
+		} 
 		query.setOrganId(organId);
 		mv.addObject("query", query);
 		mv.addObject("organ", organ);

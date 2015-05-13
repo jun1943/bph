@@ -34,8 +34,7 @@ $(function() {
 				}
 			}
 		},
-		filter : "contains",
-		suggest : true 
+		filter : "contains" 
 	}).prev().find(".k-input").attr("readonly",true);
 	$("#vehicleIntercomGroup").kendoComboBox({
 		dataTextField : "name",
@@ -49,8 +48,7 @@ $(function() {
 				}
 			}
 		},
-		filter : "contains",
-		suggest : true 
+		filter : "contains" 
 	}).prev().find(".k-input").attr("readonly",true);
 	$("#vehicleGpsName").kendoComboBox({
 		dataTextField : "name",
@@ -65,8 +63,7 @@ $(function() {
 				}
 			}
 		},
-		filter : "contains",
-		suggest : true ,
+		filter : "contains", 
 
         select: vehicleAddManage.onSelectGps
 	}).prev().find(".k-input").attr("readonly",true);
@@ -135,13 +132,13 @@ var vehicleAddManage= {
 				}});  
 				return;
 			}
-			vehicleAddManage.isExistVehicle(pNumber,0,0);
-			if(!isExist){ 
-							$("body").popjs({"title":"提示","content":"该车牌号在"+bph_Exist_OrgName+"机构下已存在，请确认后添加！","callback":function(){
-								$("#vehicleNumber").focus();
-							}});  
-				return;
-			}
+			//vehicleAddManage.isExistVehicle(pNumber,0,0);
+			//if(!isExist){ 
+			//				$("body").popjs({"title":"提示","content":"该车牌号在"+bph_Exist_OrgName+"机构下已存在，请确认后添加！","callback":function(){
+			//					$("#vehicleNumber").focus();
+			//				}});  
+			//	return;
+			//}
 			bph_vehicleAdd_pkg.number = pNumber; 
  
 			var brand = $.trim($("#vehicleBrand").val());
@@ -152,7 +149,17 @@ var vehicleAddManage= {
 							}});  
 				return;
 			}
-			
+				
+				if(brand.length>0)
+				{
+					var myReg = /^[^@\/\'\\\"#$%&\^\*]+$/;
+					if(!myReg.test(brand)){
+						$("body").popjs({"title":"提示","content":"车辆品牌不能包含特殊字符！","callback":function(){
+									$("#vehicleBrand").focus();
+								}}); 
+						return;
+					}
+				}
 			bph_vehicleAdd_pkg.brand= brand;
 			
 			 var siteQty= $.trim($("#vehicleSiteQty").val());
@@ -162,12 +169,32 @@ var vehicleAddManage= {
 							}});  
 				return;
 			}
+			if(siteQty.length>0)
+			{
+				var myReg = /^[^@\/\'\\\"#$%&\^\*]+$/;
+				if(!myReg.test(siteQty)){
+					$("body").popjs({"title":"提示","content":"车辆座位数不能包含特殊字符！","callback":function(){
+								$("#vehicleSiteQty").focus();
+							}}); 
+					return;
+				}
+			}
 			bph_vehicleAdd_pkg.siteQty = siteQty;
 			var purpose = $.trim($("#vehiclePurpose").val());
 			if (purpose.length > 20) {
 							$("body").popjs({"title":"提示","content":"车辆用途长度过长，限制长度为20！","callback":function(){
 								$("#vehiclePurpose").focus();
 							}});  
+			}
+			if(purpose.length>0)
+			{
+				var myReg = /^[^@\/\'\\\"#$%&\^\*]+$/;
+				if(!myReg.test(purpose)){
+					$("body").popjs({"title":"提示","content":"车辆用途不能包含特殊字符！","callback":function(){
+								$("#vehiclePurpose").focus();
+							}}); 
+					return;
+				}
 			}
 			bph_vehicleAdd_pkg.purpose=purpose;
 			
@@ -227,6 +254,34 @@ var vehicleAddManage= {
 				}
 			});
 		},
+		isExistNumber:function(){
+			var pNumber = $.trim($("#vehicleNumber").val()); 
+			
+			if(pNumber.length>0){
+				$.ajax({
+					url : "<%=basePath%>vehicleWeb/isExistVehicle.do?sessionId="+sessionId,
+					type : "POST",
+					dataType : "json",
+					async : false,
+					data : {
+						"param" : pNumber,
+						"type"   : 0,
+						"id"     :   0
+					},
+					success : function(req) {
+						if (req.code!=200) {  
+							bph_Exist_OrgName = req.description; 
+							$("body").popjs({"title":"提示","content":"该车牌号在"+bph_Exist_OrgName+"机构下已存在，请确认后添加","callback":function(){
+									$("#vehicleNumber").focus(); 
+									return;
+								}});   
+							return; 
+							
+						}
+					}
+				});
+			}
+		},
 		clearAddFrom:function(){
 			$("#vehicleNumber").val("");
 			$("#vehicleBrand").val("");
@@ -237,7 +292,7 @@ var vehicleAddManage= {
 </script>
 </head>
 
-<body>
+<body class="ty-body">
 	<div id="vertical" style="overflow-x:hidden;">
 		<div id="horizontal" style="height: 220px; width: 590px;">
 			<div class="pane-content">
@@ -247,28 +302,28 @@ var vehicleAddManage= {
 						<li class="ty-input"><span class="ty-input-warn">*</span><label class="ty-input-label" for="vehicleType">车辆类型:</label><input id="vehicleType"
 							placeholder="请选择车辆类型..." /></li>
 						<li class="ty-input"><span class="ty-input-warn">*</span><label class="ty-input-label" for="vehicleNumber">车牌号码:</label><input
-							type="text" class="k-textbox" name="vehicleNumber"
+							type="text" class="k-textbox" name="vehicleNumber"  onblur="vehicleAddManage.isExistNumber()"
 							id="vehicleNumber" /></li>
-						<li class="ty-input"><label class="ty-input-label" for="vehicleBrand">车辆品牌:</label><input type="text"
+						<li class="ty-input"><span class="ty-input-warn"></span><label class="ty-input-label" for="vehicleBrand">车辆品牌:</label><input type="text"
 							class="k-textbox" name="vehicleBrand" id="vehicleBrand"
 							required="required" /><input type="hidden"
 							id="vehicleId"><input type="hidden"
 							id="orgId" value="${organ.id}" /></li>
-						<li class="ty-input"><label class="ty-input-label" for="vehicleSiteQty">　座位数:</label><input type="text"
+						<li class="ty-input"><span class="ty-input-warn"></span><label class="ty-input-label" for="vehicleSiteQty">　座位数:</label><input type="text"
 							class="k-textbox" name="vehicleSiteQty" id="vehicleSiteQty"
 							required="required" /></li>
-						<li class="ty-input"><label class="ty-input-label" for="vehiclePurpose">车辆用途:</label><input type="text"
+						<li class="ty-input"><span class="ty-input-warn"></span><label class="ty-input-label" for="vehiclePurpose">车辆用途:</label><input type="text"
 							class="k-textbox" name="vehiclePurpose" id="vehiclePurpose" /></li>
-						<li class="ty-input"><label class="ty-input-label" for="vehicleIntercomGroup">　组呼号:</label><input id="vehicleIntercomGroup"
+						<li class="ty-input"><span class="ty-input-warn"></span><label class="ty-input-label" for="vehicleIntercomGroup">　组呼号:</label><input id="vehicleIntercomGroup"
 							placeholder="请选择对讲机组呼号..." /></li>
-						<li class="ty-input"><label class="ty-input-label" for="vehicleIntercomPerson">　个呼号:</label><input type="text"
+						<li class="ty-input"><span class="ty-input-warn"></span><label class="ty-input-label" for="vehicleIntercomPerson">　个呼号:</label><input type="text"
 							class="k-textbox" name="vehicleIntercomPerson" id="vehicleIntercomPerson" /></li>
-						<li class="ty-input"><label class="ty-input-label" for="vehicleGpsName">GPS设备: </label><input
-							id="vehicleGpsName" placeholder="请选择gps名称..." /></li>
+						<li class="ty-input"><span class="ty-input-warn"></span><label class="ty-input-label" for="vehicleGpsName">GPS设备: </label><input
+							id="vehicleGpsName"  style="width:199px" placeholder="请选择gps名称..." /></li>
 					</ul>
-					<p style="float:left;width:100%;margin-top:10px;">
+					<p class="ty-input-row">
 						<!--<span class="k-button"  onclick="vehicleAddManage.saveVehicleNotOut()">保存并继续</span>-->
-						<span class="k-button"  onclick="vehicleAddManage.saveVehicleWithOut()">保存</span>
+						<button class="ty-button"  onclick="vehicleAddManage.saveVehicleWithOut()">保存</button>
 					</p>
 
 

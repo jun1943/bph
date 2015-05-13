@@ -107,5 +107,7 @@ public interface DutyTypeMapper {
 	DutyType loadDutyTypeById(Integer did);
 
 	int updateDutyType(DutyType dutytype);
+
+	List<DutyType> loadDutyTypeByParentId(Integer pid);
  
 }

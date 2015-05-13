@@ -15,6 +15,7 @@ import com.tianyi.bph.dao.system.RoleModuleFuctionDAO;
 import com.tianyi.bph.dao.system.UserRoleDAO;
 import com.tianyi.bph.domain.system.Role;
 import com.tianyi.bph.domain.system.RoleModuleFuctionKey;
+import com.tianyi.bph.domain.system.UserRoleKey;
 import com.tianyi.bph.exception.RestException;
 import com.tianyi.bph.query.system.RoleQuery;
 import com.tianyi.bph.service.system.RoleService;
@@ -47,7 +48,7 @@ public class RoleServiceImpl implements RoleService{
 			for (String string : moduleList) {
 				list.add(string);
 			}
-			addModuleBak(list,moduleList);
+			addModuleBak(list,moduleList);//绑定角色权限
 			
 			RoleModuleFuctionKey roleModuleFuctionKey = new RoleModuleFuctionKey();
 			for (String moduleId : list) {
@@ -56,6 +57,12 @@ public class RoleServiceImpl implements RoleService{
 				roleModuleFuctionDao.insert(roleModuleFuctionKey);
 			}
 		}
+		
+		UserRoleKey roleKey=new UserRoleKey();
+		roleKey.setRoleId(role.getId());
+		roleKey.setUserId(role.getUserId());
+		userRoleDao.insert(roleKey);
+		
 		return id;
 	}
 	
@@ -100,7 +107,7 @@ public class RoleServiceImpl implements RoleService{
 				}else if(!string.equals(SystemConfig.BASE_MANAGER) && baseArray.contains(string)){
 					if(base == 0){
 						if(b == 0){
-							list.add(SystemConfig.SYSTEM_MANAGER);
+							list.add(SystemConfig.BASE_MANAGER);
 							b=1;
 						}
 					}
@@ -124,18 +131,19 @@ public class RoleServiceImpl implements RoleService{
 		}
 	}
 	//删
-	public int deleteRole(Integer id){
+	public int deleteRole(Role role){
 		int  i=0;
-		if(id == null){
-			throw new RestException("id不能为空");
+		if(role == null){
+			throw new RestException("对象不能为空");
 		}
-		i=userRoleDao.getUserCountByRoleId(id);
-		if(i > 0){
-			return 0;
-		}
-		roleModuleFuctionDao.deleteByRoleKey(id);
+		UserRoleKey key=new UserRoleKey();
+		key.setRoleId(role.getId());
+		key.setUserId(role.getUserId());
+		userRoleDao.deleteByPrimaryKey(key);
 		
-		i=roleDao.deleteByPrimaryKey(id);
+		roleModuleFuctionDao.deleteByRoleKey(role.getId());
+		
+		i=roleDao.deleteByPrimaryKey(role.getId());
 		return i;
 	}
 	//改

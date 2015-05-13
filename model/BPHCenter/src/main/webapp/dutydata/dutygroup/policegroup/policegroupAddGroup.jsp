@@ -11,30 +11,27 @@
 <head>
 <base href="<%=basePath%>">
 
-<title>My JSP 'gpsgroupAddGroup.jsp' starting page</title>
-
-<meta http-equiv="pragma" content="no-cache">
-<meta http-equiv="cache-control" content="no-cache">
-<meta http-equiv="expires" content="0">
-<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
-<meta http-equiv="description" content="This is my page">
-<!--
-	<link rel="stylesheet" type="text/css" href="styles.css">
-	-->
+<title>扁平化客户端</title>
+<%@ include file="../../../emulateIE.jsp" %>
 
 <script type="text/javascript">
-
+var sessionId = $("#token").val(); 
+var bph_Exist_OrgName; 
+var m_checkedNodes_id ="" ;
+var m_policeGroup_Org = {
+	id:$("#organId").val(),
+	orgCode: "",
+	orgPath :$("#organPath").val(),
+	groupId : 0,
+	sourceType:"Police"
+};
 	$(function() {
 		//获取树的所有信息
 		$.ajax({
-			url : "orgTest/treelist.do",
+			url : "<%=basePath%>organWeb/treelist.do?sessionId="+sessionId,
 			type : "POST",
 			dataType : "json",
-			data : {
-				orgId : m_policeGroup_Org.id,
-				orgCode : m_policeGroup_Org.code,
-				orgPath : m_policeGroup_Org.path
-			},
+			data : m_policeGroup_Org,
 			// async : false,
 			success : function(req) {
 				if (req.code==200) {
@@ -52,6 +49,8 @@
 				}
 			}
 		});
+		$("#radio_unshared").attr("checked","checked");
+		$("#divOrg").css("visibility", "hidden");
 	});
 	
 	var PoliceGroupManage = {
@@ -106,57 +105,41 @@
 			}
 			// pg.name = $('#txtPoliceGroupName').val();
 			var groupName = $.trim($("#txtPoliceGroupName").val());
-			if (groupName == "" && groupName == undefined) {
-				alert("操作提示，请填写分组名称", "error");
-				$("#txtPoliceGroupName").focus();
-				return;
-			}
-
-			if (groupName.length > 20) {
-				alert("错误提示, 分组名称长度过长，限制长度1-20！", "error");
-				$("#txtPoliceGroupName").focus();
-				return;
-			}
-			var myReg = /^[^|"'<>]*$/;
-			if (!myReg.test(groupName)) {
-				alert("错误提示, 分组名称含有非法字符！", "error");
-				$("#txtPoliceGroupName").focus();
-				return;
-			}
-			if (opteType == "add") {
-				PoliceGroupManage.isExistGroup(groupName, m_policeGroup_Org.id);
-				if (!isExist) {
-					alert("错误提示, 该分组名称已存在，请重新填写分组名称", "error");
-					$("#txtPoliceGroupName").focus();
+				if (groupName == "" && groupName == undefined) { 
+					$("body").popjs({"title":"提示","content":"请填写分组名称","callback":function(){
+								$("#txtPoliceGroupName").focus();
+								return;
+							}});     
 					return;
 				}
-			}
+
+				if (groupName.length > 20) {
+					$("body").popjs({"title":"提示","content":"分组名称长度过长","callback":function(){
+								$("#txtPoliceGroupName").focus();
+								return;
+							}});      
+						return;  
+				}   
 			pg.name = groupName;
 			pg.shareType = $('input:radio[name="shareType"]:checked').val();
-
-			var s = m_checkedNodes_id;
-
-			if (m_checkedNodes_id.length > 0) {
-				pg.shareOrgIds = m_checkedNodes_id.split(",");
-			}
-			/**
-			 * 强制选择根节点！
-			 */
-			/* var node = $('#treeOrg').tree('find', m_policeGroup_Org.id);
-			$('#treeOrg').tree('check', node.target); */
-
-			//var treeview = $("#treeOrg").data("kendoTreeView");
-			//var nodes = treeview.bind("check", tree_check);
-			//var nodes = $('#treeOrg').tree('getChecked');
-			/* var count = nodes.length;
-
-			for ( var i = 0; i < count; i++) {
-				var n = nodes[i];
-				pg.shareOrgIds.push(n.id);
-			} */
-
+ 
+				pg.shareType = $('input:radio[name="shareType"]:checked').val();
+				if(pg.shareType==""||pg.shareType ==undefined){
+					$("body").popjs({"title":"提示","content":"请选择共享类型"});
+					return;
+				}
+				var s = m_checkedNodes_id;
+				if(pg.shareType ==0||pg.shareType=="0"){
+					
+					var shOrgId =  m_policeGroup_Org.id;
+					pg.shareOrgIds.push(shOrgId);
+				}else{
+					if (m_checkedNodes_id.length > 0) {
+						pg.shareOrgIds = m_checkedNodes_id.split(",");
+					} 
+				}
 			$.ajax({
-				url : "policeGroup/savePoliceGroup.do",
+				url : "<%=basePath%>policeGroupWeb/savePoliceGroup.do?sessionId="+sessionId,
 				type : "POST",
 				dataType : "json",
 				data : {
@@ -164,76 +147,87 @@
 				},
 				async : false,
 				success : function(req) {
-					if (req.isSuccess) {
-						/* $("#dtPoliceGroup").datagrid('reload');
-						$('#txtPoliceGroupId').val(req.id);// 回写保存后的id
-
-						$('#winPG').window('close'); */
-						alert('提示, 保存成功!');
-						$("#winPG").data("kendoWindow").close();
-						PoliceGroupManage
-								.bindDtGroup("policeGroupTest/list.do");
-					} else {
-						alert("提示, " + req.msg + ", warning");
-					}
+					if (req.code == 200) { 
+							 $("body").popjs({"title":"提示","content":"分组信息保存成功","callback":function(){ 
+								window.parent.window.parent.PolicegroupManage.onCloseGroup();
+								window.parent.$("#dialog").tyWindow.close();
+							}}); 
+						} else {
+							$("body").popjs({"title":"提示","content":"分组信息保存失败"});
+						}
 				}
 			});
 		},
-		//查询组名（验证组名是否存在）
-		isExistGroup:function(name, orgId) {
-			isExist = false;
-			$.ajax({
-				url : "policeGroup/isExistGroup.do",
-				type : "POST",
-				dataType : "json",
-				async : false,
-				data : {
-					"name" : name,
-					"orgId" : orgId
-				},
-				success : function(req) {
-					if (req.isSuccess && req.Message == "UnExits") {
-						isExist = true;
-					}
+			isExistGroup : function() {
+				isExist = false;
+				var name =  $.trim($("#txtPoliceGroupName").val());
+				var myReg = /^[^|"'<>]*$/;
+				if (!myReg.test(name)) {
+					$("body").popjs({"title":"提示","content":"分组名称包含特殊字符，请重新输入"}); 
+					$("#txtPoliceGroupName").focus();
+					return;
+				}  
+				if(name.length>0){
+					$.ajax({
+						url : "<%=basePath%>policeGroupWeb/isExistGroup.do?sessionId="+sessionId,
+						type : "POST",
+						dataType : "json",
+						async : false,
+						data : {
+							"name" : name,
+							"orgId" : $("#organId").val(),
+							"groupId" :0,
+							"optType":0
+						},
+						success : function(req) {
+							if (req.code!=200) {  
+									bph_Exist_OrgName = req.description;
+									$("body").popjs({"title":"提示","content":"该分组名称当前机构下已存在，请确认后添加","callback":function(){
+									$("#txtPoliceGroupName").focus(); 
+									return;
+							}});    
+							return;
+							
+							}
+						}
+					});
 				}
-			});
-		}
+			}
 	};
 </script>
 </head>
 
 <body>
 	<!-- <div id="vertical" style="overflow-x:hidden;"> -->
-		<div id="winPG" style="width:330px;height:320px;" title="警员分组管理">
-			<div class="pane-content">
+		<div id="winPG" style="width:560px;height:320px;" title="警员分组管理">
+			<div style="float:left;width:250px;margin-top:10px;">
 				<!-- 左开始 -->
 				<div class="demo-section k-header"> 
 					<input type="hidden" id="txtPoliceGroupId"></input>
 					<ul>
 						<li class="ty-input"><label class="ty-input-label" for="txtPoliceGroupName">组名称:</label><input
-							type="text" class="k-textbox" name="txtPoliceGroupName"
+							type="text" class="k-textbox" name="txtPoliceGroupName"  onblur="PoliceGroupManage.isExistGroup();"
 							id="txtPoliceGroupName" /></li>
-						<li class="ty-input"><label class="ty-input-label" for="shareType">共享类型:</label>
-							<label><input type="radio" class="k-textbox" name="shareType" value="0"
+						<li class="ty-input"><label>共享类型:</label>
+							<label><input id="radio_unshared" type="radio" name="shareType" value="0"
 							onclick="PoliceGroupManage.changeShareType()" id="radioShare1" />不共享</label>
-							<label><input type="radio" class="k-textbox" name="shareType" value="1"
+							<label><input id="radio_shared"  type="radio" name="shareType" value="1"
 							onclick="PoliceGroupManage.changeShareType()" id="radioShare2" />共享到下级</label>
-							</li>
-						<li class="ty-input">
-							<div class="groupwindowdiv">
-								<div id="divOrg">
-									<ul id="treeOrg" style="overflow:auto"></ul>
-								</div>
-							</div>
-						</li>
+							</li> 
 						
 					</ul>
-					<p style="float:left;width:100%;margin-top:10px;">
+					</div>
+					<p style="float:left;width:250px;margin-top:10px;">
 						<span class="k-button"  onclick="PoliceGroupManage.savePoliceGroup()">保存</span>
 					</p>
-				</div>
-			</div>
-		<!-- </div> -->
+				
+			</div> 
+			
+							<div style="width:300px; float:left">
+								<div id="divOrg" style="height:450px; overflow:auto" >
+									<ul id="treeOrg" style="overflow:auto"></ul>
+								</div>
+							</div> 
 	</div>
 </body>
 </html>

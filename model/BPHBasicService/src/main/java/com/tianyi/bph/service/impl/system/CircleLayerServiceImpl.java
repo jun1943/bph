@@ -4,10 +4,13 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.tianyi.bph.common.ReturnResult;
 import com.tianyi.bph.dao.system.CircleLayerDao;
+import com.tianyi.bph.dao.system.TCardPointMapper;
 import com.tianyi.bph.domain.system.CircleLayer;
+import com.tianyi.bph.exception.RestException;
 import com.tianyi.bph.service.system.CircleLayerService;
 
 /**
@@ -17,9 +20,11 @@ import com.tianyi.bph.service.system.CircleLayerService;
  *
  */
 @Service
+@Transactional
 public class CircleLayerServiceImpl implements CircleLayerService {
 
 	@Autowired CircleLayerDao circleLayerDao;
+	@Autowired private TCardPointMapper cardPointDao;
 	
 	@Override
 	public int addCircleLayer(CircleLayer circleLayer) {
@@ -28,6 +33,11 @@ public class CircleLayerServiceImpl implements CircleLayerService {
 
 	@Override
 	public int deleteCircleLayer(Integer id) {
+		
+		int i=cardPointDao.countCardPointByCircleLayerId(id);
+		if(i>0){
+			throw new RestException("该圈层下存在卡点,删除失败！");
+		}
 		return circleLayerDao.deleteByPrimaryKey(id);
 	}
 

@@ -56,7 +56,7 @@ public class DutyReportController {
 			organ = organService.getOrganByPrimaryKey(organId);
 		}
 		
-		mv.addObject("num","200");
+		mv.addObject("num","300");
 		mv.addObject("organ", organ);
 		return mv;
 	}

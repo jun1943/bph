@@ -24,6 +24,7 @@ import com.tianyi.bph.common.SystemConfig;
 import com.tianyi.bph.domain.system.Module;
 import com.tianyi.bph.domain.system.Role;
 import com.tianyi.bph.domain.system.RoleModuleFuctionKey;
+import com.tianyi.bph.domain.system.User;
 import com.tianyi.bph.query.system.ModuleQuery;
 import com.tianyi.bph.query.system.RoleQuery;
 import com.tianyi.bph.service.system.ModuleService;
@@ -59,7 +60,7 @@ public class RoleController {
 			@RequestParam(value="nameSort",required=false,defaultValue="0")Integer nameSort, 
 			@RequestParam(value="sessionId",required=false)String sessionId, 
 			@RequestParam(value="timeSort",required=false,defaultValue="0")Integer timeSort, 
-			@RequestParam(value="pageSize",required=false,defaultValue="9999")Integer pageSize,
+			@RequestParam(value="pageSize",required=false,defaultValue="10")Integer pageSize,
 			@RequestParam(value="pageNo",required=false,defaultValue="1")Integer pageNo,
 			HttpServletRequest request){
 		ModelAndView mv=new ModelAndView("/base/role/roleList.jsp");
@@ -69,6 +70,9 @@ public class RoleController {
 		query.setPageSize(pageSize);
 		query.setNameSort(nameSort);
 		query.setTimeSort(timeSort);
+		
+		User user=(User) request.getAttribute("User");
+		query.setUserId(user.getUserId());
 		Pager<Role> roleList=roleService.getPageList(query);
 		if(!StringUtils.isEmpty(sessionId)){
 			request.getSession().setAttribute("sessionId", sessionId);
@@ -90,18 +94,22 @@ public class RoleController {
 	 */
 	@RequestMapping({"/getRoleList.do","/getRoleList.action"})
 	@ResponseBody
-	public PageReturn getRoleList(@RequestParam(value="name",required=false)String name,
+	public PageReturn getRoleList(HttpServletRequest request,
+			@RequestParam(value="name",required=false)String name,
 			@RequestParam(value="nameSort",required=false,defaultValue="0")Integer nameSort, 
 			@RequestParam(value="timeSort",required=false,defaultValue="0")Integer timeSort, 
 			@RequestParam(value="pageSize",required=false,defaultValue="10")Integer pageSize,
-			@RequestParam(value="pageNo",required=false,defaultValue="1")Integer pageNo){
+			@RequestParam(value="pageNo",required=false,defaultValue="1")Integer pageNo
+			){
 		RoleQuery query=new RoleQuery();
+		User user=(User)request.getAttribute("User");
+		
 		int totalRows = 0;
 		if(!StringUtils.isEmpty(name)){query.setName(name);}
 		query.setPageNo(pageNo);
 		query.setPageSize(pageSize);
-		query.setNameSort(nameSort);
-		query.setTimeSort(timeSort);
+		query.setUserId(user.getUserId());
+		
 		Pager<Role> roleList=roleService.getPageList(query);
 		totalRows=roleList.getTotalRows();
 		return PageReturn.MESSAGE(MessageCode.STATUS_SUCESS,"查詢成功",totalRows,roleList);
@@ -177,7 +185,7 @@ public class RoleController {
 	 */
 	@RequestMapping(value="/insertRole.do")
 	@ResponseBody
-	public ReturnResult insertRole(
+	public ReturnResult insertRole(HttpServletRequest request,
 		@RequestParam(value="roleName",required=true) String roleName,
 		@RequestParam(value="roleNote",required=false) String roleNote,
 		@RequestParam(value="modulesId",required=false) String modulesId
@@ -193,6 +201,8 @@ public class RoleController {
 				String[] strr=modulesId.split(",");
 				midList = (Arrays.asList(strr));
 			}
+			User user=(User) request.getAttribute("User");
+			role.setUserId(user.getUserId());
 			role.setModuleIds(midList);
 			int i=roleService.addRole(role);
 			if(i==0){
@@ -269,9 +279,14 @@ public class RoleController {
 	 */
 	@RequestMapping(value="/delete.do")
 	@ResponseBody
-	public ReturnResult delete(@RequestParam(value="roleId",required=true)String roleId){
+	public ReturnResult delete(HttpServletRequest request,
+			@RequestParam(value="roleId",required=true)String roleId){
 		try{
-			int i=roleService.deleteRole(Integer.parseInt(roleId));
+			User user=(User) request.getAttribute("User");
+			Role role=new Role();
+			role.setId(Integer.parseInt(roleId));
+			role.setUserId(user.getUserId());
+			int i=roleService.deleteRole(role);
 			if(i==0){
 				return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL,"删除失败,该角色还有绑定用户");
 			}

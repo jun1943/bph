@@ -13,7 +13,7 @@
 <html>
 <head>
 <title>扁平化指挥系统</title>
-<%@ include file="../../emulateIE.jsp" %>	
+<%@ include file="../../../emulateIE.jsp" %>	
 <meta
 	content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no'
 	name='viewport' />
@@ -25,7 +25,7 @@
 		<div id='main-nav-bg'></div>
 		<nav class="" id="main-nav">
 			<div class='navigation'>
-				<%@ include file="../../left.jsp"%>
+				<%@ include file="../../../left.jsp"%>
 			</div>
 		</nav>
 		<section id='content'>

@@ -27,6 +27,7 @@ public class OrgWithPoliceVM {
 	
 
 	private int ReportsTo;
+	private String orgName;
 
 	public Boolean getIsOrg() {
 		return dataType==1;
@@ -82,6 +83,12 @@ public class OrgWithPoliceVM {
 	}
 	public void setReportsTo(int reportsTo) {
 		ReportsTo = reportsTo;
+	}
+	public String getOrgName() {
+		return orgName;
+	}
+	public void setOrgName(String orgName) {
+		this.orgName = orgName;
 	}
 	
 }

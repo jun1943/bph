@@ -120,6 +120,9 @@
    
          <select id="findByNameAndOrg" resultType="com.tianyi.bph.domain.duty.PoliceGroup" parameterType="java.util.Map">  
        		select * from t_duty_police_group where name = #{name} and org_id = #{orgId}
+       		<if test="optType >0 ">
+       			and id != #{groupId,jdbcType=INTEGER}
+       		</if>
     	 </select> 
     	 
   <select id ="countByOrgId" parameterType="java.util.Map" resultType="java.lang.Integer">
@@ -148,7 +151,7 @@
 		org.path 			as 	orgPath
   	from 
   		t_duty_police_group as g
-  		left join t_organ as org on g.org_id=org.id
+  		left join t_organ as org on g.org_id=org.organ_id
   	where
 		g.org_id=#{orgId,jdbcType=INTEGER}
   	
@@ -174,7 +177,7 @@ select distinct	g.id,
 		org.path 			as 	orgPath
  		from t_duty_police_group g 
 			left join t_duty_police_group_org  pgo on g.id = pgo.police_group_id 
-			left join t_organ org on g.org_id = org.id
+			left join t_organ org on g.org_id = org.organ_id
   	where
 		pgo.org_id=#{orgId,jdbcType=INTEGER}
   	 

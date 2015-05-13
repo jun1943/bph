@@ -27,6 +27,7 @@ import com.tianyi.bph.domain.basicdata.IntercomGroup;
 import com.tianyi.bph.domain.basicdata.Vehicle;
 import com.tianyi.bph.domain.basicdata.VehicleType;
 import com.tianyi.bph.domain.system.Organ;
+import com.tianyi.bph.domain.system.User;
 import com.tianyi.bph.query.basicdata.GpsBaseVM;
 import com.tianyi.bph.query.basicdata.VehicleVM;
 import com.tianyi.bph.query.system.UserQuery;
@@ -59,11 +60,15 @@ public class VehicleController {
 	public ModelAndView gotoVehicleList(
 			HttpServletRequest request,
 			@RequestParam(value = "vehicleNumber", required = false) String number,
-			@RequestParam(value = "organId", required = true, defaultValue = "1") Integer organId,
+			@RequestParam(value = "organId", required = false) Integer organId,
 			@RequestParam(value = "searchType", required = true, defaultValue = "1") Integer searchType,
 			@RequestParam(value = "pageSize", required = false, defaultValue = "10") Integer pageSize,
 			@RequestParam(value = "pageNo", required = false, defaultValue = "1") Integer pageNo) {
 		UserQuery query = new UserQuery();
+		User user = (User) request.getAttribute("User");
+		if (organId == null) {
+			organId = user.getOrgId();
+		}
 		if (!StringUtils.isEmpty(number)) {
 			query.setUserName(number);
 		}
@@ -168,6 +173,7 @@ public class VehicleController {
 		try {
 			JSONObject joQuery = JSONObject.fromObject(vehicle_Query);
 			int orgId = Integer.parseInt(joQuery.getString("orgId"));
+			
 			int isSubOrg = Integer.parseInt(joQuery.getString("isSubOrg"));
 			String number = joQuery.getString("number");
 			String orgPath = joQuery.getString("orgPath");

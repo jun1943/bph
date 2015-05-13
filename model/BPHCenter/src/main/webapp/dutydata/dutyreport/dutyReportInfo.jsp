@@ -109,11 +109,19 @@
 			var t2=$('#spnEndTime').data("kendoTimePicker").value();
 			
 			
-			beginDate.setTime(t1.getTime());
-			endDate.setTime(t2.getTime());
+			//beginDate.setTime(t1.getTime());
+			//endDate.setTime(t2.getTime());
 		
-			criteria.beginTime=beginDate.toSimpleString();
-			criteria.endTime=endDate.toSimpleString();
+			criteria.beginTime=beginDate.getFullYear()+ "-"
+								+ ((beginDate.getMonth() + 1) > 10 ? (beginDate.getMonth() + 1) : "0" + (beginDate.getMonth() + 1))+ "-" 
+								+ (beginDate.getDate() < 10 ? "0" + beginDate.getDate() : beginDate.getDate()) + " "
+								+ (t1.getHours() < 10 ? "0" + t1.getHours() : t1.getHours())+":"
+								+ (t1.getMinutes() < 10 ? "0" + t1.getMinutes() : t1.getMinutes())+":00";
+			criteria.endTime=endDate.getFullYear()+ "-"
+								+ ((endDate.getMonth() + 1) > 10 ? (endDate.getMonth() + 1) : "0" + (endDate.getMonth() + 1))+ "-" 
+								+ (endDate.getDate() < 10 ? "0" + endDate.getDate() : endDate.getDate()) + " "
+								+ (t2.getHours() < 10 ? "0" + t2.getHours() : t2.getHours())+":"
+								+ (t2.getMinutes() < 10 ? "0" + t2.getMinutes() : t2.getMinutes())+":00";
 		
 			criteria.taskPropertyIds = [];
 			criteria.taskPropertyIds.push($("#dutyProperty").data("kendoComboBox").value());

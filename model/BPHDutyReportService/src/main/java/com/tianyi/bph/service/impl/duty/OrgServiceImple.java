@@ -14,6 +14,7 @@ import com.tianyi.bph.query.duty.OrgWithGpsVM;
 import com.tianyi.bph.query.duty.OrgWithPoliceVM;
 import com.tianyi.bph.query.duty.OrgWithVehicleVM;
 import com.tianyi.bph.query.duty.OrgWithWeaponVM;
+import com.tianyi.bph.query.duty.OrganGroupVM;
 import com.tianyi.bph.service.duty.OrgService;
  
 /**
@@ -78,6 +79,26 @@ public class OrgServiceImple implements OrgService {
 		// TODO Auto-generated method stub
 		return orgMapper.selectByPrimaryKey(qid);
 	}
+ 
+	public List<OrganGroupVM> loadOrgVehicleGroupVMList(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return orgMapper.loadOrgVehicleGroupVMList(map);
+	}
+	 
+		public List<OrganGroupVM> loadOrgPoliceGroupVMList(Map<String, Object> map) {
+			// TODO Auto-generated method stub
+			return orgMapper.loadOrgPoliceGroupVMList(map);
+		}
+		 
+		public List<OrganGroupVM> loadOrgWeaponGroupVMList(Map<String, Object> map) {
+			// TODO Auto-generated method stub
+			return orgMapper.loadOrgWeaponGroupVMList(map);
+		}
+
+		public List<OrganGroupVM> loadOrgGpsGroupVMList(Map<String, Object> map) {
+			// TODO Auto-generated method stub
+			return orgMapper.loadOrgGpsGroupVMList(map);
+		}
 
 
 

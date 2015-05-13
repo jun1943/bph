@@ -143,5 +143,28 @@
   </select>
   
     
+  <select id="getTaskTargetInfo"   parameterType="java.util.Map"   resultType="com.tianyi.bph.query.duty.TaskTargetVM">
+  	select 
+  			pt.task_type_id as targetType,
+  			pt.target_id    as targetId,
+  			''              as name,
+  			''              as areaName,
+  			pt.pass_count   as count ,
+  			pt.stay_time    as stayTime	  	
+  	 from t_duty_police_target as pt 
+  	where 1=1 
+  		<if test="dutyId != null">
+  			and pt.duty_id = (select di.duty_id from t_duty_item  di where di.id = #{dutyId,jdbcType=INTEGER}  ) 
+  		</if>
+  		<if test="policeId != null">
+  			and pt.police_id =  #{policeId,jdbcType=INTEGER}
+  		</if>
+  		<if test="taskTypeId != null">
+  			and pt.task_type_id =   #{taskTypeId,jdbcType=INTEGER}
+  		</if>
+  		<if test="targetId != null">
+  			and pt.target_id =   #{targetId,jdbcType=INTEGER}
+  		</if>
+  </select>
   
 </mapper>

@@ -18,6 +18,11 @@ public class GroupManager {
 
     private Integer shareType;
     
+    private String sourceData;
+    
+    private Integer areaType;
+    
+    private String areaContent;
     private String jsonData;
     
     private Integer listId;
@@ -29,6 +34,42 @@ public class GroupManager {
 	public void setListId(Integer listId) {
 		this.listId = listId;
 	}
+    
+
+	public String getSourceData() {
+		return sourceData;
+	}
+
+	public void setSourceData(String sourceData) {
+		this.sourceData = sourceData;
+	}
+
+	public Integer getAreaType() {
+		return areaType;
+	}
+
+	public void setAreaType(Integer areaType) {
+		this.areaType = areaType;
+	}
+
+	public String getAreaContent() {
+		return areaContent;
+	}
+
+	public void setAreaContent(String areaContent) {
+		this.areaContent = areaContent;
+	}
+
+	private Integer sourceId;
+    
+
+	public Integer getSourceId() {
+		return sourceId;
+	}
+
+	public void setSourceId(Integer sourceId) {
+		this.sourceId = sourceId;
+	}
 
 	public List<GroupOther> getGroupOther() {
 		return groupOther;
@@ -39,13 +80,24 @@ public class GroupManager {
 	}
 
 	private List<GroupOther> groupOther;
-
-    public String getJsonData() {
+	public String getJsonData() {
 		return jsonData;
 	}
 
 	public void setJsonData(String jsonData) {
 		this.jsonData = jsonData;
+	}
+	
+	private AreaGroup areaGroup;
+
+	
+
+	public AreaGroup getAreaGroup() {
+		return areaGroup;
+	}
+
+	public void setAreaGroup(AreaGroup areaGroup) {
+		this.areaGroup = areaGroup;
 	}
 
 	public Integer getGroupId() {

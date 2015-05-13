@@ -116,30 +116,7 @@ var sessionId = $("#token").val();
 						$("body").popjs({"title":"提示","content":"请选择定位设备类型!"}); 
 					return;
 				}
-				 
-				var pnumber = $.trim($("#gpsNumber").val()); 
-				if(pnumber.length>0){
-					if (pnumber.length > 20) {
-						$("body").popjs({"title":"提示","content":"定位设备编号长度出错，限制长度为0--20！","callback":function(){
-								$("#gpsNumber").focus();
-							}});  
-						return;
-					}
-					GpsAddManage.isExistGps(pnumber,0,0);
-					if (!isExist) {
-						$("body").popjs({"title":"提示","content":"该设备编号在"+bph_Exist_OrgName+"机构下已经存在，请确认之后添加","callback":function(){
-								$("#gpsNumber").focus();
-							}});   
-						return;
-					}
-				}else{ 
-					$("body").popjs({"title":"提示","content":"请录入定位设备编号！","callback":function(){
-								$("#gpsNumber").focus();
-							}});  
-					return;
-				}
-				bph_gpsAdd_pkg.number= pnumber;
-				var gname= $.trim($("#gpsName").val());
+				 	var gname= $.trim($("#gpsName").val());
 				if(gname.length>0){
 					if (gname.length > 20) {
 					$("body").popjs({"title":"提示","content":"定位设备名称长度过长，限制长度为20！","callback":function(){
@@ -155,6 +132,29 @@ var sessionId = $("#token").val();
 				}
 				bph_gpsAdd_pkg.gpsName = gname; 
 				
+				var pnumber = $.trim($("#gpsNumber").val()); 
+				if(pnumber.length>0){
+					if (pnumber.length > 20) {
+						$("body").popjs({"title":"提示","content":"定位设备编号长度出错，限制长度为0--20！","callback":function(){
+								$("#gpsNumber").focus();
+							}});  
+						return;
+					}
+					//GpsAddManage.isExistGps(pnumber,0,0);
+					//if (!isExist) {
+					//	$("body").popjs({"title":"提示","content":"该设备编号在"+bph_Exist_OrgName+"机构下已经存在，请确认之后添加","callback":function(){
+					//			$("#gpsNumber").focus();
+					//		}});   
+					//	return;
+					//}
+				}else{ 
+					$("body").popjs({"title":"提示","content":"请录入定位设备编号！","callback":function(){
+								$("#gpsNumber").focus();
+							}});  
+					return;
+				}
+				bph_gpsAdd_pkg.number= pnumber;
+			
 				
 				GpsAddManage.isComplete = true;
 			},
@@ -199,6 +199,36 @@ var sessionId = $("#token").val();
 					}
 				});
 			},
+
+			// 判断警员是否存在
+			isExistNumber:function() { 
+			var pnumber = $.trim($("#gpsNumber").val()); 
+			if(pnumber.length>0){
+		 	
+				$.ajax({
+					url : "<%=basePath%>gpsWeb/isExistGps.do?sessionId="+sessionId,
+					type : "POST",
+					dataType : "json",
+					async : false,
+					data : {
+						"param" : pnumber,
+						"type"  : 0,
+						"id"    : 0
+					},
+					success : function(req) {
+					if (req.code!=200) {  
+						bph_Exist_OrgName = req.description; 
+						$("body").popjs({"title":"提示","content":"该定位设备编号在"+bph_Exist_OrgName+"机构下已存在，请确认后添加","callback":function(){
+								$("#gpsNumber").focus(); 
+								return;
+							}});   
+						return; 
+						
+					}
+					}
+				});
+				}
+			},
 			clearAddForm:function(){
 				$("#gpsName").val("");
 				$("#gpsNumber").val(""); 
@@ -207,7 +237,7 @@ var sessionId = $("#token").val();
 </script>
 </head>
 
-<body>
+<body  class="ty-body">
 	<div id="vertical">
 		<div id="horizontal">
 			<div class="pane-content">
@@ -225,9 +255,9 @@ var sessionId = $("#token").val();
 										class="k-textbox" name="gpsName" id="gpsName"
 										required="required" /></li>
 									<li style="padding:5px;"><span class="ty-input-warn">*</span><label for="gpsNumber" class="fl mr5">GPS编号:</label><input
-										type="text" class="k-textbox" name="gpsNumber"
+										type="text" class="k-textbox" name="gpsNumber"  onblur="GpsAddManage.isExistNumber()" 
 										id="gpsNumber" /></li>
-									<li style="padding:5px;"><label for="gpsIcons" class="fl mr5">GPS图标:</label><input
+									<li style="padding:5px;"><span class="ty-input-warn"></span><label for="gpsIcons" class="fl mr5">GPS图标:</label><input
 										id="gpsIcons" placeholder="请选择对应图标..."  /></li>
 								</ul> 
 					 		</td>
@@ -237,9 +267,9 @@ var sessionId = $("#token").val();
 					 	</tr>
 					 </table>
 					
-					<p style="padding:5px;">
+					<p class="ty-input-row">
 						<!--<span class="k-button"  onclick="GpsAddManage.saveGpsNotOut()">保存并继续</span>-->
-						<span class="k-button"  onclick="GpsAddManage.saveGpsWithOut()">保存</span>
+						<button class="ty-button"  onclick="GpsAddManage.saveGpsWithOut()">保存</button>
 					</p>
 
 

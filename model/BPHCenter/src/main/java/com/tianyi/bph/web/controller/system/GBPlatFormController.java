@@ -1,13 +1,17 @@
 package com.tianyi.bph.web.controller.system;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import net.sf.json.JSONArray;
+
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -56,7 +60,7 @@ public class GBPlatFormController {
 	 * @param organId
 	 * @return
 	 */
-	@RequestMapping({"/toGBPlatForm.action","/toGBPlatForm.do"})
+	@RequestMapping({ "/toGBPlatForm.action", "/toGBPlatForm.do" })
 	public ModelAndView toGBPlatForm(HttpServletRequest request,
 			HttpSession session,
 			@RequestParam(value = "organId", required = false) Integer organId) {
@@ -67,7 +71,7 @@ public class GBPlatFormController {
 		if (organId != null && organId != 0) {
 			view.addObject("organId", organId);
 		}
-		view.addObject("num",SystemConfig.BASE_MANAGER);
+		view.addObject("num", SystemConfig.BASE_MANAGER);
 		return view;
 	}
 
@@ -129,44 +133,85 @@ public class GBPlatFormController {
 		request.setAttribute("organId", organId);
 		return ReturnResult.SUCCESS();
 	}
-	//
-	// public static void main(String[] args) {
-	// List<Node> nodes = new ArrayList<Node>();
-	// Node node11 = new Node();
-	// node11.setId(2);
-	// node11.setText("四川成都");
-	// node11.setExpanded(true);
-	// node11.setParentId(1);
-	// nodes.add(node11);
-	//
-	// Node node111 = new Node();
-	// node111.setId(3);
-	// node111.setText("四川德阳");
-	// node111.setParentId(1);
-	// nodes.add(node111);
-	//
-	// Node node2 = new Node();
-	// node2.setId(5);
-	// node2.setText("index.html");
-	// node2.setParentId(3);
-	// node2.setExpanded(true);
-	// nodes.add(node2);
-	//
-	// Node node1 = new Node();
-	// node1.setId(1);
-	// node1.setText("四川");
-	// node1.setParentId(null);
-	// nodes.add(node1);
-	//
-	// Node node12 = new Node();
-	// node12.setId(4);
-	// node12.setText("四川成都金牛");
-	// node12.setParentId(2);
-	// nodes.add(node12);
-	// Tree tree = new Tree(nodes);
-	//
-	// // JSONObject ob=new JSONObject();
-	// // ob.put("data", tree.buildTree());
-	// System.out.println(JSONObject.fromObject(tree).toString());
-	// }
+
+	@RequestMapping("/searchGBOrganList.do")
+	@ResponseBody
+	public ReturnResult searchGBOrganList(HttpServletRequest request,
+			@RequestParam(value = "organId", required = true) Integer organId,
+			@RequestParam(value = "gbOrganName") String gbOrganName) {
+		try {
+			GBOrgan organ = service.getOrganTree(organId);
+			if (StringUtils.hasLength(gbOrganName)) {
+				process(organ.getItems(), gbOrganName);
+			}
+			return ReturnResult.SUCCESS(organ);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ReturnResult.FAILUER(e.getMessage());
+		}
+	}
+
+	private void process(final List<GBOrgan> list, String name) {
+		Iterator<GBOrgan> it = list.listIterator();
+		while (it.hasNext()) {
+			GBOrgan organ = it.next();
+			if (organ.getItems() != null) {
+				process(organ.getItems(), name);
+			}
+			if (!organ.getName().contains(name)
+					&& (organ.getItems() == null || organ.getItems().size() == 0)) {
+				it.remove();
+			}
+		}
+	}
+
+	@RequestMapping("/getGBOrganListByOrganId.do")
+	@ResponseBody
+	public ReturnResult getGBOrganListByOrganId(HttpServletRequest request,
+			@RequestParam(value = "organId", required = true) Integer organId) {
+		try {
+			GBOrgan organ = service.getOrganTree(organId);
+			processByChecked(organ.getItems());
+			return ReturnResult.SUCCESS(organ);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ReturnResult.FAILUER(e.getMessage());
+		}
+	}
+
+	private void processByChecked(final List<GBOrgan> list) {
+		Iterator<GBOrgan> it = list.listIterator();
+		while (it.hasNext()) {
+			GBOrgan organ = it.next();
+			organ.setExpanded(false);
+			if (organ.getItems() != null) {
+				processByChecked(organ.getItems());
+			}
+			if (!organ.isChecked()
+					&& (organ.getItems() == null || organ.getItems().size() == 0)) {
+				it.remove();
+			}
+		}
+	}
+
+	@RequestMapping(value = "/lazyGBOrganList.do", produces = "application/json;charset=UTF-8")
+	@ResponseBody
+	public String lazyGBOrganList(
+			@RequestParam(value = "organId", required = true) Integer organId,
+			@RequestParam(value = "parentId", required = false) Integer parentId,
+			@RequestParam(value = "id", required = false) Integer hybrid_id,
+			HttpServletRequest request) {
+		List<GBOrgan> list = null;
+		try {
+			if (hybrid_id != null) {
+				list = service.loadGbOrgan(organId, hybrid_id);
+			} else {
+				list = service.loadGbOrgan(organId, parentId);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return JSONArray.fromObject(list).toString();
+	}
+
 }

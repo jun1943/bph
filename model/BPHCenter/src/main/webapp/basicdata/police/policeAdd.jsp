@@ -34,8 +34,7 @@ $(function() {
 				}
 			}
 		},
-		filter : "contains",
-		suggest : true 
+		filter : "contains"
 	}).prev().find(".k-input").attr("readonly",true);
 	$("#policegroupno").kendoComboBox({
 		dataTextField : "name",
@@ -49,8 +48,7 @@ $(function() {
 				}
 			}
 		},
-		filter : "contains",
-		suggest : true 
+		filter : "contains"
 	}).prev().find(".k-input").attr("readonly",true);
 	$("#policegpsname").kendoComboBox({
 		dataTextField : "name",
@@ -66,8 +64,6 @@ $(function() {
 			}
 		},
 		filter : "contains",
-		suggest : true ,
-
         select: policeAddManage.onSelectGps 
 	}).prev().find(".k-input").attr("readonly",true);
 });
@@ -169,14 +165,12 @@ var policeAddManage= {
 						return;
 					}
 				} 
-				policeAddManage.isExistPolice(idcardno, "idCard",0,0);
-				if (!isExist) {
-					isExist = false;  
-					$("body").popjs({"title":"提示","content":"该身份证号在"+bph_Exist_OrgName+"机构下已存在，请确认后添加","callback":function(){
-								$("#policeidcardno").focus(); 
-							}});    
-					return;
-				}
+				
+			}else{
+				$("body").popjs({"title":"提示","content":"警员身份证号不能为空","callback":function(){
+					$("#policeidcardno").focus();
+				}});  
+				return;
 			}
 			bph_policeAdd_pkg.idcardno =idcardno;
 			var pnumber = $.trim($("#policecode").val());
@@ -196,13 +190,12 @@ var policeAddManage= {
 					
 					return;
 				}
-				policeAddManage.isExistPolice(pnumber, "number",0,0);
-				if (!isExist) { 
-					$("body").popjs({"title":"提示","content":"该警号在 "+bph_Exist_OrgName+" 机构下已存在，请确认后添加","callback":function(){
-								$("#policecode").focus();  
-							}});    
-					return;
-				}
+				
+			}else{
+				$("body").popjs({"title":"提示","content":"警员警号不能为空","callback":function(){
+					$("#policecode").focus();
+				}});  
+				return;
 			}
 			bph_policeAdd_pkg.number= pnumber;
 			 var ptitle= $.trim($("#policetitle").val());
@@ -265,13 +258,7 @@ var policeAddManage= {
 							}});  
 						return;
 				}
-				policeAddManage.isExistPolice(intercomPerson, "intercomPerson",0,0);
-				if (!isExist) { 
-					$("body").popjs({"title":"提示","content":"该对讲机个呼号 "+bph_Exist_OrgName+"机构下已存在，请确认后添加","callback":function(){
-								$("#policepersonno").focus();    
-							}});   
-					return;
-				}
+				
 			}
 			if(intercomPerson.length>30){ 
 				$("body").popjs({"title":"提示","content":"警员对讲机个呼号长度过长，限制长度为0-30","callback":function(){
@@ -325,6 +312,62 @@ var policeAddManage= {
 				}
 			});
 		},
+		isExistIdCard:function(){
+			var idcardno = $.trim($("#policeidcardno").val());
+			if(idcardno.length>0){
+			$.ajax({
+				url : "<%=basePath%>policeWeb/isExistPolice.do?sessionId="+sessionId,
+				type : "POST",
+				dataType : "json",
+				async : false,
+				data : {
+					"param" : idcardno,
+					"paramType" : "idCard",
+					"optType"   : 0,
+					"id"     :   0
+				},
+				success : function(req) {
+					if (req.code!=200) {  
+						bph_Exist_OrgName = req.description;
+						$("body").popjs({"title":"提示","content":"该身份证号在"+bph_Exist_OrgName+"机构下已存在，请确认后添加","callback":function(){
+								$("#policeidcardno").focus(); 
+								return;
+							}});    
+								return;
+					}
+				}
+			});
+			}
+		},
+		isExistNumber:function(){
+			var pnumber = $.trim($("#policecode").val()); 
+			
+			if(pNumber.length>0){
+			$.ajax({
+				url : "<%=basePath%>policeWeb/isExistPolice.do?sessionId="+sessionId,
+				type : "POST",
+				dataType : "json",
+				async : false,
+				data : {
+					"param" : pnumber,
+					"paramType" : "number",
+					"optType"   : 0,
+					"id"     :   0
+				},
+				success : function(req) {
+					if (req.code!=200) {  
+						bph_Exist_OrgName = req.description;
+						$("body").popjs({"title":"提示","content":"该警号号在"+bph_Exist_OrgName+"机构下已存在，请确认后添加","callback":function(){
+								$("#policecode").focus(); 
+								return;
+							}});    
+						return;
+						
+					}
+				}
+			});
+			}
+		},
 		clearAddForm:function(){
 			$("#policename").val("");
 			$("#policeidcardno").val("");
@@ -335,47 +378,47 @@ var policeAddManage= {
 };
 </script>
 </head>
-<body>
+<body class="ty-body">
 	<div id="vertical" style="overflow-x:hidden;">
-		<div id="horizontal" style="height: 300px; width: 590px;">
+		<div id="horizontal" style="height: 300px; width: 610px;">
 			<div class="pane-content">
 				<!-- 左开始 -->
 				<div class="demo-section k-header"> 
 					<ul>
 						<li class="ty-input">
-							<span class="ty-input-warn">*</span><label class="ty-input-label" for="policetype">警员类型:</label><input id="policetype" placeholder="请选择警员类别..."  /><input type="hidden" id="policeId"/><input type="hidden" id="orgId" value="${organ.id}" />
+							<span class="ty-input-warn"></span><label class="ty-input-label" for="policetype" style="width:88px;text-align:right;"><span class="ty-txt-red">*</span>警员类型:</label><input id="policetype" placeholder="请选择警员类别..."  /><input type="hidden" id="policeId"/><input type="hidden" id="orgId" value="${organ.id}" />
 						</li>
 						<li class="ty-input">
 							<span class="ty-input-warn">*</span><label class="ty-input-label" for="policename">警员姓名:</label><input type="text" class="k-textbox" name="policename" id="policename" required="required" />
 						</li>
 						<li class="ty-input">
-							<label class="ty-input-label" for="policeidcardno">身份证号:</label><input type="text" class="k-textbox" name="policeidcardno" id="policeidcardno" />
+							<span class="ty-input-warn"></span><label class="ty-input-label" for="policeidcardno" style="width:88px;text-align:right;"><span class="ty-txt-red">*</span>身份证号:</label><input type="text" class="k-textbox" name="policeidcardno" id="policeidcardno" onblur="policeAddManage.isExistIdCard();" />
 						</li>
 						<li class="ty-input">
-							<label class="ty-input-label" for="policecode">警员警号:</label><input type="text" class="k-textbox" name="policecode" id="policecode" />
+							<span class="ty-input-warn">*</span><label class="ty-input-label" for="policecode">警员警号:</label><input type="text" class="k-textbox" name="policecode" id="policecode" onblur="policeAddManage.isExistNumber();" />
 						</li>
 						<li class="ty-input">
-							<label class="ty-input-label" for="policetitle">警员职务:</label><input type="text" class="k-textbox" name="policetitle" id="policetitle" />
+							<span class="ty-input-warn"></span><label class="ty-input-label" for="policetitle" style="width:88px;text-align:right;">警员职务:</label><input type="text" class="k-textbox" name="policetitle" id="policetitle" />
 						</li>
 						<li class="ty-input">
-							<label class="ty-input-label" for="policephone">手机号码:</label><input type="text" class="k-textbox" name="policephone" id="policephone" />
+							<span class="ty-input-warn"></span><label class="ty-input-label" for="policephone">手机号码:</label><input type="text" class="k-textbox" name="policephone" id="policephone" />
 						</li>
 						<li class="ty-input">
-							<label class="ty-input-label" for="policeshortno">公安短号:</label><input type="text" class="k-textbox" name="policeshortno" id="policeshortno" />
+							<span class="ty-input-warn"></span><label class="ty-input-label" for="policeshortno" style="width:88px;text-align:right;">公安短号:</label><input type="text" class="k-textbox" name="policeshortno" id="policeshortno" />
 						</li>
 						<li class="ty-input">
-							<label class="ty-input-label" for="policegroupno">对讲机组呼号:</label><input id="policegroupno" placeholder="请选择对讲机组呼号..." />
+							<span class="ty-input-warn"></span><label class="ty-input-label" for="policegroupno">对讲机组呼号:</label><input id="policegroupno" placeholder="请选择对讲机组呼号..." />
 						</li>
 						<li class="ty-input">
-							<label class="ty-input-label" for="policepersonno">对讲机个呼号:</label><input type="text" class="k-textbox" name="policepersonno" id="policepersonno" />
+							<span class="ty-input-warn"></span><label class="ty-input-label" for="policepersonno">对讲机个呼号:</label><input type="text" class="k-textbox" name="policepersonno" id="policepersonno" />
 						</li>
 						<li class="ty-input">
-							<label class="ty-input-label" for="policegpsname">GPS显示名称: </label><input id="policegpsname" placeholder="请选择gps名称..." />
+							<span class="ty-input-warn"></span><label class="ty-input-label" for="policegpsname">GPS显示名称: </label><input id="policegpsname"  placeholder="请选择gps名称..." />
 						</li>
 					</ul>
-					<p style="float:left;width:100%;margin-top:10px;">
+					<p class="ty-input-row">
 						<!--<span id="undo" class="k-button" onclick="policeAddManage.savePoliceNotOut()">保存并继续</span>-->
-						<span id="undo" class="k-button" onclick="policeAddManage.savePoliceWithOut()">保存</span>
+						<button id="undo" class="ty-button" onclick="policeAddManage.savePoliceWithOut()">保存</button>
 					</p>
 
 

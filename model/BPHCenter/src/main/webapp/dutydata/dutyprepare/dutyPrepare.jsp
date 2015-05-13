@@ -19,8 +19,8 @@
     <div id="wrapper">
 		<div id='main-nav-bg'></div>
 		<nav class="" id="main-nav">
-			<div class='navigation'>
-				<%@ include file="../../left.jsp"%>
+			<div style="display:none" class='navigation'> 
+				<%@ include file="../../left.jsp"%> 
 			</div>
 		</nav>
 		<section id='content'>

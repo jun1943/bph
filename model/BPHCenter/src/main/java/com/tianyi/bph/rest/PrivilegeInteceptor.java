@@ -12,19 +12,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import net.sf.ehcache.CacheManager;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.tianyi.bph.common.JsonUtils;
 import com.tianyi.bph.common.ReturnResult;
-import com.tianyi.bph.common.ehcache.CacheUtils;
 import com.tianyi.bph.common.utils.DateUtils;
 import com.tianyi.bph.domain.system.User;
 
@@ -34,13 +30,6 @@ import com.tianyi.bph.domain.system.User;
  */
 public class PrivilegeInteceptor implements HandlerInterceptor {
 	private final static Logger log=LoggerFactory.getLogger(PrivilegeInteceptor.class);
-	
-	private CacheManager manager;
-	
-	@Autowired
-	public void setManager(@Qualifier("ehCacheManager") CacheManager manager) {
-		this.manager = manager;
-	}
 	
 	public void afterCompletion(HttpServletRequest request,
 			HttpServletResponse response, Object handler, Exception ex)
@@ -58,19 +47,21 @@ public class PrivilegeInteceptor implements HandlerInterceptor {
         log.debug("收到请求："+uri+",会话["+session.getId()+","+DateUtils.format(new Date(session.getCreationTime()),DateUtils.YYYY_MM_DD_HH_MM_SS)+"]");
         
         //后台session控制
-        if (uri.contains("login.action")||uri.contains("login.do")||uri.contains("getModuleTreeByRoles.do")||uri.contains("getModuleTree.do")) {  
+        if (uri.contains("login.action")||uri.contains("login.do")
+        		||uri.contains("getModuleTreeByRoles.do")||uri.contains("getModuleTree.do")
+        		||uri.contains("index.do")||uri.contains("install.do")||uri.contains("serviceSet")) {  
         	return true; 
         }else{
-        	String sessionId=request.getParameter("sessionId");
+        	//String sessionId=request.getParameter("sessionId");
         	String organId=request.getParameter("organId");
         	String organPath=request.getParameter("organPath");
         	String expandeds=request.getParameter("expandeds");
         	String searchOrganName=request.getParameter("searchName");
-        	if(!StringUtils.isEmpty(sessionId)){//客户端
+        	/*if(!StringUtils.isEmpty(sessionId)){//客户端
         		//session=UserCache.getSession(sessionId);
         		session=(HttpSession) CacheUtils.getObjectValue(manager,CacheUtils.USER_BASE_DATA,sessionId);
     			request.setAttribute("sessionId", sessionId);
-        	}
+        	}*/
         	String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/";
         	User user=(User)session.getAttribute("User");
         	if(user==null){

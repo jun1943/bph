@@ -17,18 +17,17 @@
 <link href="<%=basePath %>resources/css/dataviz/kendo.material.mobile.min.css" media='all' rel='stylesheet' type='text/css' />	
 <link href="<%=basePath %>resources/css/dataviz/kendo.rtl.min.css" media='all' rel='stylesheet' type='text/css' />
 <link href="<%=basePath %>JS/extend/jquery.mCustomScrollbar.css" rel='stylesheet' type='text/css' />	
-<link href="<%=basePath %>resources/css/dataviz/fullcalendar.print.css" media='all' rel='stylesheet' type='text/css' />	
-<link href="<%=basePath %>resources/css/dataviz/fullcalendar.css" media='all' rel='stylesheet' type='text/css' /> 
 <script src="<%=basePath %>resources/js/jquery.min.js" type='text/javascript'></script>
 <script src="<%=basePath %>resources/js/kendo.all.min.js" type='text/javascript'></script>
 <script src="<%=basePath %>JS/json2.js" type='text/javascript'></script>
 <script src="<%=basePath %>JS/extend/jquery.mCustomScrollbar.concat.min.js" type='text/javascript'></script>
 <script src="<%=basePath %>JS/extend/pop.js" type='text/javascript'></script>
-<script src="<%=basePath %>JS/user/pager.js" type='text/javascript'></script>
 <script src="<%=basePath %>JS/extend/ty-window.js" type='text/javascript'></script>
-<script src="<%=basePath %>JS/extend/fullcalendar.min.js" type='text/javascript'></script>	
-<script src="<%=basePath %>JS/extend/moment.min.js" type='text/javascript'></script>
+<script src="<%=basePath %>JS/extend/checkException.js" type='text/javascript'></script>
+<script src="<%=basePath %>JS/user/pager.js" type='text/javascript'></script>
 <input id="token" type="hidden" value="${requestScope.sessionId}"/>
 <input id="expandeds" type="hidden" value="${requestScope.expandeds}"/>
 <input  id="organId" type="hidden" value="${requestScope.organId}">
 <input  id="organPath" type="hidden" value="${requestScope.organPath}">
+<input  id="organCode" type="hidden" value="${requestScope.organCode}">
+
