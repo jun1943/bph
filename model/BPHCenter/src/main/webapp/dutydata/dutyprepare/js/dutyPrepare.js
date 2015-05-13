@@ -1124,24 +1124,30 @@ var DutyItemManage={
 					.getDay(), 16, 30);
 			this.genDutyRow(null, "班次", 101, null, "班次", shift);
 			
-			var dutyItems=[];
-			
-			dutyItems.push(duty);
 			duty.items=[];
 			duty.items.push(shift);
-			//TreeListDataSource HierarchicalDataSource
-			var ds = new kendo.data.HierarchicalDataSource({
-			    data:dutyItems,
-			    schema: {
-			        model: {
-			          children: "items"
-			        }
-			      }
-			});
-
+			
 			var tv = $("#dutyItemTV").data("kendoTreeView");
-			tv.setDataSource(ds);
-			tv.expand(".k-item");
+			
+			var dutyItems=tv.dataSource.data();
+			
+			dutyItems.push(duty);
+			
+			this.reCalcDuty(dutyItems);
+			
+//			//TreeListDataSource HierarchicalDataSource
+//			var ds = new kendo.data.HierarchicalDataSource({
+//			    data:dutyItems,
+//			    schema: {
+//			        model: {
+//			          children: "items"
+//			        }
+//			      }
+//			});
+//
+//			
+//			tv.setDataSource(ds);
+//			tv.expand(".k-item");
 
 		},
 		genDutyRow:function(itemId, name, typeId, innerTypeId, innerTypeName, dutyRow) {
