@@ -548,6 +548,7 @@ public class PoliceServiceImpl implements PoliceService {
 		p.setGpsId(result.getPoliceGpsId());
 		p.setGpsName(result.getPoliceGpsName());
 		p.setId(result.getPoliceId());
+		p.setJjcount(result.getJjcount());
 		p.setIdcardno(result.getPoliceIdcardno());
 		p.setIntercomGroup(result.getPoliceIntercomGroup());
 		p.setIntercomPerson(result.getPoliceIntercomPerson());

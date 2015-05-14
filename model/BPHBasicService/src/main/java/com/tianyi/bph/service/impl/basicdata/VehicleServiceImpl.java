@@ -42,11 +42,15 @@ import com.tianyi.bph.service.basicdata.VehicleService;
 @Service
 public class VehicleServiceImpl implements VehicleService {
 
-	@Autowired VehicleMapper vehicleMapper;
+	@Autowired
+	VehicleMapper vehicleMapper;
 
-	@Autowired ExportMapper exportMapper;
+	@Autowired
+	ExportMapper exportMapper;
 
-	@Autowired OrganDAO organMapper;
+	@Autowired
+	OrganDAO organMapper;
+
 	/**
 	 * (non-Javadoc)
 	 * 
@@ -230,22 +234,23 @@ public class VehicleServiceImpl implements VehicleService {
 	 * 
 	 * @see com.tianyi.drs.basedata.service.VehicleService#loadListByOrgId(Map)
 	 */
-	public List<Vehicle> getVehicleInfo(Integer orgId,Integer isSubOrg) {
+	public List<Vehicle> getVehicleInfo(Integer orgId, Integer isSubOrg) {
 		// TODO Auto-generated method stub
 		Organ org = new Organ();
 		String orgPath = "";
 
-		Map<String, Object> map =  new HashMap<String, Object>();
-		if(isSubOrg==Constants.SEARCH_TYPE_CHILD){
+		Map<String, Object> map = new HashMap<String, Object>();
+		if (isSubOrg == Constants.SEARCH_TYPE_CHILD) {
 			org = organMapper.selectByPrimaryKey(orgId);
 			orgPath = org.getPath();
 			map.put("orgPath", orgPath);
 		}
-		map.put("orgId",orgId);
+		map.put("orgId", orgId);
 		return vehicleMapper.getVehicleInfo(map);
 	}
 
-	public List<VehicleExtItem> getVehicleDutyInfo(Integer orgId, Integer ymd,Integer isSubOrg) {
+	public List<VehicleExtItem> getVehicleDutyInfo(Integer orgId, Integer ymd,
+			Integer isSubOrg) {
 		Map<Integer, ItemInfo<?>> cache = new HashMap<Integer, ItemInfo<?>>();// dutyItemId局部缓存，避免大量低效率的循环。
 		Map<Integer, Object> cache2 = new HashMap<Integer, Object>();// ItemId
 																		// //
@@ -257,7 +262,7 @@ public class VehicleServiceImpl implements VehicleService {
 		String orgPath = "";
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("orgId", orgId);
-		if(isSubOrg==Constants.SEARCH_TYPE_CHILD){
+		if (isSubOrg == Constants.SEARCH_TYPE_CHILD) {
 			org = organMapper.selectByPrimaryKey(orgId);
 			orgPath = org.getPath();
 			map.put("orgPath", orgPath);
@@ -284,28 +289,33 @@ public class VehicleServiceImpl implements VehicleService {
 				vs.add(v);// 添加到list
 
 			} else {
-				if (cache.containsKey(r.getParentId())) {
-					VehicleInfo pp = (VehicleInfo) cache.get(r.getParentId());
 
-					switch (r.getItemTypeId()) {
-					case 2:// police
-						if (pp.getPoliceItems() == null) {
-							pp.setPoliceItems(new ArrayList<PoliceEInfo>());
+				if (cache.containsKey(r.getParentId())) {
+					if (cache.get(r.getParentId()).getItemTypeId() == 1) {
+						VehicleInfo pp = (VehicleInfo) cache.get(r
+								.getParentId());
+
+						switch (r.getItemTypeId()) {
+						case 2:// police
+							if (pp.getPoliceItems() == null) {
+								pp.setPoliceItems(new ArrayList<PoliceEInfo>());
+							}
+							PoliceEInfo p = createPoliceEInfo(r);
+							pp.getPoliceItems().add(p);
+							cache.put(r.getDutyItemId(), p);
+							break;
+						case 4: // gps
+							if (pp.getGpsItems() == null) {
+								pp.setGpsItems(new ArrayList<GpsInfo>());
+							}
+							GpsInfo g = createGpsInfo(r);
+							pp.getGpsItems().add(g);
+							cache.put(r.getDutyItemId(), g);
+							break;
 						}
-						PoliceEInfo p = createPoliceEInfo(r);
-						pp.getPoliceItems().add(p);
-						cache.put(r.getDutyItemId(), p);
-						break;
-					case 4: // gps
-						if (pp.getGpsItems() == null) {
-							pp.setGpsItems(new ArrayList<GpsInfo>());
-						}
-						GpsInfo g = createGpsInfo(r);
-						pp.getGpsItems().add(g);
-						cache.put(r.getDutyItemId(), g);
-						break;
 					}
 				}
+
 			}
 		}
 
@@ -467,7 +477,7 @@ public class VehicleServiceImpl implements VehicleService {
 	@Override
 	public List<GpsBaseVM> selectGpsId(int orgId) {
 		// TODO Auto-generated method stub
-		 return vehicleMapper.selectGpsId(orgId);
+		return vehicleMapper.selectGpsId(orgId);
 	}
 
 	@Override

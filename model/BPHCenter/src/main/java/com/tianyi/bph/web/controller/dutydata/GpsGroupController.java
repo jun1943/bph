@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.tianyi.bph.common.MessageCode;
+import com.tianyi.bph.common.PageReturn;
 import com.tianyi.bph.common.ReturnResult;
 import com.tianyi.bph.domain.duty.GpsGroup;
 import com.tianyi.bph.domain.duty.GpsGroupMember;
@@ -51,7 +52,7 @@ public class GpsGroupController {
 	 */
 	@RequestMapping(value = "list.do")
 	public @ResponseBody
-	ReturnResult List(
+	PageReturn List(
 			@RequestParam(value = "gpsGroup_Query", required = false) String query, 
 			HttpServletRequest request) {
 		try {
@@ -59,8 +60,11 @@ public class GpsGroupController {
 
 			int orgId = joQuery.getInt("orgId"); 
 			Map<String, Object> map = new HashMap<String, Object>(); 
-			map.put("pageStart", 0);
-			map.put("pageSize", 10); 
+			int pageSize = 10;
+			int page = joQuery.getInt("page"); 
+			int pageBegin = pageSize * (page > 0 ? (page - 1) : 0);
+			map.put("pageStart", pageBegin);
+			map.put("pageSize", pageSize); 
 			map.put("orgId", orgId);
 
 			map.put("inSubOrg", 0);
@@ -69,10 +73,10 @@ public class GpsGroupController {
 
 			List<GpsGroupVM> pgvms = gpsGroupService.loadVMListByOrgId(map);
 
-			return ReturnResult.MESSAGE(MessageCode.STATUS_SUCESS,
+			return PageReturn.MESSAGE(MessageCode.STATUS_SUCESS,
 					MessageCode.SELECT_SUCCESS, total, pgvms);
 		} catch (Exception ex) {
-			return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL, "", 0, null);
+			return PageReturn.MESSAGE(MessageCode.STATUS_FAIL, "", 0, null);
 		}
 	}
 

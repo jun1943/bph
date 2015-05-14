@@ -22,10 +22,33 @@ var GpsgroupManage = {
 		m_gpsGroup_Query.orgId = $("#organId").val();
 		m_gpsGroup_Query.orgPath = $("#organPath").val();
 		m_gpsGroup_Query.orgCode = $("#organCode").val();
-		m_gpsGroup_Query.page = pageNo;
-		m_gpsGroup_Query.pageSize = 100; 
+		m_gpsGroup_Query.page = GpsgroupManage.pageNo;
+		m_gpsGroup_Query.pageSize = 10; 
 	},
 	gpsGroupDataSource:[],
+	initMemberGrid:function(){
+		$("#dtGroupMember").kendoGrid({
+											dataSource: [],
+											columns : [ {
+												title : 'id',
+												field : 'id',
+												hidden : true
+											}, {
+												title : '所属单位',
+												field : 'orgShortName'
+											}, {
+												title : '设备类型',
+												field : 'typeName'
+											}, {
+												title : '设别编号',
+												field : 'number'
+											}, {
+												title : '设备名称',
+												field : 'gpsName'
+											}],
+											selectable: "row"
+										});
+	},
 	loadGroupData : function(pageNo) {
 		$.ajax({
 		type: "post",
@@ -37,16 +60,11 @@ var GpsgroupManage = {
 		success: function(req) {
 			if (req.code == 200) { 
 				if(req.data != null){
+				var total =  req.totalRows;
 				var rows =req.data; 
-				GpsgroupManage.gpsGroupDataSource = new kendo.data.DataSource({
-					data: rows,
-					batch: true,
-					pageSize: 10
-				});
-				
+			 
 				$("#dtGpsGroup").kendoGrid({
-					dataSource: GpsgroupManage.gpsGroupDataSource,
-					pageable: true,
+					dataSource:{data : rows }, 
 					columns : [ {
 						title : 'Id',
 						field : 'id',
@@ -65,10 +83,14 @@ var GpsgroupManage = {
 						GpsgroupManage.loadMemberData(groupId);
 					}
 				}); 
+				$("#dtGpsGroup .k-grid-content").mCustomScrollbar( {scrollButtons:{enable:true},advanced:{ updateOnContentResize: true } });
+               									var pg = pagination(pageNo,total,'loadData',10);
+               						 
+               	                				$("#page").html(pg);
+               	                				GpsgroupManage.initMemberGrid();
 					} else{
 						$("#dtGpsGroup").kendoGrid({
-					dataSource: GpsgroupManage.gpsGroupDataSource,
-					pageable: true,
+					dataSource: GpsgroupManage.gpsGroupDataSource, 
 					columns : [ {
 						title : 'Id',
 						field : 'id',
@@ -185,6 +207,9 @@ var GpsgroupManage = {
 											}],
 											selectable: "row"
 										});
+									}else{
+										
+               	                				GpsgroupManage.initMemberGrid();
 									}
 								}
 							});
@@ -279,8 +304,9 @@ var GpsgroupManage = {
 	}
 };
 
-</script>
-<div id="dtGpsGroup" style="width:330px;float:left"></div>   
+</script> 
+<div id="dtGpsGroup" style="width:330px;float:left"></div>    
+<div id="page"></div> 
 <div id="dtGroupMember" style="width:300px;float:left"></div> 
 <div id="dialog"></div> 
 

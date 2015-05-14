@@ -22,9 +22,32 @@ var PolicegroupManage = {
 		m_policeGroup_Query.orgPath = $("#organPath").val();
 		m_policeGroup_Query.orgCode = $("#organPath").val();
 		m_policeGroup_Query.page = pageNo;
-		m_policeGroup_Query.pageSize = 100; 
+		m_policeGroup_Query.pageSize = 10; 
 	},
 	policeGroupDataSource:[],
+	initMemberGrid:function(){
+		$("#dtGroupMember").kendoGrid({
+											dataSource: [],
+											columns : [ {
+														title : 'id',
+														field : 'id', 
+														hidden : true
+													}, {
+														title : '所属单位',
+														field : 'orgShortName'
+													}, {
+														title : '姓名',
+														field : 'name'
+													}, {
+														title : '警号',
+														field : 'number'
+													}, {
+														title : '职务',
+														field : 'title'
+													} ],
+											selectable: "row"
+										});
+	},
 	loadGroupData : function(pageNo) {
 		$.ajax({
 		type: "post",
@@ -37,15 +60,10 @@ var PolicegroupManage = {
 		success: function(req) {
 			if (req.code == 200) { 
 				if(req.data != null){
-					var rows =req.data; 
-					PolicegroupManage.policeGroupDataSource = new kendo.data.DataSource({
-							data: rows,
-							batch: true,
-							pageSize: 10
-						}); 
-						$("#dtPoliceGroup").kendoGrid({
-					dataSource: PolicegroupManage.policeGroupDataSource,
-					pageable: true,
+					var rows =req.data;  
+					var total =  req.totalRows;
+					$("#dtPoliceGroup").kendoGrid({
+					dataSource: {data:rows}, 
 					columns : [ {
 						title : 'Id',
 						field : 'id',
@@ -66,6 +84,11 @@ var PolicegroupManage = {
 						PolicegroupManage.loadMemberData(groupId);
 					}
 				}); 
+				$("#dtPoliceGroup .k-grid-content").mCustomScrollbar( {scrollButtons:{enable:true},advanced:{ updateOnContentResize: true } });
+               									var pg = pagination(pageNo,total,'loadData',10);
+               						 
+               	                				$("#page").html(pg);
+               	                				PolicegroupManage.initMemberGrid();
 					}else{
 						$("#dtPoliceGroup").kendoGrid({
 					dataSource: PolicegroupManage.policeGroupDataSource,
@@ -188,6 +211,9 @@ var PolicegroupManage = {
 													} ],
 											selectable: "row"
 										});
+									}else{
+										
+               	                				PolicegroupManage.initMemberGrid();
 									}
 								}
 							});
@@ -284,6 +310,7 @@ var PolicegroupManage = {
 
 </script>
 <div id="dtPoliceGroup" style="width:330px;float:left"></div>   
+<div id="page"></div>
 <div id="dtGroupMember" style="width:320px;float:left"></div> 
 <div id="dialog"></div> 
 

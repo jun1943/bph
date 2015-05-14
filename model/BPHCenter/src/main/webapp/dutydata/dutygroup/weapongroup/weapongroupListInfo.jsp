@@ -22,7 +22,30 @@ var WeapongroupManage = {
 		m_weaponGroup_Query.orgPath = $("#organPath").val();
 		m_weaponGroup_Query.orgCode = $("#organPath").val();
 		m_weaponGroup_Query.page = pageNo;
-		m_weaponGroup_Query.pageSize = 100; 
+		m_weaponGroup_Query.pageSize = 10; 
+	},
+	initMemberGrid:function(){
+		$("#dtGroupMember").kendoGrid({
+									dataSource: [],
+									columns : [ {
+										title : 'id',
+										field : 'id',
+										hidden : true
+									}, {
+										title : '所属单位',
+										field : 'orgShortName'
+									}, {
+										title : '武器类型',
+										field : 'typeName'
+									}, {
+										title : '武器编号',
+										field : 'number'
+									}, {
+										title : '子弹发数',
+										field : 'standard'
+									}, ], 
+								selectable: "row"
+								});
 	},
 	weaponGroupDataSource:[],
 	loadGroupData : function(pageNo) {
@@ -36,15 +59,9 @@ var WeapongroupManage = {
 			success: function(req) {
 				if (req.code == 200) { 
 					var rows =req.data; 
-					WeapongroupManage.weaponGroupDataSource = new kendo.data.DataSource({
-						data: rows,
-						batch: true,
-						pageSize: 10
-					});
-					
+					var total =  req.totalRows;
 					$("#dtWeaponGroup").kendoGrid({
-						dataSource: WeapongroupManage.weaponGroupDataSource,
-						pageable: true,
+						dataSource: {data: rows}, 
 						columns : [ {
 							title : 'Id',
 							field : 'id',
@@ -65,11 +82,15 @@ var WeapongroupManage = {
 							WeapongroupManage.getMemberBygroupId(groupId);
 						}
 					}); 
+					$("#dtWeaponGroup .k-grid-content").mCustomScrollbar( {scrollButtons:{enable:true},advanced:{ updateOnContentResize: true } });
+               									var pg = pagination(pageNo,total,'loadData',10);
+               						 
+               	                				$("#page").html(pg);
+               	                				WeapongroupManage.initMemberGrid();
 				}else{
 					
 					$("#dtWeaponGroup").kendoGrid({
-						dataSource: WeapongroupManage.weaponGroupDataSource,
-						pageable: true,
+						dataSource: WeapongroupManage.weaponGroupDataSource, 
 						columns : [ {
 							title : 'Id',
 							field : 'id',
@@ -187,29 +208,9 @@ var WeapongroupManage = {
 										field : 'standard'
 									}, ], 
 								selectable: "row"
-								});
-							}else{
-								$("#dtGroupMember").kendoGrid({
-									dataSource: [],
-									columns : [ {
-										title : 'id',
-										field : 'id',
-										hidden : true
-									}, {
-										title : '所属单位',
-										field : 'orgShortName'
-									}, {
-										title : '武器类型',
-										field : 'typeName'
-									}, {
-										title : '武器编号',
-										field : 'number'
-									}, {
-										title : '子弹发数',
-										field : 'standard'
-									}, ], 
-								selectable: "row"
-								});
+								}); 
+							}else{ 
+               	                				WeapongroupManage.initMemberGrid();
 							}
 						}
 				});
@@ -305,6 +306,7 @@ var WeapongroupManage = {
 
 </script>
 <div id="dtWeaponGroup" style="width:330px"></div>   
-<div id="dtGroupMember" style="width:300px"></div> 
+<div id="page"></div>
+<div id="dtGroupMember" style="width:300px"></div>  
 <div id="dialog"></div> 
 

@@ -42,6 +42,8 @@
     <result column="police_org_id" property="policeOrgId" jdbcType="INTEGER" />
     <result column="police_title" property="policeTitle" jdbcType="VARCHAR" />
     <result column="police_type_id" property="policeTypeId" jdbcType="INTEGER" />
+    <result column="police_jjcount" property="jjcount" jdbcType="VARCHAR" />
+    
     
     <result column="weapon_id" property="weaponId" jdbcType="INTEGER" />
     <result column="weapon_number" property="weaponNumber" jdbcType="VARCHAR" />
@@ -97,6 +99,11 @@
 			p.org_id				as	police_org_id,
 			p.title					as	police_title,
 			p.type_id				as	police_type_id,
+			(
+			select count(*) from b_pj_police  pj 
+			LEFT JOIN b_jjdb jj on pj.JJDBH = jj.JJDBH
+			where pj.PJ_POLICE_ID = p.id    and  jj.AJZT != 9 
+			) as police_jjcount,
 			w.id					as	weapon_id,
 			w.number				as	weapon_number,
 			w.org_id				as	weapon_org_id,
