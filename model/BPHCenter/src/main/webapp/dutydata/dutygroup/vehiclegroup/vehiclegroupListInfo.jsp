@@ -22,9 +22,32 @@ var VehicleGroupManage = {
 		m_vehicleGroup_Query.orgPath = $("#organPath").val();
 		m_vehicleGroup_Query.orgCode = $("#organPath").val();
 		m_vehicleGroup_Query.page = pageNo;
-		m_vehicleGroup_Query.pageSize = 100; 
+		m_vehicleGroup_Query.pageSize = 10; 
 	},
 	vehicleGroupDataSource:[],
+	initMemberGrid:function(){
+	$("#dtGroupMember").kendoGrid({
+							dataSource : [],
+							columns : [ {
+								title : 'id',
+								field : 'id',
+								hidden : true
+							}, {
+								title : '所属单位',
+								field : 'orgShortName'
+							}, {
+								title : '车辆类型',
+								field : 'typeName'
+							}, {
+								title : '车牌号码',
+								field : 'number'
+							}, {
+								title : '车辆用途',
+								field : 'purpose'
+							}, ],
+							selectable : "row"
+						});
+	},
 	loadGroupData : function(pageNo) {
 		$.ajax({
 						type : "post",
@@ -36,17 +59,12 @@ var VehicleGroupManage = {
 						success : function(req) {
 							if (req.code == 200) {
 								var rows = req.data;
-								VehicleGroupManage.vehicleGroupDataSource = new kendo.data.DataSource({
-									data : rows,
-									batch : true,
-									pageSize : 10
-								});
-
+								 
+					var total =  req.totalRows;
 								$("#dtVehicleGroup")
 										.kendoGrid(
 												{
-													dataSource : VehicleGroupManage.vehicleGroupDataSource,
-													pageable : true,
+													dataSource :{data:rows}, 
 													columns : [
 															{
 																title : 'Id',
@@ -70,6 +88,11 @@ var VehicleGroupManage = {
 														VehicleGroupManage.loadMemberData(groupId);
 													}
 												});
+												$("#dtVehicleGroup .k-grid-content").mCustomScrollbar( {scrollButtons:{enable:true},advanced:{ updateOnContentResize: true } });
+               									var pg = pagination(pageNo,total,'loadData',10);
+               						 
+               	                				$("#page").html(pg);
+               	                				VehicleGroupManage.initMemberGrid();
 							}else{
 								
 								$("#dtVehicleGroup")
@@ -201,6 +224,9 @@ var VehicleGroupManage = {
 							}, ],
 							selectable : "row"
 						});
+					}else{
+						
+               	                				VehicleGroupManage.initMemberGrid();
 					}
 				}
 			});
@@ -295,6 +321,7 @@ var VehicleGroupManage = {
 
 </script>
 <div id="dtVehicleGroup" style="width:330px;float:left"></div>   
+<div id="page"></div>
 <div id="dtGroupMember" style="width:300px;float:left"></div> 
 <div id="dialog"></div> 
 

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.tianyi.bph.common.MessageCode;
+import com.tianyi.bph.common.PageReturn;
 import com.tianyi.bph.common.ReturnResult;
 import com.tianyi.bph.domain.duty.PoliceGroup;
 import com.tianyi.bph.domain.duty.PoliceGroupMember;
@@ -47,28 +48,32 @@ public class PoliceGroupController {
 	 */
 	@RequestMapping(value = "list.do")
 	public @ResponseBody
-	ReturnResult List(
+	PageReturn List(
 			@RequestParam(value = "policeGroup_Query", required = false) String query,
 			HttpServletRequest request) {
-
-		JSONObject joQuery = JSONObject.fromObject(query);
-
-		int orgId = joQuery.getInt("orgId");
-		int page = joQuery.getInt("page");
-		int pageSize = joQuery.getInt("pageSize");
-
-		Map<String, Object> map = new HashMap<String, Object>();
-		page = page == 0 ? 1 : page;
-		map.put("pageStart", (page - 1) * pageSize);
-		map.put("pageSize", pageSize);
-		map.put("orgId", orgId);
-
-		int total = policeGroupService.loadVMCountByOrgId(map);
-
-		List<PoliceGroupVM> pgvms = policeGroupService.loadVMListByOrgId(map);
-
-		return ReturnResult
-				.MESSAGE(MessageCode.STATUS_SUCESS, "", total, pgvms);
+		try{
+			JSONObject joQuery = JSONObject.fromObject(query);
+	
+			int orgId = joQuery.getInt("orgId");
+			int page = joQuery.getInt("page");
+			int pageSize = 10;
+	
+			Map<String, Object> map = new HashMap<String, Object>(); 
+			int pageBegin = pageSize * (page > 0 ? (page - 1) : 0);
+			map.put("pageStart", pageBegin);
+			map.put("pageSize", pageSize);
+			map.put("orgId", orgId);
+	
+			int total = policeGroupService.loadVMCountByOrgId(map);
+	
+			List<PoliceGroupVM> pgvms = policeGroupService.loadVMListByOrgId(map);
+	
+			return PageReturn
+					.MESSAGE(MessageCode.STATUS_SUCESS, "", total, pgvms);
+		}catch(Exception ex){
+			return PageReturn
+					.MESSAGE(MessageCode.STATUS_FAIL, "", 0, null);
+		}
 
 	}
 

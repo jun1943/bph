@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.tianyi.bph.common.MessageCode;
+import com.tianyi.bph.common.PageReturn;
 import com.tianyi.bph.common.ReturnResult;
 import com.tianyi.bph.domain.duty.PoliceGroupMember;
 import com.tianyi.bph.domain.duty.VehicleGroup;
@@ -48,28 +49,34 @@ public class VehicleGroupController {
 	 */
 	@RequestMapping(value = "list.do")
 	public @ResponseBody
-	ReturnResult List(
+	PageReturn List(
 			@RequestParam(value = "vehicleGroup_Query", required = false) String query,
 			HttpServletRequest request) {
+		try {
+			JSONObject joQuery = JSONObject.fromObject(query);
 
-		JSONObject joQuery = JSONObject.fromObject(query);
+			int orgId = joQuery.getInt("orgId"); 
+			int page = joQuery.getInt("page");
+			int pageSize = 10;
+	
+			Map<String, Object> map = new HashMap<String, Object>(); 
+			int pageBegin = pageSize * (page > 0 ? (page - 1) : 0);
+			map.put("pageStart", pageBegin);
+			map.put("pageSize", pageSize);
+			map.put("orgId", orgId);
 
-		int orgId = joQuery.getInt("orgId");
+			map.put("inSubOrg", 0);
 
-		Map<String, Object> map = new HashMap<String, Object>();
+			int total = vehicleGroupService.loadVMCountByOrgId(map);
 
-		map.put("pageStart", 0);
-		map.put("pageSize", 10);
-		map.put("orgId", orgId);
+			List<VehicleGroupVM> pgvms = vehicleGroupService
+					.loadVMListByOrgId(map);
 
-		map.put("inSubOrg", 0);
-
-		int total = vehicleGroupService.loadVMCountByOrgId(map);
-
-		List<VehicleGroupVM> pgvms = vehicleGroupService.loadVMListByOrgId(map);
-
-		return ReturnResult
-				.MESSAGE(MessageCode.STATUS_SUCESS, "", total, pgvms);
+			return PageReturn.MESSAGE(MessageCode.STATUS_SUCESS, "", total,
+					pgvms);
+		} catch (Exception ex) {
+			return PageReturn.MESSAGE(MessageCode.STATUS_FAIL, "", 0, null);
+		}
 
 	}
 
@@ -136,7 +143,7 @@ public class VehicleGroupController {
 			@RequestParam(value = "members", required = false) String members,
 			HttpServletRequest request) {
 		try {
-			JSONArray jaMembers = JSONArray.fromObject(members); 
+			JSONArray jaMembers = JSONArray.fromObject(members);
 			List<?> list2 = JSONArray.toList(jaMembers,
 					new VehicleGroupMember(), new JsonConfig());// 参数1为要转换的JSONArray数据，参数2为要转换的目标数据，即List盛装的数据
 
@@ -153,7 +160,7 @@ public class VehicleGroupController {
 		} catch (Exception ex) {
 			return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL, "查询数据出错", 0,
 					null);
-		} 
+		}
 	}
 
 	/**
@@ -240,8 +247,9 @@ public class VehicleGroupController {
 		} catch (Exception ex) {
 			return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL, "查询数据出错", 0,
 					null);
-		}  
+		}
 	}
+
 	/**
 	 * 清除组成员
 	 * 
@@ -266,9 +274,9 @@ public class VehicleGroupController {
 		} catch (Exception ex) {
 			return ReturnResult.MESSAGE(MessageCode.STATUS_FAIL, "查询数据出错", 0,
 					null);
-		} 
+		}
 	}
-	 
+
 	/**
 	 * 判断是否有有分组存在
 	 * 

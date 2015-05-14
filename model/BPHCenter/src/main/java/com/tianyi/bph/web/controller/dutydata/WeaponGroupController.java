@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.tianyi.bph.common.MessageCode;
+import com.tianyi.bph.common.PageReturn;
 import com.tianyi.bph.common.ReturnResult; 
 import com.tianyi.bph.domain.duty.PoliceGroupMember;
 import com.tianyi.bph.domain.duty.WeaponGroup;
@@ -47,26 +48,30 @@ public class WeaponGroupController {
 	 */
 	@RequestMapping(value = "list.do")
 	public @ResponseBody
-	ReturnResult List(
+	PageReturn List(
 			@RequestParam(value = "weaponGroup_Query", required = false) String query,
 			HttpServletRequest request) {
-
+		try {
 		JSONObject joQuery = JSONObject.fromObject(query);
 
 		int orgId = joQuery.getInt("orgId");
+		int page = joQuery.getInt("page");
+		int pageSize = 10;
 
-		Map<String, Object> map = new HashMap<String, Object>();
-
-		map.put("pageStart", 0);
-		map.put("pageSize", 10);
+		Map<String, Object> map = new HashMap<String, Object>(); 
+		int pageBegin = pageSize * (page > 0 ? (page - 1) : 0);
+		map.put("pageStart", pageBegin);
+		map.put("pageSize", pageSize);
 		map.put("orgId", orgId);
 
 		map.put("inSubOrg", 0);
 
 		int total = weaponGroupService.loadVMCountByOrgId(map);
 		List<WeaponGroupVM> pgvms = weaponGroupService.loadVMListByOrgId(map);
-		return ReturnResult.MESSAGE(200, "", total, pgvms);
-
+		return PageReturn.MESSAGE(MessageCode.STATUS_SUCESS, "", total, pgvms);
+	} catch (Exception ex) {
+		return PageReturn.MESSAGE(MessageCode.STATUS_FAIL, "", 0, null);
+	}
 	}
 
 	/**
