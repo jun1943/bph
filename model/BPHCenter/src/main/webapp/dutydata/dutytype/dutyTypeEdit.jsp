@@ -25,10 +25,10 @@ $(function() {
 			dataTextField : "text",
 			panelHeight : "auto",
 			dataSource : [ {
-				id : 1,
+				id : 2,
 				text : "社区"
 			}, {
-				id : 2,
+				id : 1,
 				text : "巡区"
 			}, {
 				id : 3,
@@ -220,8 +220,16 @@ var DutyTypeEditManage= {
 	
 		bph_dutyTypeEdit_pkg.attireType = $('input:radio[name="attireType"]:checked').val();
 		bph_dutyTypeEdit_pkg.armamentType = $('input:radio[name="armamentType"]:checked').val();
-		bph_dutyTypeEdit_pkg.isLeaf = $("#txtDutyTypeIsLeaf").val();
-		bph_dutyTypeEdit_pkg.isUsed = $("#txtDutyTypeIsUsed").val();
+		if($("#txtDutyTypeIsLeaf").val()=="0"||$("#txtDutyTypeIsLeaf").val()==0){
+			bph_dutyTypeEdit_pkg.isLeaf = false;
+		}else{
+			bph_dutyTypeEdit_pkg.isLeaf = true;
+		} 
+		if($("#txtDutyTypeIsUsed").val()=="0"||$("#txtDutyTypeIsUsed").val()==0){
+			bph_dutyTypeEdit_pkg.isUsed = false;
+		}else{
+			bph_dutyTypeEdit_pkg.isUsed = true;
+		}  
 		 
 		DutyTypeEditManage.isCompleted = true;
 	},

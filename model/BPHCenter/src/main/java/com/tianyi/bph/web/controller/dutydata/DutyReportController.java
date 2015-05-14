@@ -21,6 +21,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.tianyi.bph.common.MessageCode;
 import com.tianyi.bph.common.PageReturn;
 import com.tianyi.bph.domain.system.Organ;
+import com.tianyi.bph.domain.system.User;
 import com.tianyi.bph.query.duty.DutyReportCriteria;
 import com.tianyi.bph.query.duty.DutyReportVM;
 import com.tianyi.bph.service.duty.DutyReportService;
@@ -46,17 +47,25 @@ public class DutyReportController {
 	@RequestMapping({ "/gotoDutyReport.do", "/gotoDutyReport.action" })
 	@ResponseBody
 	public ModelAndView gotoDutyReport(
-			@RequestParam(value = "organId", required = true, defaultValue = "1") Integer organId
+			@RequestParam(value = "organId", required = false
+					) Integer organId,
+					HttpServletRequest request
 			){
 		
 		ModelAndView mv = new ModelAndView("/dutydata/dutyreport/dutyReport.jsp");
-		
+
+		User user = (User) request.getAttribute("User");
 		Organ organ = new Organ();
+		
+		if (organId == null) {
+			organId = user.getOrgId();
+		}
 		if (organId != null) {
 			organ = organService.getOrganByPrimaryKey(organId);
 		}
-		
 		mv.addObject("num","300");
+		mv.addObject("loginUserId",user.getUserId());
+		mv.addObject("organId", organId);
 		mv.addObject("organ", organ);
 		return mv;
 	}

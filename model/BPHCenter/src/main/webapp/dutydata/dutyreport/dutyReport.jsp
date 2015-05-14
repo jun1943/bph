@@ -21,7 +21,7 @@
 		<div id='main-nav-bg'></div>
 		<nav class="" id="main-nav">
 			<div class='navigation'>
-				<%@ include file="../../left.jsp"%>
+				<%@ include file="../../leftWithCheckBox.jsp"%>
 			</div>
 		</nav>
 		<section id='content'>

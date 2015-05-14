@@ -299,7 +299,7 @@ var DutyPrepareManage={
 							type : "POST",
 							dataType : "json",
 							data : {
-								"temId" : row.Id
+								"temId" : row.id
 							},
 							success : function(req) {
 								if (req.code==200) {// 成功填充数据
@@ -1478,7 +1478,15 @@ var DutyItemManage={
 		addDutyTypeRow :function(value){
 			var duty = {};
 			duty.maxPolice = value.maxPolice;
-			duty.taskType = value.assoTaskType;
+			if(value.assoTaskType == "巡区"){
+				duty.taskType = 1;
+			}else if(value.assoTaskType == "社区"){ 
+				duty.taskType = 2;
+			}else if(value.assoTaskType == "卡点"){
+				duty.taskType = 3;
+			}else{
+				duty.taskType = value.assoTaskType;
+			} 
 			duty.targets = [];
 			duty.expanded =true;
 			
@@ -1921,6 +1929,7 @@ var DutyItemManage={
 						DutyItemManage.loadTaskTarget(taskType,row.itemId,row.id);
 						$('#lblPoliceInfo').text("警员："+row.name + " 的关联任务");
 						m_target = row; 
+						m_target.taskType = taskType;
 						 var winTask =$('#taskWindow');
 						 winTask.kendoWindow({
 					                        width: "600px", 
@@ -1973,14 +1982,11 @@ var DutyItemManage={
 									sortable : true,
 									selectable : "multiple", 
 									columns : [{
-											title : "名称",
-											field: "areaName"
+											title : "社区名称",
+											template: "<input type='checkbox' id='tk_ck_#: targetId #' value='#: targetId #' /> #: areaName #  "
+									 
 											 
-										},{
-											title:"点位名称",
-											field : "name"
-										} ],
-									editable: true
+										} ]
 								}); 
 								break;
 							case 1:
@@ -1992,7 +1998,7 @@ var DutyItemManage={
 											title : "名称", 
 											field: "areaName"
 										},{
-											title:"点位名称",
+											title:"必达点",
 											field : "name"
 										},{
 											title : "经过次数",
@@ -2010,16 +2016,20 @@ var DutyItemManage={
 									sortable : true,
 									selectable : "multiple", 
 									columns : [{
-											title : "名称",
-											field: "areaName"  
-										},{
-											title:"点位名称",
-											field : "name"
-										} ],
-									editable: true
+											title : "点位名称",
+											template: "<input type='checkbox' id='tk_ck_#: targetId #' value='#: targetId #' /> #: areaName #  "
+												  
+										}]
 								}); 
 								break;
 							}
+							
+							$.each(req.data,function(index,dobj){
+								if(dobj.isSelected){
+									$("#tk_ck_"+dobj.targetId).attr("checked","checked");
+								}
+								
+							});
 							
 						}
 					}else{
@@ -2101,15 +2111,13 @@ var DutyItemManage={
 		},
 		onTaskConfirm:function(){   
 			DutyItemManage.getTaskList(); 
+			var winpolicetask= $("#taskWindow").data("kendoWindow");
+			winpolicetask.close();
 		},
 		getTaskList:function(){
-			m_target.targets =[];
-			var treeList = $("#dutyItemTV").data("kendoTreeView");
-    		var dataitems = treeList.dataItem();
-			
-			var tkType = $("#pol_taskType").val(); 
+			m_target.targets =[];  
 			var grid = $("#taskGrid").data("kendoGrid");
-			if(tkType == 1 || tkType == "1"){
+			if(m_target.taskType == 1 || m_target.taskType == "1"){
 				for(var i = 0;i< grid._data.length ;i++){  
 					if(grid._data[i].dirty)
 					{
@@ -2118,7 +2126,7 @@ var DutyItemManage={
 						pt.dutyItemId = m_target.id;
 						pt.policeId = m_target.itemId;
 						pt.taskTypeId = m_target.taskType;
-						pt.targetId = grid._data[i].id;
+						pt.targetId = grid._data[i].pointId;
 						if(grid._data[i].count != undefined){
 							if($.trim(grid._data[i].count) != ""){
 								pt.count = $.trim(grid._data[i].count);
@@ -2141,17 +2149,24 @@ var DutyItemManage={
 					}
 					 
 				} 
-			}else{
-				for(var i = 0;i< grid._data.length ;i++){  
-					var pt = {};
-					pt.dutyId = m_target.dutyId;
-					pt.dutyItemId = m_target.id;
-					pt.policeId = m_target.itemId;
-					pt.taskTypeId = m_target.taskType;
-					pt.targetId = grid._data[i].id; 
-					pt.count = null; 
-					pt.stayTime = null; 
-					m_target.targets.push(pt);
+			}else{ 
+				var t = $("#taskGrid input:checkbox:checked").length;
+				if(t>0){
+					var taskObj = $("#taskGrid input:checkbox:checked");
+					$.each(taskObj, function(index, tobj){
+						var pt = {};
+						pt.dutyId = m_target.dutyId;
+						pt.dutyItemId = m_target.id;
+						pt.policeId = m_target.itemId;
+						pt.taskTypeId = m_target.taskType;
+						pt.targetId = tobj.value; 
+						pt.count = null; 
+						pt.stayTime = null; 
+						m_target.targets.push(pt);
+					});
+					 
+				}else{
+					$("body").popjs({"title":"提示","content":"未选择相关关联任务点"}); 
 				}
 			}
 		},

@@ -218,8 +218,6 @@ public class DutyController {
 						map.put("dutyId", dutyId);
 						map.put("policeId", policeId);
 						map.put("taskTypeId", a.getAreaType());
-						map.put("targetId",a.getId());
-						targetvm = dutyTaskService.getTaskTargetInfo(map);
 						TaskTargetVM tg = new TaskTargetVM();
 						int areaId = a.getId();
 						if (a.getAreaType() == 1) {
@@ -227,6 +225,9 @@ public class DutyController {
 									.queryAreaPointList(areaId);
 							if(pointList.size()>0){
 								for (AreaPoint ap : pointList) {
+
+									map.put("targetId",ap.getId());
+									targetvm = dutyTaskService.getTaskTargetInfo(map);
 									tg = new TaskTargetVM();
 									if (targetvm != null) {
 										tg.setIsSelected(1);
@@ -245,6 +246,9 @@ public class DutyController {
 									list.add(tg);
 								}
 							}else{ 
+
+								map.put("targetId",a.getId());
+								targetvm = dutyTaskService.getTaskTargetInfo(map);
 								tg = new TaskTargetVM();
 								if (targetvm != null) {
 									tg.setIsSelected(1);
@@ -263,6 +267,8 @@ public class DutyController {
 								list.add(tg);
 							}
 						} else {
+							map.put("targetId",a.getId());
+							targetvm = dutyTaskService.getTaskTargetInfo(map);
 							tg.setAreaName(a.getAreaName());
 							if (targetvm != null) {
 								tg.setIsSelected(1);
