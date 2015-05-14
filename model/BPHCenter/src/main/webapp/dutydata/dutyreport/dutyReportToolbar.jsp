@@ -1,10 +1,10 @@
 <%@ page language="java" pageEncoding="UTF-8"%>
 
 
-    <table border=0>
+<table border=0>
 		<tr>
 			<td >时间范围:</td>
-			<td><input id="dteBeginDate"  /></td>
+			<td style="width: 213px; "><input id="dteBeginDate"  /></td>
 			<td>&nbsp;</td>
 			<td><input id="spnBeginTime"  /></td>
 			<td><input id="spnEndTime"    /></td>
@@ -15,12 +15,12 @@
 			<td><input id="dutyProperty" /></td>
 			<td>&nbsp;</td>
 			<td >勤务类型 :</td>
-			<td><input id="cmbdutytype"  class="easyui-combotree dtyinquiryinput" ></td>
+			<td><input id="cmbdutytype"  ></td>
 			<td colspan="3">&nbsp;</td>
 		</tr>
 		<tr>
 			<td class="MySearchTDTitle">人员类别 :</td>
-			<td><input id="cmbpoliceType"  class="dtyinquiryinput" /></td>
+			<td><input id="cmbpoliceType"  /></td>
 			<td>&nbsp;</td>
 			<td class="MySearchTDTitle">衣着:</td>
 			<td>

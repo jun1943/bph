@@ -57,7 +57,9 @@
 			</div>
 		</section>
 	</div>
- 
+ 	<!-- 引用 js  -->
+	<script type="text/javascript" charset="utf-8" src="<%=basePath%>dutydata/common.js"></script>
+	<script type="text/javascript" charset="utf-8" src="<%=basePath%>dutydata/dutyreport/js/dutyReport.js"></script>
 	<!----底部结束---->
 </body>
 </html>

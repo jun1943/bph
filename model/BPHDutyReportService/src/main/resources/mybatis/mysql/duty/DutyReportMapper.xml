@@ -25,40 +25,40 @@
 
 <select id="loadDutyReport" parameterType="java.util.Map" resultMap="BaseResultMap">
 		select
-			org.organ_id				as id, 
-			org.parent_id				as org_parent_id,
-			org.organ_id				as org_id,
-			org.name 					as org_name,
-			org.short_name 				as org_short_name,
-			org.code					as org_code,
-			org.path					as org_path,
-			t.vehicleCount				as vehicle_count,
-			t.policeCount				as police_count,
-			t.weaponCount				as weapon_count,
-			t.gpsCount					as gps_count,
-			t.npname					as leader_names,
-			t.npnameCount				as leader_count,
-			t.dpname                    as director_names,
-			t.dpnameCount				as director_count,
-			t.communityCount			as communityCount,
-			t.patrolAreaCount			as patrolAreaCount,
-			t.bayonetCount				as bayonetCount
+			org.organ_id								as id, 
+			org.parent_id							as org_parent_id,
+			org.organ_id								as org_id,
+			org.name 									as org_name,
+			org.short_name 						as org_short_name,
+			org.code									as org_code,
+			org.path									as org_path,
+			IFNULL(t.vehicleCount,0)			as vehicle_count,
+			IFNULL(t.policeCount,0)			as police_count,
+			IFNULL(t.weaponCount,0)			as weapon_count,
+			IFNULL(t.gpsCount,0)				as gps_count,
+			IFNULL(t.npname,'')					as leader_names,
+			IFNULL(t.npnameCount,0)		as leader_count,
+			IFNULL(t.dpname,'')                	as director_names,
+			IFNULL(t.dpnameCount,0)		as director_count,
+			IFNULL(t.communityCount,0)	as communityCount,
+			IFNULL(t.patrolAreaCount,0)		as patrolAreaCount,
+			IFNULL(t.bayonetCount,0)		as bayonetCount
 		from t_organ as org
 		left join
 		(
 			select 
 				d.org_id as org_id,
-				count(v.id) 			as vehicleCount,
-				count(p.id) 			as policeCount,
-				count(w.id)				as weaponCount,
-				count(g.id) 			as gpsCount,
+				count(v.id) 								as vehicleCount,
+				count(p.id) 								as policeCount,
+				count(w.id)								as weaponCount,
+				count(g.id) 								as gpsCount,
 				GROUP_CONCAT(n.npname) 	as npname,
-				count(n.npname)			as npnameCount,
+				count(n.npname)						as npnameCount,
 				GROUP_CONCAT(s.dpname) 	as dpname,
-				count(s.dpname)         as dpnameCount,
-				count(dt1.id) 			as communityCount,
-				count(dt2.id) 			as patrolAreaCount,
-				count(dt3.id) 			as bayonetCount
+				count(s.dpname)         				as dpnameCount,
+				count(dt1.id) 							as communityCount,
+				count(dt2.id) 							as patrolAreaCount,
+				count(dt3.id) 							as bayonetCount
 			from t_duty as d 
 			left join t_duty_item as di on d.id=di.duty_id
 			left join t_vehicle as v on di.item_id=v.id and di.item_type_id=1
