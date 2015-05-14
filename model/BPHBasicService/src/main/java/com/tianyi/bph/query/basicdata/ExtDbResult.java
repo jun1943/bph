@@ -179,6 +179,7 @@ public class ExtDbResult {
 	 * 对应GPS名称
 	 */
     private String policeGpsName;
+    private Integer jjcount;
     
     /***************************************************************************************
      * 武器
@@ -533,6 +534,12 @@ public class ExtDbResult {
 	}
 	public void setGpsIconUrl(String gpsIconUrl) {
 		this.gpsIconUrl = gpsIconUrl;
+	}
+	public Integer getJjcount() {
+		return jjcount;
+	}
+	public void setJjcount(Integer jjcount) {
+		this.jjcount = jjcount;
 	}
 	
 	
