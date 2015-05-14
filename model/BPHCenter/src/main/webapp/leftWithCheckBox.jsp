@@ -9,7 +9,8 @@
             <div class="title box">搜索</div>
             <div class="hide" onclick="arrowZoom();"></div>
             <div class="clear">
-            <div class="ty-input mt0">
+            <div class="ty-input mt0"> 
+<input  id="loginUserId" type="hidden" value="${requestScope.loginUserId}">
            <!-- <input id="searchOrganName" value="${requestScope.searchOrganName}" placeholder="等待输入..." class="k-textbox ty-left-search"/> --> 
             </div>
            <!-- <button class="ty-left-search-btn" onClick="queryOrgan()">搜索</button><br><br> --> 
@@ -31,10 +32,11 @@
 			 
 			 $(document).ready(function () {
 				 $.ajax({
-						url:"<%=basePath%>role/getModuleTreeByRoles.do",
+						url:"<%=basePath%>web/organx/jumpTree.do",
 						type:"post",
 						data:{
-							userId:"",
+							organId:$("#organId").val(),
+							userId:$("#loginUserId").val(),
 							sessionId:$("#token").val(),
 							random:Math.random()
 						}, 
