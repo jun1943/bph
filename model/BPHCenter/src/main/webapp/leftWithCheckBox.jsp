@@ -10,7 +10,8 @@
             <div class="hide" onclick="arrowZoom();"></div>
             <div class="clear">
             <div class="ty-input mt0"> 
-<input  id="loginUserId" type="hidden" value="${requestScope.loginUserId}">
+<input  id="loginUserId" type="hidden" value="${requestScope.loginUserId}"/>
+<input  id="checkedOrgIds" type="hidden" />
            <!-- <input id="searchOrganName" value="${requestScope.searchOrganName}" placeholder="等待输入..." class="k-textbox ty-left-search"/> --> 
             </div>
            <!-- <button class="ty-left-search-btn" onClick="queryOrgan()">搜索</button><br><br> --> 
@@ -48,11 +49,39 @@
 							 	checkboxes: {
 							        checkChildren: true//允许复选框多选
 							    },
+						    	check: organOnCheck,//check复选框 
 							    dataSource: [eval('(' + json_data + ')')]
 							}).data("kendoTreeView"); 
 						}
 					});
 			 });
 			 
+                function organOnCheck(e) {
+		            var checkedNodes = [],
+		              treeView = $("#treeview").data("kendoTreeView"),message;
+
+		            //treeToJson(treeView.dataSource.view());
+		            
+		            checkedNodeIds(treeView.dataSource.view(), checkedNodes);
+
+		            if (checkedNodes.length > 0) {
+		                message = checkedNodes.join(",");
+		            } else {
+		                message = "";
+		            }
+		            //$("#result").html(message);
+		            $("#checkedOrgIds").val(message);
+		        }
+                
+                function checkedNodeIds(nodes, checkedNodes) {
+    	            for (var i = 0; i < nodes.length; i++) {
+    	                if (nodes[i].checked) {
+    	                    checkedNodes.push(nodes[i].id);
+    	                } 
+    	                if (nodes[i].hasChildren) {
+    	                    checkedNodeIds(nodes[i].children.view(), checkedNodes);
+    	                }
+    	            }
+    	        }
 		</script>
 
