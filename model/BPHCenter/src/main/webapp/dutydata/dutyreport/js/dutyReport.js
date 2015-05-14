@@ -12,23 +12,27 @@
 	
 	var reportManage={
 		initCtl:function(){
-			$("#dteBeginDate").kendoDatePicker({
-    			value: new Date()
-			});
+			var bd=new Date();
+			var ed =new Date();
 			
+			$("#dteBeginDate").kendoDatePicker({
+    			value: bd
+			});
+			bd.setHours(0, 0);
+			ed.setHours(23,30);
 			$("#spnBeginTime").kendoTimePicker();
 			var spnBeginTime = $("#spnBeginTime").data("kendoTimePicker");
-			spnBeginTime.value("0:00");
+			spnBeginTime.value(bd);
 			
 			$("#spnEndTime").kendoTimePicker();
 			var spnEndTime = $("#spnEndTime").data("kendoTimePicker");
-			spnEndTime.value("24:00");
+			spnEndTime.value(ed);
 			
 			$('#tlSReport').kendoTreeList({
 				columns:[
-					{title : '机构树',	field : 'orgShortName',align : 'left',width : 120,expandable:true},
-					{title : '值班领导',	field : 'leaderNames',align : 'left',width : 80},
-					{title : '值班主任',	field : 'directorName',align : 'left',width : 80},
+					{title : '机构树',	field : 'orgDescription',align : 'left',width : 120,expandable:true},
+					{title : '值班领导',	field : 'leaderCount',align : 'left',width : 80},
+					{title : '值班主任',	field : 'directorCount',align : 'left',width : 80},
 					{title : '警力',	field : 'policeCount',align : 'right',width : 80},
 					{title : '警车',	field : 'vehicleCount',align : 'right',width : 80},
 					{title : '枪支',	field : 'weaponCount',align : 'right',width : 80},
@@ -186,7 +190,11 @@
 			}
 			
 			criteria.orgIds=[];
-			criteria.orgIds.push($("#organId").val());
+			var s=$("#checkedOrgIds").val();
+			criteria.orgIds=s.split(',');
+			
+
+			//criteria.orgIds.push($("#organId").val());
 
 			return criteria;
 
@@ -225,18 +233,58 @@
 						//var ss = buildReportTree(data);
 //						var tlRepport=$('#tlReport').data("kendoTreeList");
 //						tlRepport.setDataSource(ds);
-
+						$('#tlSReport').empty();
 						$('#tlReport').empty();
+						
+						var result=reportManage.fmtReportData(req.data);
+						
+						var sds= new kendo.data.TreeListDataSource({
+						 	data:result.sum,
+						 	schema: { 
+	                            model: {
+	                                id: "id",
+	                                expanded:true
+	                            }
+	                        }
+						});
+						
+						var ds= new kendo.data.TreeListDataSource({
+						 	data:result.list,
+						 	schema: { 
+	                            model: {
+	                                id: "id",
+	                                expanded:true
+	                            }
+	                        }
+						});
+						
+						$('#tlSReport').kendoTreeList({
+							dataSource:sds,
+							columns:[
+								{title : '机构树',	field : 'orgDescription',align : 'left',width : 120},
+								{title : '值班领导',	field : 'leaderCount',align : 'left',width : 80},
+								{title : '值班主任',	field : 'directorCount',align : 'left',width : 80},
+								{title : '警力',	field : 'policeCount',align : 'right',width : 80},
+								{title : '警车',	field : 'vehicleCount',align : 'right',width : 80},
+								{title : '枪支',	field : 'weaponCount',align : 'right',width : 80},
+								{title : '社区',	field : 'communityCount',align : 'right',width : 80},
+								{title : '巡区',	field : 'patrolAreaCount',align : 'right',width : 80},
+								{title : '卡点',	field : 'bayonetCount',align : 'right',width : 80}
+							]
+						});
 						
 						$('#tlReport').kendoTreeList({
 							dataSource:ds,
 							columns:[
 								{title : '机构树',	field : 'orgShortName',align : 'left',width : 120,expandable:true},
-
+								{title : '值班领导',	field : 'leaderNames',align : 'left',width : 80},
+								{title : '值班主任',	field : 'directorName',align : 'left',width : 80},
 								{title : '警力',	field : 'policeCount',align : 'right',width : 80},
 								{title : '警车',	field : 'vehicleCount',align : 'right',width : 80},
 								{title : '枪支',	field : 'weaponCount',align : 'right',width : 80},
-	
+								{title : '社区',	field : 'communityCount',align : 'right',width : 80},
+								{title : '巡区',	field : 'patrolAreaCount',align : 'right',width : 80},
+								{title : '卡点',	field : 'bayonetCount',align : 'right',width : 80}
 							]
 						});
 						
@@ -248,6 +296,59 @@
 		},
 		/*格式化返回数据*/
 		fmtReportData:function(data){
+			var ls=[];
+			var sum_ls=[];
+			var sumObj={};
 			
+			sumObj = {};
+			sumObj.id=0;
+			sumObj.parentId=null;
+			sumObj.orgCount1 = data.length;
+			sumObj.orgCount2 = 0;
+			sumObj.leaderCount = 0;
+			sumObj.directorCount = 0;
+			sumObj.policeCount = 0;
+			sumObj.vehicleCount = 0;
+			sumObj.weaponCount = 0;
+			sumObj.gpsCount = 0;
+			sumObj.communityCount = 0;
+			sumObj.patrolAreaCount = 0;
+			sumObj.bayonetCount = 0;
+			
+			var ids={};
+			
+			$.each(data, function(i, v) {
+				
+				if (v.policeCount > 0) {
+					sumObj.orgCount2++;
+				}
+				
+				sumObj.leaderCount += v.leaderCount;
+				sumObj.directorCount += v.directorCount;
+				sumObj.policeCount += v.policeCount;
+				sumObj.vehicleCount += v.vehicleCount;
+				sumObj.weaponCount += v.weaponCount;
+				sumObj.gpsCount += v.gpsCount;
+				sumObj.communityCount += v.communityCount;
+				sumObj.patrolAreaCount += v.patrolAreaCount;
+				sumObj.bayonetCount += v.bayonetCount;
+				
+				ids['key'+v.id] = v.id;
+			});
+			
+			sumObj.orgDescription=sumObj.orgCount2 + "/" + sumObj.orgCount1;
+			
+			$.each(data, function(i, v) {
+				if(ids['key'+v.parentId]==undefined){
+					v.parentId=null;
+				}
+			});
+			
+			var result={};
+			result.sum=[];
+			result.sum.push(sumObj);
+			result.list=data;
+			
+			return result;
 		}
 	};

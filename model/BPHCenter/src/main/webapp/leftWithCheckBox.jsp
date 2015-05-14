@@ -47,7 +47,7 @@
 							
 							$("#treeview").kendoTreeView({
 							 	checkboxes: {
-							        checkChildren: true//允许复选框多选
+							        checkChildren: false//允许复选框多选
 							    },
 						    	check: organOnCheck,//check复选框 
 							    dataSource: [eval('(' + json_data + ')')]
